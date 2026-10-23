@@ -1,0 +1,22 @@
+.env
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+tests/fixtures/battles/*.pkl
+!tests/fixtures/battles/gen9random_midbattle.pkl
+data/teams/*/_rejected/
+runs/
+
+# third-party reproductions and their environments (setup.sh in each bridge recreates them)
+external/*/repo/
+external/*/venv/
+external/*/.venv/
+# local model weights / caches
+*.safetensors
+!models/s1/**/adapters.safetensors
+.DS_Store
+
+# derived training sets (rebuild with scripts/s1_dataset.py from data/s1/experience)
+data/s1/*/train.jsonl
+data/s1/*/valid.jsonl

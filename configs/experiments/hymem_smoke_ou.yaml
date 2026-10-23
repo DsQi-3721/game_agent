@@ -1,0 +1,10 @@
+# Mac smoke test: one HyMem battle in gen9ou (mirror team from data/teams/gen9ou) vs Max Base Power.
+name: hymem_smoke_ou
+format: gen9ou
+seed: 0
+agents:
+  - {name: hymem, type: llm_hymem, model: qwen3.5-4b-mlx, params: {config_path: configs/hymem/mac.yaml}}
+  - {name: maxpow, type: max_base_power}
+augmentations: {}
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 1, anchors: [maxpow]}

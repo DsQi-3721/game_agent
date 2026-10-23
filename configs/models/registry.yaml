@@ -1,0 +1,77 @@
+# Model registry. API keys come from env vars (or project-root .env), never here.
+# litellm_id is the exact litellm model string (prefix matters).
+models:
+  deepseek-chat:
+    litellm_id: deepseek/deepseek-chat
+    api_key_env: DEEPSEEK_API_KEY
+    use_proxy: false
+    supports_tools: true
+    price_in: 0.27          # USD / 1M tokens (cache-miss); update as pricing changes
+    price_out: 1.10
+    notes: "domestic API, low latency, no proxy"
+
+  deepseek-reasoner:
+    litellm_id: deepseek/deepseek-reasoner
+    api_key_env: DEEPSEEK_API_KEY
+    use_proxy: false
+    supports_tools: false       # R1 historically lacks reliable tool-calling
+    price_in: 0.55
+    price_out: 2.19
+    notes: "reasoning model; use text-protocol ReAct"
+
+  # Local Qwen3.5-4B on this Mac via mlx_lm.server (bash scripts/serve_qwen35_mlx.sh).
+  # mlx resolves the request `model` field: "default_model" = the model loaded with
+  # --model; any other name makes it try to load/download that name.
+  qwen3.5-4b-mlx:
+    litellm_id: openai/default_model
+    api_base: http://127.0.0.1:8080/v1
+    api_key_env: LOCAL_LLM_API_KEY   # optional: a dummy key is sent when unset
+    use_proxy: false
+    supports_tools: true             # mlx auto-detects the qwen3_coder tool parser
+    context_window: 32768            # what we let a single context grow to on the Mac
+    max_tokens: 1024
+    timeout_s: 1200
+    max_retries: 0                   # mlx never cancels a request; retries would pile up
+    tokenizer_path: /Users/hoi/project/models/Qwen3.5-4B
+    # thinking is ON by default for Qwen3.5-4B -> always send the flag explicitly;
+    # agents override it per call. Never send `seed` to mlx (disables batching).
+    extra_body: {top_k: 20, chat_template_kwargs: {enable_thinking: false}}
+    notes: "local, free; ~15 tok/s bf16 on an M4"
+
+  # Same model on a GPU box via vLLM (bash scripts/serve_qwen35_vllm.sh). Edit api_base.
+  qwen3.5-4b-vllm:
+    litellm_id: openai/Qwen3.5-4B    # = --served-model-name
+    api_base: http://localhost:8001/v1   # 8000 is the local Showdown server
+    api_key_env: VLLM_API_KEY
+    use_proxy: false
+    supports_tools: true             # needs --enable-auto-tool-choice --tool-call-parser qwen3_coder
+    context_window: 65536
+    max_tokens: 2048
+    timeout_s: 600
+    max_retries: 0
+    tokenizer_path: /Users/hoi/project/models/Qwen3.5-4B
+    extra_body: {top_k: 20, chat_template_kwargs: {enable_thinking: false}}
+    notes: "GPU server; reasoning comes back in reasoning_content (--reasoning-parser qwen3)"
+
+  # Local vLLM (OpenAI-compatible). Set api_base to your server.
+  vllm-local:
+    litellm_id: openai/Qwen2.5-7B-Instruct
+    api_base: http://localhost:8001/v1
+    api_key_env: VLLM_API_KEY      # often a dummy like "EMPTY"
+    use_proxy: false
+    supports_tools: false          # depends on vLLM launch flags
+    notes: "edit litellm_id/api_base to match your vLLM deployment"
+
+  gpt-4o:
+    litellm_id: openai/gpt-4o
+    api_key_env: OPENAI_API_KEY
+    use_proxy: true
+    supports_tools: true
+    notes: "overseas API; set proxy at the call layer if required"
+
+  gemini-2.0-flash:
+    litellm_id: gemini/gemini-2.0-flash
+    api_key_env: GEMINI_API_KEY
+    use_proxy: true
+    supports_tools: true
+    notes: "overseas API; set proxy at the call layer if required"

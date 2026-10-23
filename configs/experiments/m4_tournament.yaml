@@ -1,0 +1,28 @@
+# M4 full integration: PokeLLMon (native) + PokeChamp (external minimax) + internal
+# baselines, round-robin on gen9ou. n_battles=1 to bound wall-time (PokeChamp minimax
+# is ~10-20 min/battle). Costs DeepSeek tokens (PokeLLMon samples + PokeChamp minimax).
+# Metamon is excluded here (needs a GPU box).
+name: m4_tournament
+format: gen9ou
+seed: 0
+agents:
+  - {name: random, type: random}
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+  - {name: pokellmon, type: llm_pokellmon, model: deepseek-chat, params: {n_samples: 2, temperature: 0.6}}
+  - name: pokechamp
+    type: pokechamp
+    kind: external
+    external:
+      launch_cmd: ["bash", "run.sh"]
+      cwd: external/pokechamp
+      username: PokeChampM4
+      ready_regex: "accepting challenges"
+      ready_timeout_s: 120
+      stall_timeout_s: 2400    # real minimax is slow (~20-40 min/battle)
+teams: {mode: mirror}
+evaluation:
+  mode: round_robin
+  n_battles: 1
+guardrails:
+  max_cost_usd: 5.0

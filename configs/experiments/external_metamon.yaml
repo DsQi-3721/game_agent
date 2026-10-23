@@ -1,0 +1,28 @@
+# Metamon (pretrained offline-RL transformer) vs our agents on gen9 OU.
+# *** RUN ON A LINUX+NVIDIA-GPU MACHINE *** (Metamon needs flash-attention 2).
+# Prereqs: bash external/metamon/setup.sh; Showdown server running on :8000.
+#   python -m arena.cli run configs/experiments/external_metamon.yaml
+name: external_metamon
+format: gen9ou
+seed: 0
+agents:
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+  - name: metamon
+    type: metamon
+    kind: external
+    external:
+      launch_cmd: ["bash", "run.sh"]
+      cwd: external/metamon
+      username: MetamonBot
+      env: {METAMON_CHECKPOINT: "SmallRLGen9Beta"}   # gen9-trained checkpoint
+      # Metamon's exact "accepting challenges" stdout line is unconfirmed (we hit the
+      # GPU wall before it). Tune this regex on the GPU box if startup times out.
+      ready_regex: "accepting|waiting for challenge|logged in|challenge|listening"
+      ready_timeout_s: 600          # first run downloads the checkpoint + builds the model
+teams: {mode: mirror}
+evaluation:
+  mode: anchored
+  n_battles: 4
+  anchors: [metamon]
+# no cost cap needed: the RL bot makes no LLM calls (our anchored opponents may).

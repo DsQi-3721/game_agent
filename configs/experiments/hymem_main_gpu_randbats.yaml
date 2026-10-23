@@ -1,0 +1,24 @@
+# GPU server (vLLM, qwen3.5-4b-vllm): HyMem vs the paper's baselines on gen9randombattle (paper Table 1 analogue).
+# Edit configs/models/registry.yaml -> qwen3.5-4b-vllm.api_base first.
+name: hymem_main_gpu_randbats
+format: gen9randombattle
+seed: 0
+agents:
+  - {name: hymem, type: llm_hymem, model: qwen3.5-4b-vllm, params: {config_path: configs/hymem/gpu.yaml}}
+  - {name: flat_react, type: llm_flat_react, model: qwen3.5-4b-vllm, params: {max_steps: 6}}
+  - {name: summary, type: llm_summary, model: qwen3.5-4b-vllm, params: {max_steps: 6, summary_threshold: 12000}}
+  - {name: react, type: llm_react, model: qwen3.5-4b-vllm, params: {max_steps: 4, temperature: 0.7}}
+  - {name: io, type: llm_io, model: qwen3.5-4b-vllm, params: {temperature: 0.7}}
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+augmentations:   # TOOL mode only: ReAct gets the same tools; nothing is injected passively
+  matchup: tool
+  damage_calc: tool
+  speed_check: tool
+  opponent_sets: tool
+  switch_eval: tool
+  type_matchup: tool
+  pokedex: tool
+  battle_log: tool
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 30, anchors: [maxpow, heuristic]}

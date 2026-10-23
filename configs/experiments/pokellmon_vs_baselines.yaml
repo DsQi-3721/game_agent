@@ -1,0 +1,19 @@
+# Native PokeLLMon (knowledge-augmented + consistency + feedback) vs baselines.
+# Costs DeepSeek API tokens. Dry-run first:
+#   arena run configs/experiments/pokellmon_vs_baselines.yaml --dry-run
+name: pokellmon_vs_baselines
+format: gen9randombattle
+seed: 0
+agents:
+  - {name: random, type: random}
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+  - {name: pokellmon, type: llm_pokellmon, model: deepseek-chat, params: {n_samples: 3, temperature: 0.7}}
+# PokeLLMon force-injects its own knowledge blocks; extra passive augments optional.
+teams: {mode: mirror}
+evaluation:
+  mode: anchored
+  n_battles: 3
+  anchors: [maxpow, heuristic]
+guardrails:
+  max_cost_usd: 1.0

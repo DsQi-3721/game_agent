@@ -1,0 +1,10 @@
+# Every game tool in TOOL mode (agents call them; nothing is injected passively).
+# HyMem's executor and the flat baselines use this same set by default.
+matchup: tool
+damage_calc: tool
+speed_check: tool
+opponent_sets: tool
+switch_eval: tool
+type_matchup: tool
+pokedex: tool
+battle_log: tool

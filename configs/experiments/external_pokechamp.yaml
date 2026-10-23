@@ -1,0 +1,26 @@
+# PokeChamp (external minimax bot) vs our agents on gen9 OU.
+# Prereqs: bash external/pokechamp/setup.sh; Showdown server running; LLM key.
+#   arena run configs/experiments/external_pokechamp.yaml
+name: external_pokechamp
+format: gen9ou
+seed: 0
+agents:
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+  - name: pokechamp
+    type: pokechamp
+    kind: external
+    external:
+      launch_cmd: ["bash", "run.sh"]
+      cwd: external/pokechamp
+      username: PokeChampBot
+      ready_regex: "accepting challenges|logged in|listening"
+      ready_timeout_s: 240
+      stall_timeout_s: 2400
+teams: {mode: mirror}
+evaluation:
+  mode: anchored
+  n_battles: 4
+  anchors: [pokechamp]      # everyone plays the external bot
+guardrails:
+  max_cost_usd: 2.0

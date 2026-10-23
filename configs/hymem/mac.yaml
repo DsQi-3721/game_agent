@@ -1,0 +1,10 @@
+# HyMem settings for local runs on an Apple-silicon Mac (Qwen3.5-4B via mlx_lm, ~15 tok/s).
+# Budgets are reduced from the paper; thinking stays off everywhere for speed.
+planner_steps: 3
+execute_turns: 3
+max_iso_per_decision: 1
+router: rule
+fold_mode: two_stage
+replan: false
+decision_budget_s: 900
+memory_max_tokens: 640

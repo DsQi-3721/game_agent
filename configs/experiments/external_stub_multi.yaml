@@ -1,0 +1,24 @@
+# Validates the unique-username-per-launch fix: the stub external plays TWO
+# sequential pairings (anchored). Each launch must get a fresh login name so the
+# second pairing doesn't inherit orphaned rooms. Both should complete (not 0-0).
+# Fast (stub battles ~30s). Needs the local Showdown server.
+name: external_stub_multi
+format: gen9randombattle
+seed: 0
+agents:
+  - {name: heuristic, type: simple_heuristics}
+  - {name: maxpow, type: max_base_power}
+  - name: stub
+    type: stub
+    kind: external
+    external:
+      launch_cmd: ["bash", "run.sh"]
+      cwd: external/_stub
+      username: ArenaStubBot
+      ready_regex: "accepting challenges"
+      ready_timeout_s: 60
+teams: {mode: mirror}
+evaluation:
+  mode: anchored
+  n_battles: 1
+  anchors: [stub]

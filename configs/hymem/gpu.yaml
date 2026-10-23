@@ -1,0 +1,19 @@
+# HyMem settings for GPU runs (vLLM): paper / reference values where they exist.
+# paper App. A.2: execute_turns=10, max_iso_reasoning=5 (per fold window here), max_iso_reasoning_turn=3
+planner_steps: 6
+execute_turns: 10
+max_iso_per_window: 5
+max_iso_per_decision: 2
+max_iso_turns: 3
+router: llm                # reference: LLM complexity router with rule fast path
+fold_mode: two_stage       # reference: planner self-summary -> 3 parallel aux extractions
+replan: true               # reference: low-confidence answers are re-checked once
+think_iso: true            # deliberate only inside isolated sessions
+iso_max_tokens: 2048
+iso_temperature: 1.0       # Qwen3.5 thinking-mode recommendation
+iso_top_p: 0.95
+planner_max_tokens: 512
+executor_max_tokens: 512
+fold_summary_max_tokens: 1024
+memory_max_tokens: 768
+decision_budget_s: 600

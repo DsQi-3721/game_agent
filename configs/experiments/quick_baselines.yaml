@@ -1,0 +1,10 @@
+# Fast, no-cost sanity experiment: baselines round-robin on random battles.
+name: quick_baselines
+format: gen9randombattle
+seed: 0
+agents:
+  - {name: random, type: random}
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+teams: {mode: mirror}
+evaluation: {mode: round_robin, n_battles: 4}

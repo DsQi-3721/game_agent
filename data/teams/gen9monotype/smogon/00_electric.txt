@@ -1,0 +1,62 @@
+Zapdos @ Heavy-Duty Boots
+Ability: Pressure
+Tera Type: Electric
+EVs: 16 HP / 240 SpA / 252 Spe
+Timid Nature
+IVs: 0 Atk
+- Discharge
+- Hurricane
+- Roost
+- Substitute
+
+Iron Hands @ Shuca Berry
+Ability: Quark Drive
+Tera Type: Fighting
+EVs: 116 Def / 252 SpD / 140 Spe
+Adamant Nature
+- Drain Punch
+- Ice Punch
+- Swords Dance
+- Thunder Punch
+
+Magnezone @ Assault Vest
+Ability: Analytic
+Tera Type: Electric
+EVs: 168 HP / 68 Def / 60 SpA / 204 SpD / 8 Spe
+Modest Nature
+- Flash Cannon
+- Thunderbolt
+- Tri Attack
+- Volt Switch
+
+Regieleki @ Heavy-Duty Boots
+Ability: Transistor
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Rapid Spin
+- Thunderbolt
+- Thunder Wave
+- Volt Switch
+
+Rotom-Wash @ Leftovers
+Ability: Levitate
+Tera Type: Electric
+EVs: 212 HP / 48 Def / 248 Spe
+Timid Nature
+IVs: 0 Atk
+- Hydro Pump
+- Nasty Plot
+- Stored Power
+- Substitute
+
+Sandy Shocks @ Choice Scarf
+Ability: Protosynthesis
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+IVs: 0 Atk
+- Earth Power
+- Power Gem
+- Stealth Rock
+- Volt Switch

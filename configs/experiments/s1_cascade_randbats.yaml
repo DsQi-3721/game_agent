@@ -1,0 +1,17 @@
+# System-1 loop, step "deploy": a local student answers first, the teacher (Jev) only the turns the
+# student's gate rejects (cascade); both are recorded -> the next iteration's data.
+#   python scripts/s1_serve.py --model <base> --adapter runs/s1_models/<champion> --port 8090   # in another shell
+#   python -m arena.cli run configs/experiments/s1_cascade_randbats.yaml --emit-events
+name: s1_cascade_randbats
+format: gen9randombattle
+seed: 2
+agents:
+  - name: cascade
+    type: jev_fast
+    params: {jev_model: jev-1.13.0, student_url: "http://127.0.0.1:8090", student_model: champion,
+             s1_timeout_s: 20.0, record: true}
+  - {name: random, type: random}
+  - {name: heuristic, type: simple_heuristics}
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 3, anchors: [random, heuristic]}
+guardrails: {max_cost_usd: 1.0}

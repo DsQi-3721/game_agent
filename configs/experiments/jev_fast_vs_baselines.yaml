@@ -1,0 +1,21 @@
+# System 1 alone: Jev (TypeSafe System One) plays every decision from code-computed battle facts
+# ("split" layout: attack-or-switch Noul + best move + best switch-in, both option orders).
+#   jev113 / jev114   every decision is Jev's (the gate is only logged)
+#   jev113_gated      Jev plays the turns its gate accepts, SimpleHeuristics the escalated ones
+#                     (a cheap stand-in for System 2: does routing on Jev's confidence help?)
+# Measures win rate vs the baselines AND per-decision latency. Needs TYPESAFE_API_KEY in .env
+# (~$0.0002 per decision).
+#   python -m arena.cli run configs/experiments/jev_fast_vs_baselines.yaml --emit-events
+name: jev_fast_vs_baselines
+format: gen9randombattle
+seed: 0
+agents:
+  - {name: jev113, type: jev_fast, params: {jev_model: jev-1.13.0}}
+  - {name: jev114, type: jev_fast, params: {jev_model: jev-1.14.0}}
+  - {name: jev113_gated, type: jev_fast, params: {jev_model: jev-1.13.0, escalate: heuristic, max_hard: 1.0}}
+  - {name: random, type: random}
+  - {name: maxpow, type: max_base_power}
+  - {name: heuristic, type: simple_heuristics}
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 10, anchors: [random, maxpow, heuristic]}
+guardrails: {max_cost_usd: 1.0}
