@@ -1,8 +1,0 @@
-# Augmentation modes: off | passive | tool
-# "grounded" preset: give the agent damage/type/stat/ability info passively,
-# and let it actively query the Pokedex.
-damage_calc: passive
-type_matchup: passive
-base_stats: passive
-ability: passive
-pokedex: tool

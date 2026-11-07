@@ -7,6 +7,13 @@ pretrained checkpoints on HF [`jakegrigsby/metamon`](https://huggingface.co/jake
 
 We run a **pretrained** policy as an opponent — no retraining.
 
+**On the GPU server (2026-10-31):** `run.sh` runs **Kakuna** — the current best Metamon policy, also the teacher
+of our student's action labels — through `kakuna_local.py accept`: local weights (`METAMON_WEIGHTS`, default
+`/data/models/metamon`), amago's flex attention instead of flash-attn (no wheel for this torch; same 96-step
+window), the Showdown port taken from `ARENA_SERVER`, `ARENA_TEAM_FILE` as its team (mirror teams), no battle
+timer, and the ready line `accepting challenges` printed only once it is logged in. `METAMON_CHECKPOINT` is no
+longer read (`METAMON_KAKUNA_EPOCH`, default 34). The original HF-download flow below is kept for reference.
+
 ## ⚠️ Requires a Linux machine with an NVIDIA GPU
 
 Metamon's amago Transformer needs **flash-attention 2 (CUDA-only)**. It installs

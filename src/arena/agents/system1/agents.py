@@ -21,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import contextvars
 import json
+import random
 import time
 from collections import defaultdict
 from dataclasses import dataclass, fields
@@ -35,6 +36,7 @@ from arena.agents.hymem.agent import HyMemAgent
 from arena.agents.hymem.memory import render_memory, render_tool_memory
 from arena.agents.hymem.messages import clip
 from arena.agents.hymem.planner import Planner
+from arena.agents.hymem.session import DecisionStats, stats_scope
 from arena.agents.system1.controller import S1Controller, S1Executor, S1Router, facts_block
 from arena.agents.system1.decider import FastDecider, FastDecision, RouteConfig, obvious_choice
 from arena.agents.system1.facts import build_option_facts, build_state, option_key
@@ -66,6 +68,7 @@ S1_PARAMS = [
     Param("s1_timeout_s", float, 8.0, help="timeout of one System-One request", label="S1 timeout (s)"),
     Param("mode", str, "split", choices=["split", "flat"],
           help="question layout: attack-or-switch + best move / switch-in, or one flat Choice", label="Layout"),
+    Param("history_events", int, 0, help="completed decisions included in the policy input", label="History decisions"),
     Param("min_branch_confidence", float, 0.3, help="split: |2 P(attack) - 1| needed to act fast",
           label="Min attack/switch confidence"),
     Param("teacher", bool, True, help="use the TypeSafe API (Jev) as the teacher tier", label="Teacher (Jev)"),
@@ -76,10 +79,17 @@ S1_PARAMS = [
     Param("student_min_margin", float, 0.15, label="Student min margin"),
     Param("student_min_branch_confidence", float, 0.3, label="Student min attack/switch confidence"),
     Param("record", bool, True, help="write the System-1 experience log (s1exp_<agent>.jsonl)", label="Record"),
+    Param("shadow_rate", float, 0.0, help="share of the turns the student answers alone that are also sent to the "
+          "teacher in the background (role 'shadow'): the student's online precision, plus labels", label="Shadow rate"),
 ]
+JEV_USD_PER_TOKEN = 0.042e-6          # TypeSafe Jev: $0.042 per 1M input tokens, output free
 TIER0 = Param("tier0", bool, False, help="play a sure first-strike KO without asking any model", label="Tier-0 rule")
 
 _BATTLE: contextvars.ContextVar = contextvars.ContextVar("s1_battle", default=None)
+# monotonic deadline of the System-2 work in flight: the planner turns answer-only before it and every LLM call
+# inside it is bounded by it, so the budget degrades the decision instead of killing it half-way
+_DEADLINE: contextvars.ContextVar = contextvars.ContextVar("s2_deadline", default=None)
+DEADLINE_SPACES = ("planner", "executor", "iso", "router", "distill")
 
 
 @dataclass
@@ -93,6 +103,7 @@ class S1Config:
     ask_hard: bool = True
     s1_timeout_s: float = 8.0
     mode: str = "split"
+    history_events: int = 0
     min_branch_confidence: float = 0.3
     tier0: bool = False
     teacher: bool = True
@@ -102,6 +113,7 @@ class S1Config:
     student_min_margin: float = 0.15
     student_min_branch_confidence: float = 0.3
     record: bool = True
+    shadow_rate: float = 0.0
     # dual-process only
     fast_path: bool = True
     slow_hint: bool = True
@@ -109,10 +121,13 @@ class S1Config:
     memory_router: str = "off"
     fast_memory: bool = False
     mem_timeout_s: float = 20.0
+    mem_min_valid: Optional[float] = None
     shared_facts: bool = False
     step_control: bool = False
     s1_router: bool = False
     s1_executor: bool = False
+    answer_reserve_s: float = 8.0
+    fold_timeout_s: float = 180.0
 
     @classmethod
     def pop_from(cls, params: dict) -> "S1Config":
@@ -124,11 +139,11 @@ class S1Config:
             return RouteConfig(model=self.student_model or "local", min_confidence=self.student_min_confidence,
                                min_margin=self.student_min_margin, max_hard=self.max_hard,
                                require_consistency=self.require_consistency, debias=self.debias,
-                               ask_hard=self.ask_hard, mode=self.mode,
+                               ask_hard=self.ask_hard, mode=self.mode, history_events=self.history_events,
                                min_branch_confidence=self.student_min_branch_confidence)
         return RouteConfig(model=self.jev_model, min_confidence=self.min_confidence, min_margin=self.min_margin,
                            max_hard=self.max_hard, require_consistency=self.require_consistency,
-                           debias=self.debias, ask_hard=self.ask_hard, mode=self.mode,
+                           debias=self.debias, ask_hard=self.ask_hard, mode=self.mode, history_events=self.history_events,
                            min_branch_confidence=self.min_branch_confidence)
 
 
@@ -156,6 +171,41 @@ class S1Stack:
         self.deciders = [(tier, FastDecider(client, cfg.route_config(tier)))
                          for tier, client in (("student", self.student), ("teacher", self.teacher)) if client]
         self.primary = self.teacher or self.student          # controller / memory-router client
+        self.shadow = None
+        if self.teacher is not None and self.student is not None and cfg.shadow_rate > 0:
+            self.shadow = RecordingClient(self.teacher.inner, recorder, backend=self.teacher.backend, role="shadow")
+        self._rng = random.Random(0)
+        self._background: set = set()
+        self.n_shadow = 0
+
+    def jev_input_tokens(self) -> int:
+        """Every TypeSafe request of this agent (decisions, shadows, and -- through ``primary`` -- the
+        memory router and controller), including background ones that have completed."""
+        return sum(c.input_tokens_total for c in (self.teacher, self.shadow)
+                   if c is not None and c.backend.startswith("typesafe"))
+
+    def jev_cost_usd(self) -> float:
+        return self.jev_input_tokens() * JEV_USD_PER_TOKEN
+
+    def _shadow_teacher(self, battle, options, extra_facts) -> None:
+        """Ask the teacher about a turn the student answered alone -- in the background, the move
+        is already played: measures the student's online precision and adds a label."""
+        teacher = next(d for t, d in self.deciders if t == "teacher")
+        state, questions, _ = teacher.build_request(battle, options, extra_facts=extra_facts)   # battle as of now
+
+        async def run():
+            try:
+                with s1_meta(purpose="action", tier="shadow"):
+                    await asyncio.wait_for(self.shadow.system_one(state, questions, model=teacher.cfg.model),
+                                           timeout=self.cfg.s1_timeout_s)
+            except asyncio.CancelledError:
+                raise
+            except Exception:  # noqa: BLE001  (logged as s1_error by the recording client)
+                pass
+        self.n_shadow += 1
+        task = asyncio.ensure_future(run())
+        self._background.add(task)
+        task.add_done_callback(self._background.discard)
 
     async def decide(self, battle, options, *, extra_facts=None) -> tuple[Optional[FastDecision], str, list]:
         """-> (decision of the accepting tier, or the last tier's for hint / fallback; accepting tier
@@ -173,6 +223,8 @@ class S1Stack:
                 continue
             tried.append((tier, fd, ""))
             if fd.accept:
+                if tier == "student" and self.shadow is not None and self._rng.random() < self.cfg.shadow_rate:
+                    self._shadow_teacher(battle, options, extra_facts)
                 return fd, tier, tried
         last = next((fd for _t, fd, _e in reversed(tried) if fd is not None), None)
         return last, "", tried
@@ -217,7 +269,12 @@ def _key_of(options, order: BattleOrder) -> Optional[str]:
                                      help="order on API error / timeout", label="Fallback"),
                         Param("escalate", str, "none", choices=["none", "heuristic"],
                               help="who plays the turns the gate escalates (a cheap stand-in for System 2)",
-                              label="Escalate to")],
+                              label="Escalate to"),
+                        Param("team_preview", str, "lead_prior", choices=["lead_prior", "random"],
+                              help="OU lead / team order policy", label="Team preview"),
+                        Param("opponent_model", str, "", choices=["", "team", "prior"],
+                              help="opponent set model (empty: ARENA_OPPONENT_MODEL, default team)",
+                              label="Opponent model")],
 )
 class JevFastAgent(Agent):
     """Pure System 1: one typed request per decision (student -> teacher cascade when configured)."""
@@ -225,8 +282,11 @@ class JevFastAgent(Agent):
     name = "jev_fast"
 
     def __init__(self, ctx: Optional[AgentContext] = None, *, client=None, student_client=None,
-                 fallback: str = "random", escalate: str = "none", **params):
+                 fallback: str = "random", escalate: str = "none", team_preview: str = "lead_prior",
+                 opponent_model: str = "", **params):
         super().__init__(ctx)
+        self.team_preview = team_preview
+        self.opponent_model = opponent_model or None
         self.s1 = S1Config.pop_from(params)
         if params:
             raise TypeError(f"unknown jev_fast params: {sorted(params)}")
@@ -255,6 +315,8 @@ class JevFastAgent(Agent):
 
     async def _act(self, battle: AbstractBattle, decision_id: str) -> BattleOrder:
         t0, t_wall = time.perf_counter(), time.time()
+        from arena.s1.policy_data import begin_policy_decision, record_policy_action
+        begin_policy_decision(battle, self.s1.history_events)
         options = legal_options(battle)
         key = _request_key(battle)
         fd: Optional[FastDecision] = None
@@ -290,15 +352,15 @@ class JevFastAgent(Agent):
                 final, fallback = _fallback_order(battle, self.fallback), True
         self.n_decisions += 1
         self.n_fallbacks += int(fallback)
+        record_policy_action(battle, _key_of(options, final), self.s1.history_events)
         ranked = []
         for t, f, _e in tried:
             if f is None:
                 continue
             self.metrics[f"{t}_requests"] += 1
             self.metrics[f"{t}_accepted"] += int(f.accept)
-            if t == "teacher":
-                self.tokens_in += f.input_tokens
-                self.cost_usd += f.input_tokens * 0.042e-6
+        self.tokens_in = self.stack.jev_input_tokens()
+        self.cost_usd = self.stack.jev_cost_usd()
         if fd is not None:
             by_key = {f.key: f.option.order.message for f in fd.facts}
             ranked = [by_key[k] for k, _ in fd.ranked(len(fd.probabilities))]
@@ -338,6 +400,9 @@ class JevFastAgent(Agent):
         return final
 
     def on_battle_end(self, battle: AbstractBattle) -> None:
+        from arena.s1.policy_data import finish_policy_history
+        finish_policy_history(battle, self.s1.history_events)
+        self.tokens_in, self.cost_usd = self.stack.jev_input_tokens(), self.stack.jev_cost_usd()
         if self.recorder is not None:
             with s1_meta(agent=self.agent_name, battle_tag=battle.battle_tag):
                 self.recorder.outcome(won=bool(battle.won), turns=battle.turn,
@@ -345,7 +410,40 @@ class JevFastAgent(Agent):
         self._n.pop(battle.battle_tag, None)
 
     def extra_metrics(self) -> dict:
-        return {k: (round(v, 4) if isinstance(v, float) else v) for k, v in self.metrics.items()}
+        out = {k: (round(v, 4) if isinstance(v, float) else v) for k, v in self.metrics.items()}
+        if self.stack.n_shadow:
+            out["shadow_requests"] = self.stack.n_shadow
+        return out
+
+
+@register_agent("s1_policy_collect", is_llm=True, needs_model=False,
+                label="Student policy trajectory collection", params=S1_PARAMS + [TIER0])
+class PolicyCollectionAgent(JevFastAgent):
+    """Record native pre-action inputs and the action actually submitted by the student."""
+
+    async def _act(self, battle: AbstractBattle, decision_id: str) -> BattleOrder:
+        from copy import deepcopy
+        from arena.agents.system1.decider import RouteConfig
+        from arena.s1.convert_metamon import action_key
+        from arena.s1.policy_data import capture_universal
+
+        options = legal_options(battle)
+        state, questions, facts = FastDecider(None, RouteConfig(
+            mode="flat", debias=False, ask_hard=False, history_events=self.s1.history_events,
+        )).build_request(battle, options)
+        universal = capture_universal(battle)
+        snapshot = {"state": state, "question": questions.get("best"),
+                    "universal": universal, "request": deepcopy(battle._last_request),
+                    "keys": [f.key for f in facts],
+                    "action_map": [action_key(universal, i) for i in range(13)],
+                    "public_prefix": [list(event) for event in battle._replay_data]}
+        final = await super()._act(battle, decision_id)
+        played = _key_of(options, final)
+        if self.recorder is not None:
+            self.recorder.write({"type": "policy", "battle_tag": battle.battle_tag,
+                                 "decision_id": decision_id, "turn": battle.turn,
+                                 "played_key": played, "order": final.message, **snapshot})
+        return final
 
 
 class _DualPlanner(Planner):
@@ -376,6 +474,8 @@ DUAL_PARAMS = [
           label="Memory router"),
     Param("fast_memory", bool, False, help="give System 1 the routed memory as known facts", label="Fast memory"),
     Param("mem_timeout_s", float, 20.0, help="timeout of one memory-routing request", label="Memory timeout (s)"),
+    Param("mem_min_valid", float, None, help="drop a factual memory below this P(still true) (default: the "
+          "router's 0.1, set for Jev; a local student scores on its own scale)", label="Memory min P(valid)"),
     Param("shared_facts", bool, False, help="show the planner the option facts System 1 decides from",
           label="Shared facts"),
     Param("step_control", bool, False, help="System One decides whether the planner answers right away",
@@ -384,6 +484,9 @@ DUAL_PARAMS = [
           label="S1 task router"),
     Param("s1_executor", bool, False, help="System One plans the executor's tool calls (no executor LLM)",
           label="S1 executor"),
+    Param("answer_reserve_s", float, 8.0, help="the planner answers directly once less than this is left of the "
+          "System-2 budget", label="Answer reserve (s)"),
+    Param("fold_timeout_s", float, 180.0, help="time cap of one background fold", label="Fold timeout (s)"),
 ]
 
 
@@ -397,6 +500,17 @@ class HyMemDualAgent(HyMemAgent):
 
     name = "llm_hymem_dual"
 
+    @property
+    def cost_usd(self) -> float:
+        """HyMem's LLM spend (``LLMAgent`` adds to it) + every Jev request of the System-1 layer."""
+        stack = self.__dict__.get("stack")
+        return self.__dict__.get("_llm_cost_usd", 0.0) + (stack.jev_cost_usd() if stack is not None else 0.0)
+
+    @cost_usd.setter
+    def cost_usd(self, value: float) -> None:
+        stack = self.__dict__.get("stack")
+        self._llm_cost_usd = value - (stack.jev_cost_usd() if stack is not None else 0.0)
+
     def __init__(self, ctx: Optional[AgentContext] = None, *, model: str = "qwen3.5-4b-mlx",
                  jev_client=None, student_client=None, **params):
         params.setdefault("tier0", True)
@@ -405,12 +519,15 @@ class HyMemDualAgent(HyMemAgent):
         self.recorder = ExperienceRecorder.beside(self.ctx.logger) if self.s1.record else None
         self.stack = S1Stack(self.s1, self.recorder, teacher_client=jev_client, student_client=student_client)
         self.jev = self.stack.primary
-        self.mrouter = (MemoryRouter(self.jev, RouterConfig(model=self.s1.jev_model))
+        rcfg = RouterConfig(model=self.s1.jev_model)
+        if self.s1.mem_min_valid is not None:
+            rcfg.min_valid = self.s1.mem_min_valid
+        self.mrouter = (MemoryRouter(self.jev, rcfg)
                         if self.s1.memory_router == "jev" else None)
         self.controller = S1Controller(self.jev, self.s1.jev_model)
         self.planner = _DualPlanner(self)
         if self.s1.s1_router:
-            self.router = S1Router(self.jev, self.s1.jev_model, battle_fn=_BATTLE.get)
+            self.router = S1Router(self.jev, self.s1.jev_model, battle_fn=_BATTLE.get, timeout_s=self.s1.s1_timeout_s)
         if self.s1.s1_executor:
             self.executor = S1Executor(self)
         self._hints: dict[str, str] = {}
@@ -421,6 +538,12 @@ class HyMemDualAgent(HyMemAgent):
         return self.ctx.logger.agent_name if self.ctx.logger is not None else self.name
 
     # --- memory views ------------------------------------------------------------------
+    def _ingest(self, sess, battle) -> None:
+        super()._ingest(sess, battle)
+        if self.s1.history_events and not sess.closed:
+            from arena.s1.policy_data import begin_policy_decision
+            begin_policy_decision(battle, self.s1.history_events)
+
     def memory_text(self, sess, space: str) -> str:
         routed: Optional[RoutedMemory] = getattr(sess, "routed", None)
         if self.mrouter is None or routed is None:
@@ -429,7 +552,7 @@ class HyMemDualAgent(HyMemAgent):
 
     async def reroute(self, sess, battle) -> None:
         """After a fold the memory was rewritten: route it again before the planner continues."""
-        await self._route_memory(sess, battle, collect_items(sess.store), memory_version(sess.store))
+        await self._route_memory(sess, battle, collect_items(sess.store), memory_version(sess.store) + (battle.turn,))
         if getattr(sess, "routed", None) is not None:
             self._record_routed(sess, sess.routed)
 
@@ -450,9 +573,26 @@ class HyMemDualAgent(HyMemAgent):
         return "\n".join(x for x in (base, shared, hint) if x)
 
     # --- System 1 inside the planner -----------------------------------------------------------
+    async def call(self, space: str, messages: list[dict], *, tools=None, sess=None, extra_body=None):
+        """HyMem's LLM call, bounded by the System-2 deadline when one is set."""
+        dl = _DEADLINE.get()
+        if dl is None or space not in DEADLINE_SPACES:
+            return await super().call(space, messages, tools=tools, sess=sess, extra_body=extra_body)
+        left = dl[0] - time.monotonic()
+        if left <= 0.05:
+            raise asyncio.TimeoutError(f"System-2 budget spent before a {space} call")
+        return await asyncio.wait_for(super().call(space, messages, tools=tools, sess=sess, extra_body=extra_body), timeout=left)
+
     async def answer_now(self, sess, battle, options, step: int) -> bool:
-        if not self.s1.step_control or step != 0:
-            return False
+        if self.s1.step_control and step == 0 and await self._step_control(sess, battle, options):
+            return True
+        dl = _DEADLINE.get()
+        if dl is not None and dl[0] - time.monotonic() < min(self.s1.answer_reserve_s, 0.25 * dl[1]):
+            sess.stats.extra["answer_only_by"] = "deadline"
+            return True
+        return False
+
+    async def _step_control(self, sess, battle, options) -> bool:
         try:
             mode, p_answer = await asyncio.wait_for(
                 self.controller.step_mode(battle, options, ranking=self._ranking.get(battle.battle_tag)),
@@ -465,13 +605,18 @@ class HyMemDualAgent(HyMemAgent):
         sess.stats.extra["s1_step"] = mode
         sess.stats.extra["s1_p_answer_now"] = round(p_answer, 4)
         go = mode == "answer_now" and p_answer >= self.controller.min_answer_now
+        sess.stats.extra["s1_step_go"] = go
+        if go:
+            sess.stats.extra["answer_only_by"] = "step_control"
         self.metrics["step_answer_now"] += int(go)
         return go
 
     # --- the dual-process decision ----------------------------------------------------------
     async def _route_memory(self, sess, battle, items: list, version: tuple) -> None:
         """One memory-routing request (its own request: at ~140 questions / ~26k tokens it takes
-        1-4 s, so riding on the ~0.4 s decision request would slow every fast turn down)."""
+        1-4 s, so riding on the ~0.4 s decision request would slow every fast turn down). Results are applied in
+        request order: a slow, older routing never overwrites a newer one."""
+        sess.route_seq = seq = getattr(sess, "route_seq", 0) + 1
         try:
             with s1_meta(purpose="memory"):
                 routed = await asyncio.wait_for(self.mrouter.route(build_state(battle), items, version),
@@ -482,7 +627,10 @@ class HyMemDualAgent(HyMemAgent):
             self.metrics["mem_errors"] += 1
             sess.mem_error = f"{type(e).__name__}: {clip(str(e), 120)}"
             return
-        sess.routed = routed
+        if seq < getattr(sess, "routed_seq", 0):
+            self.metrics["mem_routes_stale"] += 1
+            return
+        sess.routed, sess.routed_seq = routed, seq
         self.metrics["mem_routes"] += 1
         self.metrics["mem_items_sum"] += len(routed.items)
         self.metrics["mem_kept_sum"] += sum(1 for r in routed.items if r.kept)
@@ -497,13 +645,17 @@ class HyMemDualAgent(HyMemAgent):
 
         async def run():
             t0 = time.perf_counter()
+            sess.in_flight += 1
             try:
-                with s1_meta(purpose="memory"):
-                    await self.planner.fold(sess, battle, options, reason)
+                with s1_meta(purpose="memory"), stats_scope(DecisionStats(t_start=time.time())):
+                    await asyncio.wait_for(self.planner.fold(sess, battle, options, reason),
+                                           timeout=self.s1.fold_timeout_s)
             except asyncio.CancelledError:
                 raise
             except Exception:  # noqa: BLE001  (memory stays as it was; the trigger asks again later)
                 self.metrics["fold_errors"] += 1
+            finally:
+                sess.in_flight -= 1
             self.metrics["background_fold_s_sum"] += time.perf_counter() - t0
         sess.fold_task = asyncio.ensure_future(run())
 
@@ -526,7 +678,7 @@ class HyMemDualAgent(HyMemAgent):
                 return sure.option, 1.0, "", ""
         fd: Optional[FastDecision] = None
         if self.mrouter is not None:
-            version = memory_version(sess.store)
+            version = memory_version(sess.store) + (battle.turn,)      # "still true now?" changes with the turn
             routed = getattr(sess, "routed", None)
             pending = getattr(sess, "route_task", None)
             items = collect_items(sess.store)
@@ -567,8 +719,10 @@ class HyMemDualAgent(HyMemAgent):
             self._ranking[battle.battle_tag] = [[k, round(p, 3)] for k, p in fd.ranked(3)]
         budget = c.slow_budget_s or self.cfg.decision_budget_s * 2
         sess.deciding = True
+        deadline_token = _DEADLINE.set((time.monotonic() + budget, budget))
         try:
-            opt, conf, raw = await asyncio.wait_for(self.planner.decide(sess, battle, options), timeout=budget)
+            # the planner answers before the deadline and its calls are bounded by it; the outer cap is a backstop
+            opt, conf, raw = await asyncio.wait_for(self.planner.decide(sess, battle, options), timeout=budget + 15)
             if opt is None and fd is not None:
                 st.extra["route"] = "slow_failed_fast"
                 m["slow_failed_fast"] += 1
@@ -590,12 +744,15 @@ class HyMemDualAgent(HyMemAgent):
                 return fd.option, fd.confidence, "", err
             return None, None, "", err
         finally:
+            _DEADLINE.reset(deadline_token)
             sess.deciding = False
             self._hints.pop(battle.battle_tag, None)
             self._ranking.pop(battle.battle_tag, None)
             self._schedule_fold(sess, battle, options)
 
     def _finish(self, sess, battle, options, final: BattleOrder, fallback: bool, conf, t0: float, **kw) -> BattleOrder:
+        from arena.s1.policy_data import record_policy_action
+        record_policy_action(battle, _key_of(options, final), self.s1.history_events)
         out = super()._finish(sess, battle, options, final, fallback, conf, t0, **kw)
         if self.recorder is not None and not kw.get("recall"):
             ex = sess.stats.extra
@@ -609,10 +766,20 @@ class HyMemDualAgent(HyMemAgent):
                                        latency_s=round(time.monotonic() - t0, 3), n_options=len(options))
         return out
 
+    def extra_metrics(self) -> dict:
+        out = super().extra_metrics()
+        out["jev_input_tokens"] = self.stack.jev_input_tokens()
+        out["jev_cost_usd"] = round(self.stack.jev_cost_usd(), 5)
+        if self.stack.n_shadow:
+            out["shadow_requests"] = self.stack.n_shadow
+        return out
+
     def on_battle_end(self, battle: AbstractBattle) -> None:
         sess = self.sessions.get(battle.battle_tag)
         decisions = sess.decision_idx if sess is not None else 0
         super().on_battle_end(battle)
+        from arena.s1.policy_data import finish_policy_history
+        finish_policy_history(battle, self.s1.history_events)
         if self.recorder is not None:
             with s1_meta(agent=self.agent_name, battle_tag=battle.battle_tag):
                 self.recorder.outcome(won=bool(battle.won), turns=battle.turn, decisions=decisions)

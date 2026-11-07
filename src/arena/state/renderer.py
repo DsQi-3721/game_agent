@@ -2,8 +2,8 @@
 
 ``StateRenderer`` is the swappable representation module (a research variable).
 ``DefaultRenderer`` produces a compact, human-readable partial-observability view
-(our side fully known; opponent only as revealed). ``full_info=True`` additionally
-surfaces the opponent's team-preview roster. Passive augmentation results (M4) are
+(our side fully known; opponent as revealed, plus its team preview where the format
+shows one -- that is public, not privileged). Passive augmentation results (M4) are
 appended verbatim.
 """
 
@@ -16,6 +16,7 @@ from poke_env.battle.abstract_battle import AbstractBattle
 
 from arena.state.observe import (
     active_boosts,
+    bench_seen_turn,
     known_ability,
     known_item,
     mon_label,
@@ -66,6 +67,9 @@ class DefaultRenderer(StateRenderer):
         if battle.available_moves:
             lines.append("  Moves:")
             for mv in battle.available_moves:
+                if mv.id == "recharge":
+                    lines.append("    - recharge (forced: your Pokemon must recharge this turn and cannot act)")
+                    continue
                 pp = f" (pp {mv.current_pp}/{mv.max_pp})" if mv.max_pp else ""
                 lines.append(f"    - {mv.id} [{mv.type.name} {mv.category.name.lower()} bp{mv.base_power}]{pp}")
         if battle.available_switches:
@@ -81,6 +85,8 @@ class DefaultRenderer(StateRenderer):
                 lines.append(f"  Ability (revealed): {opp.ability}")
             if known_item(opp):
                 lines.append(f"  Item (revealed): {opp.item}")
+            elif opp.item is None:
+                lines.append("  Item: none (lost or used up)")
             mv = revealed_moves(opp)
             if mv:
                 lines.append(f"  Revealed moves: {', '.join(mv)}")
@@ -90,13 +96,15 @@ class DefaultRenderer(StateRenderer):
         if my_bench:
             lines.append("")
             lines.append("Your bench: " + ", ".join(my_bench))
-        opp_seen = [mon_label(p) for p in battle.opponent_team.values() if not p.active]
+        opp_seen = [mon_label(p)[:-1] + (f", last seen turn {t})" if (t := bench_seen_turn(battle, p)) is not None
+                                          else ")")
+                    for p in battle.opponent_team.values() if not p.active]
         if opp_seen:
             lines.append("Opponent revealed (bench): " + ", ".join(opp_seen))
 
-        if full_info and battle.teampreview_opponent_team:
+        if battle.teampreview_opponent_team:     # public at team preview (OU): not privileged information
             roster = ", ".join(sorted(p.species for p in battle.teampreview_opponent_team))
-            lines.append(f"[full-info] Opponent full roster: {roster}")
+            lines.append(f"Opponent team preview: {roster}")
 
         for aug in passive_augments:
             lines.append("")

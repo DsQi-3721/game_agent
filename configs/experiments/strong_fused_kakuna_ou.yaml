@@ -1,0 +1,55 @@
+# The concurrent agent (llm_hymem_fused: student + look-ahead search fused, HyMem memory in the background)
+# against kakuna, with the same mirror-team protocol as strong_kakuna_ou.yaml (12 legal competitive teams).
+#   external/foulplay/venv/bin/python external/foulplay/lookahead_server.py --port 8104 --workers 16
+#   (student server as in strong_kakuna_ou.yaml; the 4B vLLM is not needed: HyMem's planner is not on the decision path)
+name: strong_fused_kakuna_ou
+format: gen9ou
+seed: 17
+agents:
+- name: fused
+  type: llm_hymem_fused
+  model: qwen3.5-4b-vllm
+  params:
+    config_path: configs/hymem/gpu.yaml
+    teacher: false
+    student_url: http://127.0.0.1:8093
+    student_model: s1-v7-2b
+    s1_timeout_s: 10.0
+    fold_mode: typed
+    memory_router: jev
+    fast_memory: true
+    max_hard: 1.0
+    mem_timeout_s: 20.0
+    lookahead_url: http://127.0.0.1:8104
+    search_ms: 700
+    samples: 8
+    fuse_w: 0.5
+    wait_policy: critical
+    wait_s: 2.5
+    think_budget_s: 120.0
+- name: kakuna
+  type: metamon
+  kind: external
+  external:
+    launch_cmd:
+    - bash
+    - run.sh
+    cwd: external/metamon
+    username: Kakuna
+    env:
+      CUDA_VISIBLE_DEVICES: '0'
+    ready_regex: accepting challenges
+    ready_timeout_s: 600
+    stall_timeout_s: 900
+augmentations: {}
+teams:
+  mode: mirror
+  pool: data/teams/gen9ou
+  per_team: 5
+evaluation:
+  mode: anchored
+  n_battles: 60
+  anchors:
+  - kakuna
+guardrails:
+  max_cost_usd: 0.01

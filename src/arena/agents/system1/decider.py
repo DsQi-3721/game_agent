@@ -77,8 +77,9 @@ class RouteConfig:
     require_consistency: bool = True
     debias: bool = True            # also ask with the options reversed
     ask_hard: bool = True
-    mode: str = "split"            # "split" (attack-or-switch, then best move / switch-in) | "flat"
+    mode: str = "split"            # conditional distributions recombined jointly | one flat distribution
     min_branch_confidence: float = 0.3   # split: |2 P(stay) - 1| needed to act fast
+    history_events: int = 0             # compact completed decisions supplied to the policy
 
 
 @dataclass
@@ -134,23 +135,40 @@ class FastDecision:
                 "s1_top": [[k, round(p, 4)] for k, p in self.ranked(5)]}
 
 
+# how far the lowest estimated damage must exceed the target's HP (percentage points of its max HP) for the
+# estimate to be trusted with an automatic decision: on 115 strict battles, "KO if the estimate holds" was
+# right 87% of the time with a 0-4 point margin, 97% with 10-19, 98.6% with 20+ (reports/io_audit_batch5.md)
+SURE_MARGIN = 20.0
+
+
 def obvious_choice(battle: AbstractBattle, facts: list[OptionFacts]) -> Optional[OptionFacts]:
     """Tier 0 (no model): a sure knock-out before the opponent can act.
 
-    Sure = the whole damage range KOs, the move cannot miss, we act first (speed or priority),
-    and the target is already damaged so Focus Sash / Sturdy cannot save it. Spending the tera
-    is a strategic call, so tera options never qualify; among several, prefer a move without
-    recoil or stat drops."""
+    Sure = the whole estimated damage range KOs with nothing public that could save the target (no
+    Focus Sash / Sturdy / Multiscale chance at full HP, no Substitute), the move cannot miss, and we
+    certainly act first (speed band or priority). Premises that stay: the estimate's assumptions (the
+    opponent's spread and item) and that the opponent does not Terastallize defensively this turn (a
+    simultaneous choice nobody can see). Spending the tera is a strategic call, so tera options never
+    qualify; among several, prefer a move without recoil or stat drops."""
     opp = battle.opponent_active_pokemon
     if opp is None or hp_pct(opp) >= 100:
         return None
     sure = []
     for f in facts:
         mv = f.option.order.order if f.option.kind == "move" and not f.option.tera else None
-        if mv is None or not f.ko_now or not f.fields.get("damage", "").endswith("guaranteed KO this turn"):
+        dmg = f.fields.get("damage", "")
+        verdict = dmg.split(": ", 1)[-1]
+        if mv is None or not f.ko_now or verdict not in (
+                "KO this turn if the estimate holds", "KO this turn if the estimate holds (unless it Terastallizes defensively)"):
             continue
+        if f.ko_margin is None or f.ko_margin < SURE_MARGIN:
+            continue
+        lo_hits, hi_hits = mv.n_hit
+        if lo_hits != hi_hits and battle.active_pokemon.ability != "skilllink":
+            continue                                 # how many times it hits is a roll
         order = f.fields.get("order", "")
-        if not (mv.accuracy is True or float(mv.accuracy) >= 1.0) or not ("move first" in order or "priority" in order):
+        if not (mv.accuracy is True or float(mv.accuracy) >= 1.0) or order not in (
+                "you move first", "priority move: acts before normal moves"):
             continue
         drawback = bool(getattr(mv, "recoil", 0)) or any(v < 0 for v in (getattr(mv, "self_boost", None) or {}).values())
         sure.append((drawback, -(f.exp_damage or 0.0), f))
@@ -184,6 +202,9 @@ class FastDecider:
                       extra_facts: Optional[list[str]] = None) -> tuple[dict, dict, list[OptionFacts]]:
         facts = build_option_facts(battle, options)
         state = build_state(battle, extra_facts=extra_facts)
+        if self.cfg.history_events:
+            from arena.s1.policy_data import add_history
+            state = add_history(battle, state, self.cfg.history_events)
         questions: dict = {}
 
         def ask(qid: str, instructions: str, group: list[OptionFacts]) -> None:
@@ -195,7 +216,8 @@ class FastDecider:
                 questions[qid + "_rev"] = ts.choice(instructions, dict(reversed(list(criteria.items()))))
 
         if self.cfg.mode == "flat":
-            ask("best", BEST_INSTRUCTIONS, facts)
+            from arena.s1.policy_data import POLICY_INSTRUCTIONS
+            ask("best", POLICY_INSTRUCTIONS, facts)
         else:
             moves = [f for f in facts if f.option.kind == "move"]
             switches = [f for f in facts if f.option.kind == "switch"]
@@ -228,11 +250,47 @@ class FastDecider:
         return True, "confident", "confident"
 
     @staticmethod
-    def _debiased(res, qid: str, keys: list[str]) -> tuple[dict, dict, dict]:
-        fwd = _normalise(res.answers[qid].probabilities, keys) if qid in res.answers else \
-            {k: 1 / len(keys) for k in keys}
-        rev = _normalise(res.answers[qid + "_rev"].probabilities, keys) if qid + "_rev" in res.answers else fwd
+    def _debiased(answers: dict, qid: str, keys: list[str]) -> tuple[dict, dict, dict]:
+        fwd = _normalise(answers[qid].probabilities, keys) if qid in answers else {k: 1 / len(keys) for k in keys}
+        rev = _normalise(answers[qid + "_rev"].probabilities, keys) if qid + "_rev" in answers else fwd
         return fwd, rev, {k: (fwd[k] + rev[k]) / 2 for k in keys}
+
+    def combine(self, answers: dict, *, keys: list[str], move_keys: list[str], switch_keys: list[str]) -> dict:
+        """The System-1 decision from the full joint action distribution (no battle needed):
+        chosen key, action kind, order consistency, confidences and the gate verdict.
+        ``answers`` maps question id -> an answer with ``probabilities`` / ``noul`` (TypeSafe Answer).
+        ``decide`` uses it live; offline evaluation replays recorded or student answers through it."""
+        hard = answers.get("hard")
+        p_hard = hard.noul if hard is not None else None
+        branch, p_stay, branch_conf = "", None, 1.0
+        if self.cfg.mode == "flat":
+            fwd, rev, probs = self._debiased(answers, "best", keys)
+            joint, branch_keys = probs, keys
+        else:
+            mkeys, skeys = move_keys, switch_keys
+            if mkeys and skeys:
+                stay = answers.get("stay")
+                p_stay = stay.noul if stay is not None and stay.noul is not None else 0.5
+                branch_conf = abs(2 * p_stay - 1)
+            else:
+                p_stay = 1.0 if mkeys else 0.0
+            mf, mr, pm = self._debiased(answers, "best_move", mkeys) if mkeys else ({}, {}, {})
+            sf, sr, ps = self._debiased(answers, "best_switch", skeys) if skeys else ({}, {}, {})
+            joint = {**{k: p_stay * v for k, v in pm.items()}, **{k: (1 - p_stay) * v for k, v in ps.items()}}
+            fwd = {**{k: p_stay * v for k, v in mf.items()},
+                   **{k: (1 - p_stay) * v for k, v in sf.items()}}
+            rev = {**{k: p_stay * v for k, v in mr.items()},
+                   **{k: (1 - p_stay) * v for k, v in sr.items()}}
+            probs, branch_keys = joint, list(joint)
+            branch = "move" if max(joint, key=joint.get) in mkeys else "switch"
+        key = max(branch_keys, key=lambda k: probs[k])
+        consistent = max(branch_keys, key=lambda k: fwd[k]) == max(branch_keys, key=lambda k: rev[k])
+        choice_conf, margin = choice_confidence(probs), _margin(probs)
+        accept, code, reason = self.gate(choice_conf, margin, consistent, p_hard, branch_conf)
+        return {"key": key, "joint": joint, "fwd": fwd, "rev": rev, "probs": probs, "branch": branch,
+                "branch_keys": branch_keys, "p_stay": p_stay, "p_hard": p_hard, "branch_confidence": branch_conf,
+                "choice_confidence": choice_conf, "confidence": min(choice_conf, branch_conf), "margin": margin,
+                "consistent": consistent, "accept": accept, "reason_code": code, "reason": reason}
 
     async def decide(self, battle: AbstractBattle, options: list[Option], *,
                      extra_facts: Optional[list[str]] = None,
@@ -246,38 +304,16 @@ class FastDecider:
         t0 = time.perf_counter()
         res = await self.client.system_one(state, questions, model=self.cfg.model)
         latency = res.latency_s or (time.perf_counter() - t0)
-        hard = res.answers.get("hard")
-        p_hard = hard.noul if hard is not None else None
-
-        branch, p_stay, branch_conf = "", None, 1.0
-        if self.cfg.mode == "flat":
-            keys = [f.key for f in facts]
-            fwd, rev, probs = self._debiased(res, "best", keys)
-            joint, branch_keys = probs, keys
-        else:
-            mkeys = [f.key for f in facts if f.option.kind == "move"]
-            skeys = [f.key for f in facts if f.option.kind == "switch"]
-            if mkeys and skeys:
-                stay = res.answers.get("stay")
-                p_stay = stay.noul if stay is not None and stay.noul is not None else 0.5
-                branch_conf = abs(2 * p_stay - 1)
-            else:
-                p_stay = 1.0 if mkeys else 0.0
-            mf, mr, pm = self._debiased(res, "best_move", mkeys) if mkeys else ({}, {}, {})
-            sf, sr, ps = self._debiased(res, "best_switch", skeys) if skeys else ({}, {}, {})
-            joint = {**{k: p_stay * v for k, v in pm.items()}, **{k: (1 - p_stay) * v for k, v in ps.items()}}
-            branch = "move" if p_stay >= 0.5 else "switch"
-            fwd, rev, probs, branch_keys = (mf, mr, pm, mkeys) if branch == "move" else (sf, sr, ps, skeys)
-        key = max(branch_keys, key=lambda k: probs[k])
-        consistent = max(branch_keys, key=lambda k: fwd[k]) == max(branch_keys, key=lambda k: rev[k])
-        choice_conf, margin = choice_confidence(probs), _margin(probs)
-        conf = min(choice_conf, branch_conf)
-        accept, code, reason = self.gate(choice_conf, margin, consistent, p_hard, branch_conf)
+        c = self.combine(res.answers, keys=[f.key for f in facts],
+                         move_keys=[f.key for f in facts if f.option.kind == "move"],
+                         switch_keys=[f.key for f in facts if f.option.kind == "switch"])
+        key = c["key"]
         option = next(f.option for f in facts if f.key == key)
         extra = {q: a for q, a in res.answers.items() if extra_questions and q in extra_questions}
-        return FastDecision(option=option, key=key, probabilities=joint, p_fwd=fwd, p_rev=rev,
-                            confidence=conf, margin=margin, consistent=consistent, p_hard=p_hard,
-                            accept=accept, reason=reason, reason_code=code, latency_s=latency,
-                            input_tokens=res.input_tokens, model=res.model, facts=facts, extra_answers=extra,
-                            branch=branch, p_stay=p_stay, branch_confidence=branch_conf,
-                            choice_confidence=choice_conf, branch_keys=branch_keys)
+        return FastDecision(option=option, key=key, probabilities=c["joint"], p_fwd=c["fwd"], p_rev=c["rev"],
+                            confidence=c["confidence"], margin=c["margin"], consistent=c["consistent"],
+                            p_hard=c["p_hard"], accept=c["accept"], reason=c["reason"], reason_code=c["reason_code"],
+                            latency_s=latency, input_tokens=res.input_tokens, model=res.model, facts=facts,
+                            extra_answers=extra, branch=c["branch"], p_stay=c["p_stay"],
+                            branch_confidence=c["branch_confidence"], choice_confidence=c["choice_confidence"],
+                            branch_keys=c["branch_keys"])

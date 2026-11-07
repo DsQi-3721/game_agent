@@ -176,6 +176,11 @@ class DamageEstimate:
                 f"{self.pct_lo:.0f}-{self.pct_hi:.0f}%{ko}")
 
 
+# Items a Pokemon shows as it enters the field ("X floats in the air with its Air Balloon!"): one that has been
+# on the field with its item still unknown does not hold them, so the estimate never assumes them.
+REVEALED_ON_ENTRY = {"airballoon"}
+
+
 def _assumption(battle, mon, model) -> tuple[Optional[StatEstimate], Optional[str], Optional[str], str]:
     est = model.estimate(battle, mon)
     if est is None:
@@ -184,8 +189,8 @@ def _assumption(battle, mon, model) -> tuple[Optional[StatEstimate], Optional[st
     notes = [est.note]
     prior = model.set_prior(battle, mon)
     if prior is not None:
-        if mon.item in (None, "", "unknown_item"):
-            top = prior.top("items")
+        if mon.item == "unknown_item":       # None = known to hold nothing (knocked off, consumed, popped)
+            top = next((c for c in prior.items if c.id not in REVEALED_ON_ENTRY), None)
             if top and top.p >= 0.5:
                 item = top.id
                 notes.append(f"assumes {top.name}")
@@ -193,6 +198,7 @@ def _assumption(battle, mon, model) -> tuple[Optional[StatEstimate], Optional[st
             top = prior.top("abilities")
             if top and top.p >= 0.5:
                 ability = top.id
+                notes.append(f"assumes {top.name}")
     return est, item, ability, ", ".join(notes)
 
 

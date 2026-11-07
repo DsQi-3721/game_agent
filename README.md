@@ -1,167 +1,171 @@
-# arena — Pokémon Showdown adversarial-game agent evaluation platform
+# Game Agent
 
-A clean, pluggable platform for evaluating game-playing agents (LLM, classical
-search/heuristic, and hybrids) on Pokémon Showdown. Built on
-[poke-env](https://github.com/hsahovic/poke-env). The LLM agent's reasoning is the
-primary research subject; the harness makes models and methods directly comparable.
+面向 Pokémon Showdown 的博弈智能体研究项目，主要研究 Gen 9 OU 下的快速决策、策略记忆与对手建模。
 
-## Setup
+## 项目结构
 
-```bash
-conda activate SystemofML            # has poke-env, litellm, pydantic
-cd /Users/hoi/project/game/pokemonbot
-pip install -e ".[dev]"              # once
+| 模块 | 内容 | 入口 |
+|---|---|---|
+| 对手建模 | 配置、战斗状态、信息记忆和动态策略的联合推断 | `src/arena/opponent/joint/` |
+| System 1 | 本地决策模型、动作监督微调与 PPO | `src/arena/s1/`、`scripts/s1_action_train.py` |
+| HyMem | 策略规划、跨回合记忆、执行协调与搜索融合 | `src/arena/agents/hymem/`、`src/arena/agents/fusion/` |
+| 对战框架 | 统一观测、智能体注册、配队、对局调度和终端界面 | `src/arena/`、`configs/experiments/` |
+| 外部方法 | Foul Play、Metamon、PokéChamp 和 PokeLLMon 的桥接与复现脚本 | `external/` |
+| 领域知识 | 宝可梦资料、统计配置先验、队伍和规则定义 | `data/` |
+| 研究结果 | 主实验、玩家记忆实验与二维玩家画像 | `results/` |
 
-# local Showdown server (separate terminal, keep running)
-cd ../pokemon-showdown && node pokemon-showdown start --no-security
-```
+## 对手建模
 
-LLM keys: copy `.env.example` to `.env` and fill in (e.g. `DEEPSEEK_API_KEY`).
+模块维护四类变量的联合信念：
 
-## Interactive TUI (POKEBOTMON)
+- **C：初始配置**。队伍、招式、道具、特性、性格、努力值、个体值与太晶属性。
+- **X：战斗状态**。血量、PP、锁招、道具消耗与交换、状态和能力变化。
+- **M：信息记忆**。对手合法可见的历史及其编码表示。
+- **Z：策略状态**。行为原型、连续策略表示与策略变化。
 
-```bash
-python -m arena.cli tui     # configure → live monitor → results → trajectory/history
-```
-The TUI runs the eval as a subprocess and tails `runs/<name>/events.jsonl`, so it
-stays smooth and the eval survives closing the UI. Charts: in-terminal always, an
-interactive `runs/<name>/charts.html`, and optional W&B (`arena run ... --wandb`).
-New agents auto-appear in the configurator via `@register_agent` (see below).
+神经网络采用 8 层、256 维的带记忆因果 Transformer，包含配置生成、动态策略、条件行动和推断提议四类计算。序贯蒙特卡洛过滤器将网络概率与 Showdown 机制观测相结合，逐步更新联合假设。默认预算为 1,024 个粒子、128 个配置候选。
 
-## Run an evaluation (CLI)
+输入包含赛制、队伍预览、公开事件和观察方合法掌握的私有信息。对手决策通道使用对手可知的信息。每个决策点先预测，再读取实际动作与结算事件并更新；新一局重置配置和战斗状态，只继承玩家级策略记忆。
 
-```bash
-# baselines only — fast, no API cost
-python -m arena.cli run configs/experiments/quick_baselines.yaml
+`JointOpponentModel` 提供 `update`、`predict`、`query`、`sample_joint`、`condition`、`forecast`、`new_game`、`snapshot` 与 `restore` 接口。`dossier()` 输出可阅读的 JSON 资料卡，包含配置预测、当前状态、行为倾向和行动分布。底层查询同时提供概率、候选覆盖和推断状态。
 
-# LLM methods (DeepSeek) with grounding — estimate cost first
-python -m arena.cli run configs/experiments/grounded_deepseek.yaml --dry-run
-python -m arena.cli run configs/experiments/grounded_deepseek.yaml
-```
+## 安装
 
-Output: a win-rate matrix + per-agent win rate (Wilson CI), Elo, fallback rate and
-cost, written to `runs/<name>/report.json`, plus per-LLM-agent decision
-trajectories in `runs/<name>/traj_<agent>.jsonl`.
-
-## Concepts
-
-- **Agent** (`agents/base.py`): `async act(battle) -> BattleOrder`, network-unaware,
-  plus an optional `on_battle_end(battle)` hook. `AgentPlayer` adapts any Agent onto
-  poke-env. Built-ins: baselines + `llm_io`, `llm_cot`, `llm_self_consistency`,
-  `llm_react`, `llm_hymem` (below), and the long-context baselines `llm_flat_react` /
-  `llm_summary`.
-- **State** (`state/`): partial-observability renderer (default), `full_info` toggle;
-  `views.py` (numbered legal options, battle brief, snapshot) and `battle_log.py`
-  (protocol log -> per-turn digests + key facts) shared by the persistent-context agents.
-- **Augmentations** (`augment/`): damage calc (both directions; hidden opponent stats
-  estimated from set priors), `matchup`, `speed_check`, `opponent_sets`, `switch_eval`,
-  type chart, Pokedex (with effect text), raw `battle_log`, base stats, ability -- each
-  `off | passive | tool` per config. `tool` mode feeds the ReAct / HyMem tool loops.
-- **Knowledge** (`knowledge/`, `data/knowledge/`): Showdown Dex text, randbats set
-  distributions sampled from the server's own generator, gen9ou usage sets filtered by
-  the server's rules. Rebuild with `python scripts/build_knowledge.py` (needs node).
-- **Teams** (`teams/`): `scripts/ingest_teams.py` downloads Smogon sample teams;
-  `scripts/prune_teams.py` validates them against the server. Modes: mirror / pool_random.
-- **Eval** (`eval/`): round-robin or anchored tournament, metrics, guardrails.
-
-## Config (YAML)
-
-```yaml
-name: my_exp
-format: gen9ou                 # or gen9randombattle (teamless)
-agents:
-  - {name: maxpow, type: max_base_power}
-  - {name: react, type: llm_react, model: deepseek-chat, params: {max_steps: 3}}
-augmentations: {damage_calc: passive, type_matchup: passive, pokedex: tool}
-teams: {mode: mirror}
-evaluation: {mode: anchored, n_battles: 5, anchors: [maxpow]}
-guardrails: {max_cost_usd: 1.0}
-```
-
-## HyMem agent (`llm_hymem`)
-
-HyMem ("Hierarchical Context Management for Long-Horizon Agents via Information
-Isolation", arXiv 2608.15703) ported to battles, following the reference
-implementation (HyMem2026). A battle is the long-horizon task: the **planner** is the
-only persistent context and sees only typed messages -- `<TURN_RESULT>` digests of the
-protocol log, `<RESULTS>` from a fresh tool-using **executor**, `<RETURN>` from
-**isolated reasoning** sessions, its own `<DECISION>`s -- plus the current state and
-numbered legal actions. **Folds** (two-stage: planner `<summary>` -> three parallel
-JSON extractions) rewrite episode / working / tool memory when a paper Eq. 17 trigger
-fires. Raw tool output and isolated deliberation never reach the planner.
+建议使用 Python 3.11、Node.js 和支持 CUDA 的 PyTorch。训练与完整推断需要另行准备模型权重和数据。
 
 ```bash
-bash scripts/serve_qwen35_mlx.sh                       # local Qwen3.5-4B (Apple silicon)
-python scripts/check_llm.py --model qwen3.5-4b-mlx     # 4 preflight checks
-python scripts/build_knowledge.py                      # once (data/knowledge/)
-python -m arena.cli run configs/experiments/hymem_smoke_randbats.yaml --emit-events
-python -m arena.cli run configs/experiments/longctx_smoke.yaml          # flat / summary baselines
-python scripts/analyze_context.py runs/hymem_smoke_randbats runs/longctx_smoke --export-dilution
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[s1,s1-gpu,opponent,viz]'
+cp .env.example .env
 ```
 
-- Parameters: `configs/hymem/{mac,gpu}.yaml` via `params: {config_path: ...}`, or inline
-  (`planner_steps`, `execute_turns`, `ablation: full|no_iso|no_mm|no_typed_isolation`,
-  `fold_mode: two_stage|direct`, `router: off|rule|llm`, `think_iso`, `replan`, `aux_model`,
-  per-space knobs like `iso_max_tokens`). See `agents/hymem/config.py`.
-- Logs: `traj_<agent>.jsonl` (per decision, with an `extra` block of context telemetry) and
-  `calls_<agent>.jsonl` (every LLM call: space, messages, output, tokens) -- the input of
-  `scripts/analyze_context.py` and a ready-made source of SFT/RL data.
-- GPU server: `bash scripts/serve_qwen35_vllm.sh`, set `qwen3.5-4b-vllm.api_base`, then
-  `configs/experiments/hymem_{main,ablation}_gpu_{randbats,ou}.yaml`.
-- Extension points: new context spaces (planner directive registry), the
-  `knowledge.opponent_model.OpponentModel` protocol, `FoldTrigger` / `Router` policies.
-- Real-time analysis: `scripts/bench_llm_latency.py` (server prefill/decode/cache/concurrency),
-  `configs/experiments/hymem_latency_randbats.yaml` (one battle, server log kept),
-  `scripts/analyze_latency.py` (per-decision wall-clock decomposition, Showdown timer replay,
-  counterfactuals) and `scripts/plot_latency_report.py`. Findings: `reports/hymem_realtime_report.md`.
-
-## System 1: fast typed decisions with Jev (`jev_fast`, `llm_hymem_dual`)
-
-A System One model ([TypeSafe Jev](https://docs.typesafe.ai)) answers typed questions with
-calibrated probabilities in one ~0.3–0.8 s request; code computes every number first (damage
-ranges and KO verdicts, move order, hazards, opponent set priors -> `agents/system1/facts.py`).
-
-- `jev_fast`: every decision is one Jev request (best action asked in both option orders to
-  cancel position bias, plus a "hard turn" Noul); routing signals are logged per decision.
-- `llm_hymem_dual`: Tier 0 rule (sure first-strike KO) -> Tier 1 Jev when confident /
-  order-consistent / not hard -> Tier 2 HyMem planner with the Jev ranking as a hint and a time
-  cap (on timeout the Jev answer is played). `memory_router: jev` classifies, validates and
-  routes HyMem's memory items per context space in the same request.
-- Key: `TYPESAFE_API_KEY` in `.env` (`TYPESAFE_BASE_URL` can point at a compatible local server).
-  Validation: `bash scripts/run_jev_validation.sh` -> `reports/jev_validation_results.md`;
-  design and research: `reports/jev_system1_design.md`.
-
-## System-1 learning loop (`arena.s1`)
-
-Every typed System-One request (teacher Jev or a local student), the decision it fed and the
-battle outcome are recorded (`s1exp_<agent>.jsonl`). From that experience a local student
-(Qwen3.5 + LoRA) is distilled, evaluated against held-out teacher labels, registered and, when
-better than the champion, promoted. The student is served over the same TypeSafe protocol and
-plugged in front of the teacher (`student_url`): the cascade asks the teacher only when the
-student is unsure, so every deployment collects exactly the labels the next student needs.
+Showdown 放在与本仓库同级的 `pokemon-showdown/`。当前规则记录对应提交 `1636bf6d0848fb3c9330576963a647d4e179d278`。
 
 ```bash
-python -m arena.cli run configs/experiments/s1_collect_randbats.yaml          # collect (teacher plays)
-python scripts/s1_loop.py --id s1-v1 --base <models>/Qwen3.5-0.8B --experience "data/s1/experience/*.jsonl"
-python scripts/s1_serve.py --model <models>/Qwen3.5-0.8B --adapter runs/s1_models/s1-v1 --port 8090
-python -m arena.cli run configs/experiments/s1_cascade_randbats.yaml          # deploy + collect (cascade)
+git clone https://github.com/smogon/pokemon-showdown.git ../pokemon-showdown
+git -C ../pokemon-showdown checkout 1636bf6d0848fb3c9330576963a647d4e179d278
+(cd ../pokemon-showdown && npm install && npm run build)
 ```
 
-Backends: `--backend mlx` (Apple silicon; `--mode head` trains the last attention block of the
-hybrid Qwen3.5) or `--backend hf` (torch/peft, GPU servers, full LoRA). Deep fusion inside HyMem
-(`llm_hymem_dual` params `shared_facts`, `step_control`, `s1_router`, `s1_executor`, `fold_mode: typed`,
-`memory_router: jev`, `fast_memory`): `configs/experiments/hymem_deep_latency_randbats.yaml`,
-GPU ablation `configs/experiments/hymem_s1_ablation_gpu_randbats.yaml`. Handover: `HANDOVER.md`.
-
-## Tests
+对手模型直接调用本地模拟器。运行智能体对战时，另开一个终端启动服务器：
 
 ```bash
-python -m pytest -q     # offline, no server/keys/node needed
+cd ../pokemon-showdown
+node pokemon-showdown start --no-security
 ```
 
-## Status / roadmap
+基础对战与终端界面：
 
-v1 complete (M0–M6). HyMem agent + long-context baselines + rebuilt game tools added
-(offline-tested, smoke-tested live with local Qwen3.5-4B). Next: GPU-scale evaluations,
-cross-battle memory, search-augmented spaces, SFT/RL on the call logs. Deferred: agent
-self-built teams and tournament-level concurrency across pairings.
+```bash
+arena run configs/experiments/quick_baselines.yaml
+arena tui
+```
+
+模型服务地址在 `configs/models/registry.yaml`，密钥放在 `.env`。本地模型路径、队伍池和训练数据路径按实际环境修改。外部方法通过各自的 `external/<method>/setup.sh` 安装；桥接协议见 [external/README.md](external/README.md)。
+
+## 对手模型的数据与训练
+
+训练数据由两部分构成：
+
+| 数据来源 | 可用监督 |
+|---|---|
+| 本地受控对局 | 双方合法视角、提交动作、完整配置、状态轨迹和控制器分布 |
+| Metamon / PokéChamp 公开回放 | 公开事件、实际可见动作及已揭示配置；缺失隐藏标签保持缺失 |
+
+原始数据、派生训练集和模型权重放在 `artifacts/`、`models/` 或 `runs/`。这些目录不随代码发布。
+
+配置目录由 Showdown 完整配招和 Foul Play 队伍组合构建。准备相应 JSON 后执行：
+
+```bash
+python scripts/opp_joint_catalog.py \
+  --sets /path/to/showdown_sets/gen9ou.json \
+  --teams /path/to/foulplay/gen9ou/teams.json
+node scripts/node/opp_joint_catalog.js artifacts/opponent_joint
+python scripts/opp_joint_generate.py --workers 12
+```
+
+`opp_joint_generate.py` 的默认预算为 40 万局；`--groups` 可限制每个数据分区的生成组数。规则合法性由本地 Showdown 校验。
+
+人类回放转换器读取 `artifacts/opponent_data/metamon/` 和 `artifacts/opponent_data/pokechamp/` 下已准备的 `manifest.json`、`battles.parquet` 索引及原始 Parquet 文件。`manifest.json` 的 `files[].path` 指向源文件，索引记录对局身份、时间、玩家和源行位置。下载与初始索引需要单独准备。
+
+```bash
+python scripts/opp_joint_human_data.py --workers 6
+python scripts/opp_joint_prepare_training.py --workers 8
+torchrun --standalone --nproc_per_node=2 scripts/opp_joint_train.py \
+  --epochs 0 --min-epochs 5 --batch 256
+```
+
+`--epochs 0` 按验证集平台期停止。训练脚本支持断点续训及学习率调整，主检查点写入 `artifacts/opponent_joint/training/model.pt`。玩家策略先验的训练与校准入口为 `scripts/opp_joint_adaptation.py`；完整过滤评测默认读取 `training/adaptation/model.pt`。
+
+准备好检查点与 `catalog.json` 后，将合法观察历史写为输入 JSON：
+
+```bash
+python scripts/opp_joint_predict.py \
+  --input /path/to/history.json \
+  --output /path/to/opponent.json \
+  --model artifacts/opponent_joint/training/adaptation/model.pt \
+  --device cuda:0
+```
+
+输入字段定义见 [opponent-joint-input.json](data/schemas/opponent-joint-input.json)。底层联合信念结构见 [opponent-joint.json](data/schemas/opponent-joint.json)，面向阅读的资料卡由 `src/arena/opponent/joint/dossier.py` 组织。
+
+## 独立对手建模评测
+
+核心指标为隐藏招式 Recall@k、隐藏道具/特性/太晶 Top-k、下一提交动作 Top-k 与 NLL。只计入决策时尚未公开的配置；不支持的预测项目保留为空，预测失败计入分母。
+
+完整联合模型的匹配评测入口：
+
+```bash
+python scripts/opp_joint_public.py --split test \
+  --start-group 70 --groups 14 --games 2 \
+  --output artifacts/opponent_joint/training/joint_validation --workers 2
+```
+
+原生配置预测 baseline 由 `opp_baseline_topk.py` 和各外部项目的预测脚本处理；LLM baseline 使用 `opp_qwen27b.py`。玩家行为画像与换队迁移实验按顺序执行：
+
+```bash
+python scripts/opp_profile_transfer.py prepare
+python scripts/opp_profile_transfer.py support --workers 4
+python scripts/opp_profile_transfer.py match
+python scripts/opp_profile_transfer.py query --workers 4
+python scripts/opp_profile_transfer.py report
+python scripts/opp_profile_visualization.py
+```
+
+该实验固定后续新队伍对局，比较正确玩家历史、无历史和其他玩家历史，使用前 0、1、3、5 局记忆，按玩家计算配对置信区间。
+
+## 已保存的结果
+
+主实验使用相同的 14 名受控玩家、28 个完整玩家对局，包含 978 个非预览提交动作。配置指标覆盖 17,689 个尚未公开招式、4,300 个道具、4,161 个特性和 5,303 个太晶属性目标。完整 Top-1/3/5、协议与运行统计见 [baselines.json](results/baselines.json)。
+
+| 方法 | 隐藏招式 Recall@3 | 隐藏道具 Top-1 | 隐藏特性 Top-1 | 隐藏太晶 Top-1 | 提交动作 Top-1 |
+|---|---:|---:|---:|---:|---:|
+| Joint C/X/M/Z filter | 76.53% | 78.65% | 96.20% | 50.88% | 41.00% |
+| Current neural prediction heads | 73.50% | 67.84% | 95.53% | 43.20% | 23.82% |
+| Foul Play native tracker + set sampler | 70.77% | 70.28% | 94.30% | 36.13% | — |
+| Metamon NaiveUsagePredictor | 65.85% | 56.21% | 94.71% | 40.17% | — |
+| PokéChamp BayesianTeamPredictor | 66.62% | 52.77% | 94.71% | 43.75% | — |
+| PokéChamp opponent prompt + Qwen3-8B | — | — | — | — | 24.13% |
+| PokéChamp opponent prompt + Qwen3.8-27B | — | — | — | — | 25.56% |
+| Pure Qwen3.8-27B | 26.21% | 15.53% | 40.62% | 22.59% | 24.03% |
+
+玩家记忆实验的主分析为 40 名未参与训练的非随机玩家；另有 10 名随机控制器作为对照。使用前 5 局历史，预测固定新队伍对局的前 10 次决策：
+
+| 跨局记忆 | 行动 NLL ↓ | 行动分布 KL ↓ | 画像 MAE ↓ | 行动 Top-1 ↑ |
+|---|---:|---:|---:|---:|
+| 正确玩家历史 | 1.4530 | 0.2191 | 0.0675 | 46.75% |
+| 无历史 | 1.5154 | 0.2903 | 0.0963 | 45.25% |
+| 其他玩家历史 | 1.5107 | 0.2748 | 0.0847 | 47.25% |
+
+正确玩家记忆改善了行动分布和行为画像。完整历史长度曲线、前 5 次决策结果与配对置信区间见 [player_memory.json](results/player_memory.json)。
+
+![玩家记忆与换队迁移](results/figures/player_memory.png)
+
+在共同参考局面下比较不同玩家的预测行为倾向，展示换人、强化、回复和太晶使用概率的差异。数值见 [player_profiles.json](results/player_profiles.json)。
+
+![标准化玩家行为画像](results/figures/standardized_player_profiles.png)
+
+## 已知限制
+
+当前主要匹配实验与玩家记忆实验使用受控玩家，外部人类回放提供另一类训练和评测监督。28 个玩家对局的主实验规模有限。神经网络直接预测与联合过滤采用不同的行动预测头，因此该主实验支持整体系统比较，不能单独归因于粒子过滤或配置与策略的耦合。跨局记忆的 Top-1 尚未呈现稳定提升，收益主要体现在概率分布和画像误差。

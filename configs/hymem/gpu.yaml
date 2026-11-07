@@ -1,4 +1,5 @@
 # HyMem settings for GPU runs (vLLM): paper / reference values where they exist.
+# state_view / team_preview are not set here, so the defaults apply (obs1 / lead_prior since 2026-10-30); the paper's own settings: configs/hymem/gpu_paper.yaml
 # paper App. A.2: execute_turns=10, max_iso_reasoning=5 (per fold window here), max_iso_reasoning_turn=3
 planner_steps: 6
 execute_turns: 10

@@ -18,6 +18,8 @@ All requests carry ``s1_meta(purpose=...)`` so the experience log knows what eac
 
 from __future__ import annotations
 
+import asyncio
+
 import time
 from typing import TYPE_CHECKING, Optional
 
@@ -83,18 +85,22 @@ class S1Controller:
 class S1Router:
     """Drop-in for ``hymem.router.Router``: ``await route(task, hint_iso=..., llm_call=...)``."""
 
-    def __init__(self, client, model: str, *, battle_fn):
+    def __init__(self, client, model: str, *, battle_fn, timeout_s: float = 10.0):
         self.client = client
         self.model = model
         self.battle_fn = battle_fn            # () -> current battle (state for the question)
+        self.timeout_s = timeout_s
 
     async def route(self, task: str, hint_iso: bool = False, llm_call=None) -> Route:
         battle = self.battle_fn()
         state = {**(build_state(battle) if battle is not None else {}), "task": task}
         try:
             with s1_meta(purpose="route_task"):
-                res = await self.client.system_one(state, {"route": ts.choice(ROUTE_Q, ROUTE_OPTIONS)},
-                                                   model=self.model)
+                res = await asyncio.wait_for(
+                    self.client.system_one(state, {"route": ts.choice(ROUTE_Q, ROUTE_OPTIONS)}, model=self.model),
+                    timeout=self.timeout_s)
+        except asyncio.CancelledError:
+            raise
         except Exception:  # noqa: BLE001  (an unanswered routing question defaults to the executor)
             return Route("executor", 0.5, "fallback", "System One unavailable")
         p = res.answers["route"].probabilities
@@ -151,7 +157,8 @@ class S1Executor:
         tools = list(a.executor_tools())
         qs, args_of = self._questions(battle, task, tools)
         with s1_meta(purpose="tool_plan"):
-            res = await a.jev.system_one(build_state(battle), qs, model=a.s1.jev_model)
+            res = await asyncio.wait_for(a.jev.system_one(build_state(battle), qs, model=a.s1.jev_model),
+                                         timeout=a.s1.s1_timeout_s)
         use = sorted(((res.answers[f"use_{t.name}"].noul or 0.0, t) for t in tools if f"use_{t.name}" in res.answers),
                      key=lambda x: -x[0])
         chosen = [t for p, t in use if p >= self.min_use][: self.max_tools]

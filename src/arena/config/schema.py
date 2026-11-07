@@ -26,6 +26,10 @@ class ExternalConfig(BaseModel):
     ready_regex: str = "logged in|listening|ready"       # stdout line = "connected"
     ready_timeout_s: float = 180.0
     stall_timeout_s: float = 420.0         # abort if no battle finishes in this window
+    battle_timeout_s: float = 600.0        # absolute ceiling per battle of a match (slow bots: PokeChamp's LLM
+                                           # minimax takes 15-25 min per battle with several instances running)
+    challenger: str = "us"                 # "us": we challenge, the bot accepts | "them": the bot challenges
+                                           # ARENA_OPPONENT and we accept (bots that miss challenges between battles)
     healthy_via: str = "stdout"            # "stdout" | "logfile"
 
 
@@ -42,7 +46,15 @@ class AgentConfig(BaseModel):
 
 
 class TeamConfig(BaseModel):
-    mode: str = "mirror"                   # mirror | pool_random
+    mode: str = "mirror"                   # mirror | pool_random | pools
+    pool: Optional[str] = None             # a directory of Showdown pastes (*.txt) instead of data/teams/<format>
+    opponent_pool: Optional[str] = None    # pools: the second agent's teams (the first plays ``pool``); block b
+                                           # pairs our team b % n_ours with theirs b % n_theirs, so nobody faces
+                                           # its own team (a mirror hides what opponent modelling is worth)
+    per_team: int = 0                      # mirror: play each pairing in blocks of this many battles, one team per
+                                           # block, cycling through the pool in order (0: one random team per match)
+    offset: int = 0                        # index of this run's first battle in that block sequence (set per shard
+                                           # by scripts/run_parallel.py, so that shards play different teams)
 
 
 class EvalConfig(BaseModel):

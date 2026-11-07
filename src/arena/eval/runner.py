@@ -7,6 +7,7 @@ the minimal building block that produces a ``MatchResult`` for one pairing.
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import itertools
 import os
 import random
@@ -111,15 +112,21 @@ class MatchRunner:
         self.tm = team_manager or TeamManager()
         self.rng = rng or random.Random()
 
-    def _teambuilders(self, fmt: str, mode: AssignmentMode):
+    def _teambuilders(self, fmt: str, mode: AssignmentMode, team: Optional[str] = None):
+        """-> (builder a, builder b, the mirror team's paste or None). ``team`` fixes the mirror team
+        (otherwise one is drawn from the pool for the whole match)."""
         if is_random_format(fmt):
-            return None, None
+            return None, None, None
         if mode == AssignmentMode.MIRROR:
-            team = self.rng.choice(self.tm.pool.get(fmt))
-            return ConstantTeambuilder(team), ConstantTeambuilder(team)
+            team = team or self.rng.choice(self.tm.pool.get(fmt))
+            return ConstantTeambuilder(team), ConstantTeambuilder(team), team
         if mode == AssignmentMode.POOL_RANDOM:
             pool = self.tm.pool.get(fmt)
-            return _PoolTeambuilder(pool, self.rng), _PoolTeambuilder(pool, self.rng)
+            return _PoolTeambuilder(pool, self.rng), _PoolTeambuilder(pool, self.rng), None
+        if mode == AssignmentMode.POOLS:   # team = (first agent's paste, second agent's paste)
+            if not (isinstance(team, tuple) and len(team) == 2):
+                raise ValueError("pools mode needs a (team a, team b) pair")
+            return ConstantTeambuilder(team[0]), ConstantTeambuilder(team[1]), team
         raise NotImplementedError(f"mode {mode} not supported in runner yet")
 
     async def run_match(
@@ -136,13 +143,14 @@ class MatchRunner:
         turn_delay: float = 0.0,
         run_dir: Optional[str] = None,
         ext_logger=None,
+        team: Optional[str] = None,
     ) -> MatchResult:
         if isinstance(spec_a, ExternalAgentSpec) or isinstance(spec_b, ExternalAgentSpec):
             return await self._run_external_match(
                 spec_a, spec_b, fmt, mode, n_battles, ctx_a, ctx_b,
                 save_replays=save_replays, announce=announce, turn_delay=turn_delay,
-                run_dir=run_dir or "runs", ext_logger=ext_logger)
-        tb_a, tb_b = self._teambuilders(fmt, mode)
+                run_dir=run_dir or "runs", ext_logger=ext_logger, team=team)
+        tb_a, tb_b, _ = self._teambuilders(fmt, mode, team)
         agent_a = spec_a.build(ctx_a or AgentContext())
         agent_b = spec_b.build(ctx_b or AgentContext())
         # Showdown allows only ONE challenge between a given pair of usernames at a
@@ -158,6 +166,7 @@ class MatchRunner:
                          turn_delay=turn_delay,
                          max_concurrent_battles=1)
         await pa.battle_against(pb, n_battles=n_battles)
+        await asyncio.gather(agent_a.flush_background(), agent_b.flush_background())
 
         turns = [b.turn for b in pa.battles.values() if b.finished]
         res = MatchResult(
@@ -174,7 +183,7 @@ class MatchRunner:
     async def _run_external_match(
         self, spec_a: Spec, spec_b: Spec, fmt: str, mode: AssignmentMode,
         n_battles: int, ctx_a, ctx_b, *, save_replays, announce, turn_delay,
-        run_dir: str, ext_logger,
+        run_dir: str, ext_logger, team: Optional[str] = None,
     ) -> MatchResult:
         from arena.external.launcher import ExternalLauncher
 
@@ -183,7 +192,15 @@ class MatchRunner:
         int_spec: AgentSpec = spec_b if external_is_a else spec_a          # type: ignore[assignment]
         int_ctx = ctx_b if external_is_a else ctx_a
 
-        tb, _ = self._teambuilders(fmt, mode)
+        tb, tb_other, mirror = self._teambuilders(fmt, mode, team)
+        if mode == AssignmentMode.POOLS:   # our builder is the internal side's, the external plays the other paste
+            tb = tb_other if external_is_a else tb
+            mirror = mirror[0] if external_is_a else mirror[1]
+        team_file = None
+        if mirror is not None:             # the external bot plays the same paste (bridges read ARENA_TEAM_FILE)
+            team_file = Path(run_dir) / "teams" / f"team_{hashlib.sha1(mirror.encode()).hexdigest()[:10]}.txt"
+            team_file.parent.mkdir(parents=True, exist_ok=True)
+            team_file.write_text(mirror + "\n", encoding="utf-8")
         agent = int_spec.build(int_ctx or AgentContext())
         our = AgentPlayer(
             agent, battle_format=fmt, team=tb,
@@ -200,13 +217,17 @@ class MatchRunner:
 
         launcher = ExternalLauncher(ext_spec.cfg, ext_spec.name)
         try:
-            await launcher.start(fmt, our_username, Path(run_dir), username=eff_username)
+            await launcher.start(fmt, our_username, Path(run_dir), username=eff_username,
+                                 team_file=str(team_file.resolve()) if team_file else None)
             await launcher.wait_ready()
             await self._challenge_with_watchdog(
                 our, to_id_str(eff_username), n_battles, launcher,
-                stall_timeout=ext_spec.cfg.stall_timeout_s)
+                stall_timeout=ext_spec.cfg.stall_timeout_s,
+                accept=ext_spec.cfg.challenger == "them",
+                battle_timeout=ext_spec.cfg.battle_timeout_s)
         finally:
             await launcher.stop()
+            await agent.flush_background()
 
         turns = [b.turn for b in our.battles.values() if b.finished]
         res = _orient_external(
@@ -221,13 +242,15 @@ class MatchRunner:
 
     @staticmethod
     async def _challenge_with_watchdog(our: AgentPlayer, opp_id: str, n_battles: int,
-                                       launcher, stall_timeout: float = 420.0) -> None:
-        """Send N challenges to the external username; abort if it (a) dies, or
-        (b) stalls -- alive but no battle finishes within ``stall_timeout`` (a hung
-        external would otherwise block ``send_challenges`` on its queue forever)."""
+                                       launcher, stall_timeout: float = 420.0, accept: bool = False,
+                                       battle_timeout: float = 600.0) -> None:
+        """Send N challenges to the external username (``accept``: accept N of its challenges instead); abort if
+        it (a) dies, or (b) stalls -- alive but no battle finishes within ``stall_timeout`` (a hung external would
+        otherwise block ``send_challenges`` on its queue forever)."""
         import time
 
-        send = asyncio.ensure_future(our.send_challenges(opp_id, n_battles))
+        play = our.accept_challenges(opp_id, n_battles) if accept else our.send_challenges(opp_id, n_battles)
+        send = asyncio.ensure_future(play)
 
         async def watchdog() -> None:
             last_done = our.n_finished_battles
@@ -245,7 +268,7 @@ class MatchRunner:
                 await asyncio.sleep(1.0)
 
         wd = asyncio.ensure_future(watchdog())
-        budget = 120 + n_battles * 600  # absolute ceiling on top of the stall detector
+        budget = 120 + n_battles * battle_timeout  # absolute ceiling on top of the stall detector
         try:
             await asyncio.wait_for(send, timeout=budget)
         except (asyncio.CancelledError, asyncio.TimeoutError):

@@ -1,6 +1,20 @@
 # Model registry. API keys come from env vars (or project-root .env), never here.
 # litellm_id is the exact litellm model string (prefix matters).
 models:
+  qwen3.5-9b-strategic:
+    litellm_id: openai/Qwen3.5-9B
+    api_base: http://127.0.0.1:8113/v1
+    api_key_env: VLLM_API_KEY
+    use_proxy: false
+    supports_tools: false
+    context_window: 16384
+    max_tokens: 6000
+    timeout_s: 180
+    max_retries: 0
+    tokenizer_path: models/Qwen3.5-9B
+    extra_body: {chat_template_kwargs: {enable_thinking: true}}
+    notes: "Background persistent strategy planning with structured execution goals"
+
   deepseek-chat:
     litellm_id: deepseek/deepseek-chat
     api_key_env: DEEPSEEK_API_KEY
@@ -19,7 +33,7 @@ models:
     price_out: 2.19
     notes: "reasoning model; use text-protocol ReAct"
 
-  # Local Qwen3.5-4B on this Mac via mlx_lm.server (bash scripts/serve_qwen35_mlx.sh).
+  # Local Qwen3.5-4B on Apple silicon via mlx_lm.server (bash scripts/serve_qwen35_mlx.sh).
   # mlx resolves the request `model` field: "default_model" = the model loaded with
   # --model; any other name makes it try to load/download that name.
   qwen3.5-4b-mlx:
@@ -32,7 +46,7 @@ models:
     max_tokens: 1024
     timeout_s: 1200
     max_retries: 0                   # mlx never cancels a request; retries would pile up
-    tokenizer_path: /Users/hoi/project/models/Qwen3.5-4B
+    tokenizer_path: models/Qwen3.5-4B
     # thinking is ON by default for Qwen3.5-4B -> always send the flag explicitly;
     # agents override it per call. Never send `seed` to mlx (disables batching).
     extra_body: {top_k: 20, chat_template_kwargs: {enable_thinking: false}}
@@ -41,7 +55,7 @@ models:
   # Same model on a GPU box via vLLM (bash scripts/serve_qwen35_vllm.sh). Edit api_base.
   qwen3.5-4b-vllm:
     litellm_id: openai/Qwen3.5-4B    # = --served-model-name
-    api_base: http://localhost:8001/v1   # 8000 is the local Showdown server
+    api_base: ${ARENA_VLLM_BASE:-http://localhost:8001/v1}   # 8000 is the local Showdown server; ARENA_VLLM_BASE moves it
     api_key_env: VLLM_API_KEY
     use_proxy: false
     supports_tools: true             # needs --enable-auto-tool-choice --tool-call-parser qwen3_coder
@@ -49,7 +63,7 @@ models:
     max_tokens: 2048
     timeout_s: 600
     max_retries: 0
-    tokenizer_path: /Users/hoi/project/models/Qwen3.5-4B
+    tokenizer_path: ${ARENA_QWEN35_4B_TOKENIZER:-models/Qwen3.5-4B}
     extra_body: {top_k: 20, chat_template_kwargs: {enable_thinking: false}}
     notes: "GPU server; reasoning comes back in reasoning_content (--reasoning-parser qwen3)"
 

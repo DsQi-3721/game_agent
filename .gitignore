@@ -1,22 +1,58 @@
+# Local configuration and credentials
 .env
-__pycache__/
-*.pyc
-*.egg-info/
-.pytest_cache/
-tests/fixtures/battles/*.pkl
-!tests/fixtures/battles/gen9random_midbattle.pkl
-data/teams/*/_rejected/
-runs/
+.env.*
+!.env.example
+.aws/
+.claude/
+.codex/
+.agents/
 
-# third-party reproductions and their environments (setup.sh in each bridge recreates them)
-external/*/repo/
-external/*/venv/
-external/*/.venv/
-# local model weights / caches
-*.safetensors
-!models/s1/**/adapters.safetensors
+# Python, JavaScript and native build outputs
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+build/
+dist/
+target/
+*.so
+*.dylib
+*.o
 .DS_Store
 
-# derived training sets (rebuild with scripts/s1_dataset.py from data/s1/experience)
-data/s1/*/train.jsonl
-data/s1/*/valid.jsonl
+# Models, datasets and experiment working directories
+/models/
+/artifacts/
+/runs/
+/reports/
+/data/opponent_data/
+/data/opponent_joint/
+/data/s1/
+/data/splits/
+/data/jev_eval/
+/data/manifests/
+/data/teams/**/_rejected/
+/external/*/repo/
+/external/*/checkpoints/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+*.pkl
+*.pickle
+*.parquet
+*.arrow
+*.log
+*.jsonl
+*.jsonl.gz
+*.zip
+*.tar
+*.tar.gz
+*.zst

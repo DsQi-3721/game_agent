@@ -20,6 +20,7 @@ import inspect
 import json
 import time
 from dataclasses import dataclass, field
+from importlib import import_module
 from typing import Any, Callable, Optional, Protocol, Sequence
 
 
@@ -111,6 +112,8 @@ def _cached_tokens_of(usage) -> int:
 
 class LiteLLMClient:
     def __init__(self, registry, cache=None):
+        # Initialize provider dependencies before the battle event loop starts.
+        import_module("litellm")
         self.registry = registry
         self.cache = cache
 

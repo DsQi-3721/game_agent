@@ -1,0 +1,1399 @@
+{
+  "protocol": {
+    "player_games": 28,
+    "decisions": 1006,
+    "counts": {
+      "moves": 17689,
+      "item": 4300,
+      "ability": 4161,
+      "tera": 5303
+    },
+    "public_species": [
+      "Alomomola",
+      "Araquanid",
+      "Blaziken",
+      "Blissey",
+      "Ceruledge",
+      "Cinderace",
+      "Clefable",
+      "Clodsire",
+      "Comfey",
+      "Corviknight",
+      "Darkrai",
+      "Deoxys-Speed",
+      "Dondozo",
+      "Dragapult",
+      "Dragonite",
+      "Enamorus",
+      "Excadrill",
+      "Garchomp",
+      "Garganacl",
+      "Gholdengo",
+      "Glimmora",
+      "Gliscor",
+      "Great Tusk",
+      "Hatterene",
+      "Hawlucha",
+      "Heatran",
+      "Hydrapple",
+      "Hydreigon",
+      "Iron Crown",
+      "Iron Hands",
+      "Iron Treads",
+      "Keldeo-Resolute",
+      "Kingambit",
+      "Kyurem",
+      "Landorus-Therian",
+      "Latias",
+      "Lokix",
+      "Manaphy",
+      "Meowscarada",
+      "Moltres",
+      "Ninetales",
+      "Ninetales-Alola",
+      "Ogerpon-Cornerstone",
+      "Ogerpon-Wellspring",
+      "Okidogi",
+      "Pecharunt",
+      "Quagsire",
+      "Quaquaval",
+      "Raging Bolt",
+      "Reuniclus",
+      "Rillaboom",
+      "Samurott-Hisui",
+      "Scizor",
+      "Serperior",
+      "Sinistcha",
+      "Skarmory",
+      "Slowking-Galar",
+      "Ting-Lu",
+      "Tornadus-Therian",
+      "Toxapex",
+      "Tyranitar",
+      "Ursaluna",
+      "Walking Wake",
+      "Weavile",
+      "Weezing-Galar",
+      "Zamazenta-*",
+      "Zapdos"
+    ],
+    "cohort": [
+      {
+        "group": 70,
+        "game": "test-70-7",
+        "side": "p2",
+        "player": "test-70-12",
+        "scenario": "known"
+      },
+      {
+        "group": 70,
+        "game": "test-70-16",
+        "side": "p2",
+        "player": "test-70-12",
+        "scenario": "known"
+      },
+      {
+        "group": 71,
+        "game": "test-71-8",
+        "side": "p2",
+        "player": "test-71-11",
+        "scenario": "unseen_team"
+      },
+      {
+        "group": 71,
+        "game": "test-71-17",
+        "side": "p2",
+        "player": "test-71-11",
+        "scenario": "unseen_team"
+      },
+      {
+        "group": 72,
+        "game": "test-72-9",
+        "side": "p2",
+        "player": "test-72-10",
+        "scenario": "unseen_set"
+      },
+      {
+        "group": 72,
+        "game": "test-72-18",
+        "side": "p2",
+        "player": "test-72-10",
+        "scenario": "unseen_set"
+      },
+      {
+        "group": 73,
+        "game": "test-73-9",
+        "side": "p1",
+        "player": "test-73-9",
+        "scenario": "unseen_family"
+      },
+      {
+        "group": 73,
+        "game": "test-73-19",
+        "side": "p2",
+        "player": "test-73-9",
+        "scenario": "unseen_family"
+      },
+      {
+        "group": 74,
+        "game": "test-74-8",
+        "side": "p1",
+        "player": "test-74-8",
+        "scenario": "abrupt"
+      },
+      {
+        "group": 74,
+        "game": "test-74-19",
+        "side": "p1",
+        "player": "test-74-8",
+        "scenario": "abrupt"
+      },
+      {
+        "group": 75,
+        "game": "test-75-7",
+        "side": "p1",
+        "player": "test-75-7",
+        "scenario": "gradual"
+      },
+      {
+        "group": 75,
+        "game": "test-75-18",
+        "side": "p1",
+        "player": "test-75-7",
+        "scenario": "gradual"
+      },
+      {
+        "group": 76,
+        "game": "test-76-6",
+        "side": "p1",
+        "player": "test-76-6",
+        "scenario": "confounded"
+      },
+      {
+        "group": 76,
+        "game": "test-76-17",
+        "side": "p1",
+        "player": "test-76-6",
+        "scenario": "confounded"
+      },
+      {
+        "group": 77,
+        "game": "test-77-5",
+        "side": "p1",
+        "player": "test-77-5",
+        "scenario": "known"
+      },
+      {
+        "group": 77,
+        "game": "test-77-16",
+        "side": "p1",
+        "player": "test-77-5",
+        "scenario": "known"
+      },
+      {
+        "group": 78,
+        "game": "test-78-4",
+        "side": "p1",
+        "player": "test-78-4",
+        "scenario": "unseen_team"
+      },
+      {
+        "group": 78,
+        "game": "test-78-15",
+        "side": "p1",
+        "player": "test-78-4",
+        "scenario": "unseen_team"
+      },
+      {
+        "group": 79,
+        "game": "test-79-3",
+        "side": "p1",
+        "player": "test-79-3",
+        "scenario": "unseen_set"
+      },
+      {
+        "group": 79,
+        "game": "test-79-14",
+        "side": "p1",
+        "player": "test-79-3",
+        "scenario": "unseen_set"
+      },
+      {
+        "group": 80,
+        "game": "test-80-8",
+        "side": "p2",
+        "player": "test-80-11",
+        "scenario": "unseen_family"
+      },
+      {
+        "group": 80,
+        "game": "test-80-17",
+        "side": "p2",
+        "player": "test-80-11",
+        "scenario": "unseen_family"
+      },
+      {
+        "group": 81,
+        "game": "test-81-9",
+        "side": "p2",
+        "player": "test-81-10",
+        "scenario": "abrupt"
+      },
+      {
+        "group": 81,
+        "game": "test-81-18",
+        "side": "p2",
+        "player": "test-81-10",
+        "scenario": "abrupt"
+      },
+      {
+        "group": 82,
+        "game": "test-82-9",
+        "side": "p1",
+        "player": "test-82-9",
+        "scenario": "gradual"
+      },
+      {
+        "group": 82,
+        "game": "test-82-19",
+        "side": "p2",
+        "player": "test-82-9",
+        "scenario": "gradual"
+      },
+      {
+        "group": 83,
+        "game": "test-83-8",
+        "side": "p1",
+        "player": "test-83-8",
+        "scenario": "confounded"
+      },
+      {
+        "group": 83,
+        "game": "test-83-19",
+        "side": "p1",
+        "player": "test-83-8",
+        "scenario": "confounded"
+      }
+    ],
+    "scope": "Identical complete player-games for all methods; masks use public facts before each decision.",
+    "move_metric": "Micro recall@k over true unrevealed moves. Unsupported fields remain null.",
+    "move_recall_upper_bound": {
+      "top1": 0.3229690768274069,
+      "top3": 0.8495675278421618,
+      "top5": 1.0
+    }
+  },
+  "methods": [
+    {
+      "method": "Joint C/X/M/Z filter",
+      "category": "supervised + SMC",
+      "metrics": {
+        "moves": {
+          "count": 17689,
+          "top1": 0.3053309966645938,
+          "top3": 0.7653343886030867,
+          "top5": 0.9189326700209169,
+          "nll": 1.1025082795006262,
+          "coverage": 0.9713381197354288
+        },
+        "item": {
+          "count": 4300,
+          "top1": 0.7865116279069767,
+          "top3": 0.9216279069767442,
+          "top5": 0.9472093023255814,
+          "nll": 1.9532355122444218,
+          "coverage": 0.9472093023255814
+        },
+        "ability": {
+          "count": 4161,
+          "top1": 0.962028358567652,
+          "top3": 0.977409276616198,
+          "top5": 0.977409276616198,
+          "nll": 0.6723897204478345,
+          "coverage": 0.977409276616198
+        },
+        "tera": {
+          "count": 5303,
+          "top1": 0.5087686215349801,
+          "top3": 0.8427305298887422,
+          "top5": 0.8480105600603433,
+          "nll": 5.224104634298336,
+          "coverage": 0.8480105600603433
+        },
+        "action": {
+          "count": 978,
+          "top1": 0.4100204498977505,
+          "top3": 0.7638036809815951,
+          "top5": 0.8742331288343558,
+          "nll": 2.212546788960524,
+          "coverage": 0.9744376278118609,
+          "brier": 0.7306427326471641,
+          "ece_valid_predictions": 0.06551618784417274,
+          "calibration_count": 953
+        }
+      },
+      "input": "Causal public history plus observer own legitimate private information; opponent labels are scoring-only."
+    },
+    {
+      "method": "Current neural prediction heads",
+      "metrics": {
+        "item": {
+          "count": 4300,
+          "hits": [
+            2917,
+            4123,
+            4300
+          ],
+          "top1": 0.6783720930232559,
+          "top3": 0.9588372093023256,
+          "top5": 1.0
+        },
+        "ability": {
+          "count": 4161,
+          "hits": [
+            3975,
+            4161,
+            4161
+          ],
+          "top1": 0.9552992069214131,
+          "top3": 1.0,
+          "top5": 1.0
+        },
+        "tera": {
+          "count": 5303,
+          "hits": [
+            2291,
+            4734,
+            5067
+          ],
+          "top1": 0.4320196115406374,
+          "top3": 0.8927022440128229,
+          "top5": 0.9554968885536489
+        },
+        "moves": {
+          "count": 17689,
+          "hits": [
+            5316,
+            13002,
+            16423
+          ],
+          "top1": 0.3005257504663915,
+          "top3": 0.7350330714003053,
+          "top5": 0.9284300978008933
+        },
+        "action": {
+          "count": 978,
+          "hits": [
+            233,
+            466,
+            605
+          ],
+          "top1": 0.23824130879345604,
+          "top3": 0.47648261758691207,
+          "top5": 0.6186094069529653
+        }
+      },
+      "player_games": 28,
+      "decision_points": 1006,
+      "seconds": 140.40415573120117,
+      "input": "Public-history encoder and trained outcome head; no true hidden configuration, private state, submitted-action history or true legal-action list.",
+      "history_scope": "Same selected encounters as the joint filter; complete first-encounter public support for the second encounter.",
+      "action_scope": "Same fixed non-preview cases as PokéChamp. Move/Tera classes are marginalized to move identity; switches use public species identity. Unknown outcome remains a class and counts as a miss for submitted-action targets.",
+      "limitation": "This evaluates the existing head trained on observable outcomes, not the conditional policy head or joint particle-filter marginal. Submission labels include actions that did not execute.",
+      "category": "supervised",
+      "configuration_samples": 32,
+      "configuration_input": "Causal public-history configuration decoder with sampled prefixes; shared unrevealed-field masks are used only for scoring. No joint filtering or true hidden decoder prefixes."
+    },
+    {
+      "method": "Foul Play native tracker + set sampler",
+      "category": "traditional",
+      "source": "https://github.com/pmariglia/foul-play",
+      "commit": "8f541f8",
+      "samples": 64,
+      "player_games": 28,
+      "decision_points": 1006,
+      "sampled_states": 760,
+      "metrics": {
+        "moves": {
+          "count": 17689,
+          "hits": [
+            5278,
+            12519,
+            15507
+          ],
+          "empty_predictions": 232,
+          "top1": 0.29837752275425405,
+          "top3": 0.7077279665328735,
+          "top5": 0.876646503476737
+        },
+        "item": {
+          "count": 4300,
+          "hits": [
+            3022,
+            3805,
+            3963
+          ],
+          "empty_predictions": 0,
+          "top1": 0.7027906976744186,
+          "top3": 0.8848837209302326,
+          "top5": 0.9216279069767442
+        },
+        "ability": {
+          "count": 4161,
+          "hits": [
+            3924,
+            4142,
+            4142
+          ],
+          "empty_predictions": 0,
+          "top1": 0.943042537851478,
+          "top3": 0.9954337899543378,
+          "top5": 0.9954337899543378
+        },
+        "tera": {
+          "count": 5303,
+          "hits": [
+            1916,
+            3726,
+            4660
+          ],
+          "empty_predictions": 0,
+          "top1": 0.36130492174240997,
+          "top3": 0.7026211578351876,
+          "top5": 0.878747878559306
+        },
+        "action": null
+      },
+      "seconds": 34.267003536224365,
+      "input": "Public history plus observer own legitimate private configuration/requests; no opponent hidden labels or future events.",
+      "prior": "Official cached Showdown/Smogon/replay set tables bundled with the local Foul Play reproduction; not refit on this test set.",
+      "action": "Unsupported: MCTS decisions are not opponent-action predictions."
+    },
+    {
+      "method": "Metamon NaiveUsagePredictor",
+      "category": "traditional",
+      "source": "https://github.com/UT-Austin-RPL/metamon",
+      "samples": 64,
+      "player_games": 28,
+      "decision_points": 1006,
+      "sampled_states": 512,
+      "metrics": {
+        "moves": {
+          "count": 17689,
+          "hits": [
+            4574,
+            11648,
+            15130
+          ],
+          "empty_predictions": 0,
+          "top1": 0.2585787777714964,
+          "top3": 0.6584883260783537,
+          "top5": 0.8553338232800045
+        },
+        "item": {
+          "count": 4300,
+          "hits": [
+            2417,
+            3910,
+            4149
+          ],
+          "empty_predictions": 0,
+          "top1": 0.562093023255814,
+          "top3": 0.9093023255813953,
+          "top5": 0.9648837209302326
+        },
+        "ability": {
+          "count": 4161,
+          "hits": [
+            3941,
+            4161,
+            4161
+          ],
+          "empty_predictions": 0,
+          "top1": 0.947128094208123,
+          "top3": 1.0,
+          "top5": 1.0
+        },
+        "tera": {
+          "count": 5303,
+          "hits": [
+            2130,
+            4593,
+            5064
+          ],
+          "empty_predictions": 0,
+          "top1": 0.4016594380539317,
+          "top3": 0.8661135206486894,
+          "top5": 0.954931171035263
+        },
+        "action": null
+      },
+      "seconds": 8.031015157699585,
+      "input": "Causal public prefix parsed by official SimProtocol; initial revealed fields via PokemonSet.from_ReplayPokemon. No backward filling or hidden labels.",
+      "prior": "Smogon gen9ou October 2026, rating cutoff 0; official SmogonStat parser and native predictor. Cross-tier/historical fallbacks absent from this frozen data source.",
+      "sampling": "Exact native categorical marginals; hidden-move rankings from 64 native unmerged proposals per species followed by native fill_from_PokemonSet. All six names are known, so attribute sampling is independent of teammates.",
+      "action": "Unsupported: team completion does not predict opponent actions."
+    },
+    {
+      "method": "PokéChamp BayesianTeamPredictor",
+      "category": "traditional",
+      "source": "https://github.com/sethkarten/pokechamp",
+      "commit": "0f84c46",
+      "player_games": 28,
+      "decision_points": 1006,
+      "metrics": {
+        "moves": {
+          "count": 17689,
+          "hits": [
+            4815,
+            11785,
+            15234
+          ],
+          "empty_predictions": 0,
+          "top1": 0.2722030640511052,
+          "top3": 0.6662332523036916,
+          "top5": 0.8612131833342755
+        },
+        "item": {
+          "count": 4300,
+          "hits": [
+            2269,
+            3766,
+            4139
+          ],
+          "empty_predictions": 0,
+          "top1": 0.5276744186046511,
+          "top3": 0.8758139534883721,
+          "top5": 0.9625581395348837
+        },
+        "ability": {
+          "count": 4161,
+          "hits": [
+            3941,
+            4161,
+            4161
+          ],
+          "empty_predictions": 0,
+          "top1": 0.947128094208123,
+          "top3": 1.0,
+          "top5": 1.0
+        },
+        "tera": {
+          "count": 5303,
+          "hits": [
+            2320,
+            null,
+            null
+          ],
+          "empty_predictions": 0,
+          "top1": 0.437488214218367,
+          "top3": null,
+          "top5": null
+        },
+        "action": null
+      },
+      "seconds": 3.8753621578216553,
+      "input": "Public team preview and moves revealed before each decision; no hidden labels or future observations.",
+      "prior": {
+        "dataset": "Native Metamon modern_replays gen9ou team cache",
+        "teams": 25192,
+        "species": 408
+      },
+      "method_detail": "Official component marginals with (1 + observed move matches)^2 weighting. The native function accepts teammates but does not use them in these component predictions.",
+      "unsupported": "The native full-config interface supplies one Tera guess (Top-1 only); no Tera Top-3/5 marginal or opponent-action prediction."
+    },
+    {
+      "method": "PokéChamp opponent prompt + Qwen3-8B",
+      "category": "LLM",
+      "source": "https://github.com/sethkarten/pokechamp",
+      "commit": "0f84c46",
+      "backbone": "/data/models/Qwen3-8B",
+      "model_variant": "Official GPTPlayer interface with local Qwen3-8B, thinking disabled; not the paper Llama/GPT checkpoint.",
+      "player_games": 28,
+      "decision_points": 978,
+      "metrics": {
+        "moves": null,
+        "item": null,
+        "ability": null,
+        "tera": null,
+        "action": {
+          "count": 978,
+          "hits": [
+            236,
+            264,
+            264
+          ],
+          "top1": 0.24130879345603273,
+          "top3": 0.26993865030674846,
+          "top5": 0.26993865030674846
+        }
+      },
+      "seconds": 901.9599850177765,
+      "samples": 32,
+      "temperature": 0.3,
+      "invalid_generations": 0,
+      "input": "Official causal replay parser and opponent prompts; observer own private requests only. No opponent true configuration, legal-action list, submitted action or future observations enter inference.",
+      "action_scope": "All non-preview points of the shared locked cohort. Predict submitted move identity or switch species; Tera flags are merged because the native opponent prompt does not emit them.",
+      "ranking": "Empirical action frequencies from repeated unmodified GPTPlayer generations; ties sorted by action name. These are Monte Carlo Top-k results, not the paper original evaluation scores.",
+      "candidate_coverage": 0.7699386503067485,
+      "phases": {
+        "turn": 847,
+        "forced_switch": 131
+      }
+    },
+    {
+      "method": "PokéChamp opponent prompt + Qwen3.8-27B",
+      "category": "LLM",
+      "backbone": "/data/models/Qwen3.8-27B",
+      "quantization": "bitsandbytes 4-bit",
+      "thinking": false,
+      "player_games": 28,
+      "decision_points": 978,
+      "metrics": {
+        "moves": null,
+        "item": null,
+        "ability": null,
+        "tera": null,
+        "action": {
+          "count": 978,
+          "hits": [
+            250,
+            338,
+            341
+          ],
+          "top1": 0.2556237218813906,
+          "top3": 0.3456032719836401,
+          "top5": 0.3486707566462168
+        }
+      },
+      "temperature": 0.3,
+      "samples": 32,
+      "max_tokens": 64,
+      "invalid_generations": 4,
+      "truncated_generations": 0,
+      "input": "Frozen native PokéChamp opponent prompts and candidates from the shared causal cases.",
+      "ranking": "Empirical frequencies of 32 native-prompt JSON generations per decision; ties use action name.",
+      "scoring": "Same locked cohort and unrevealed masks. Moves use micro recall@k. Actions merge Tera and exclude preview. Invalid or missing predictions count as misses.",
+      "candidate_coverage": 0.7699386503067485,
+      "mean_request_seconds": 20.42012368866332
+    },
+    {
+      "method": "Pure Qwen3.8-27B",
+      "category": "LLM",
+      "backbone": "/data/models/Qwen3.8-27B",
+      "quantization": "bitsandbytes 4-bit",
+      "thinking": false,
+      "player_games": 28,
+      "decision_points": 1006,
+      "metrics": {
+        "moves": {
+          "count": 17689,
+          "hits": [
+            1736,
+            4636,
+            5638
+          ],
+          "empty_predictions": 0,
+          "top1": 0.09814008705975465,
+          "top3": 0.2620837808807734,
+          "top5": 0.318729153711346
+        },
+        "item": {
+          "count": 4300,
+          "hits": [
+            668,
+            1257,
+            1479
+          ],
+          "empty_predictions": 0,
+          "top1": 0.15534883720930232,
+          "top3": 0.2923255813953488,
+          "top5": 0.343953488372093
+        },
+        "ability": {
+          "count": 4161,
+          "hits": [
+            1690,
+            2348,
+            2348
+          ],
+          "empty_predictions": 0,
+          "top1": 0.4061523672194184,
+          "top3": 0.5642874309060322,
+          "top5": 0.5642874309060322
+        },
+        "tera": {
+          "count": 5303,
+          "hits": [
+            1198,
+            2037,
+            2627
+          ],
+          "empty_predictions": 0,
+          "top1": 0.22590986234207053,
+          "top3": 0.3841221949839713,
+          "top5": 0.49537997359984914
+        },
+        "action": {
+          "count": 978,
+          "hits": [
+            235,
+            482,
+            574
+          ],
+          "top1": 0.24028629856850717,
+          "top3": 0.49284253578732107,
+          "top5": 0.5869120654396728
+        }
+      },
+      "temperature": 0,
+      "samples": 1,
+      "max_tokens": 2048,
+      "invalid_generations": 0,
+      "truncated_generations": 0,
+      "mean_request_seconds": 135.11795261500043,
+      "input": "Complete observer-visible history, own initial configuration, opponent public preview and previous selected encounter public history. No opponent hidden labels or true legal-action list.",
+      "ranking": "One schema-constrained JSON ranking per decision: five moves/items/Tera candidates, all species abilities, five action positions with null allowed for insufficient public action support. No trained opponent module, usage prior or search.",
+      "scoring": "Same locked cohort and unrevealed masks. Moves use micro recall@k. Actions merge Tera and exclude preview. Invalid or missing predictions count as misses."
+    }
+  ],
+  "joint_runtime": {
+    "model_version": "joint-8x256-step22874-behavior12-jointchange",
+    "split": "test",
+    "games": 28,
+    "windows": 1137,
+    "particles": 1024,
+    "configuration_proposals": 128,
+    "mechanics_branches": 32,
+    "max_windows_per_game": 0,
+    "seconds": 7411.246303319931,
+    "metrics": {
+      "moves": {
+        "count": 17689,
+        "top1": 0.3053309966645938,
+        "top3": 0.7653343886030867,
+        "top5": 0.9189326700209169,
+        "nll": 1.1025082795006262,
+        "coverage": 0.9713381197354288
+      },
+      "item": {
+        "count": 4300,
+        "top1": 0.7865116279069767,
+        "top3": 0.9216279069767442,
+        "top5": 0.9472093023255814,
+        "nll": 1.9532355122444218,
+        "coverage": 0.9472093023255814
+      },
+      "ability": {
+        "count": 4161,
+        "top1": 0.962028358567652,
+        "top3": 0.977409276616198,
+        "top5": 0.977409276616198,
+        "nll": 0.6723897204478345,
+        "coverage": 0.977409276616198
+      },
+      "tera": {
+        "count": 5303,
+        "top1": 0.5087686215349801,
+        "top3": 0.8427305298887422,
+        "top5": 0.8480105600603433,
+        "nll": 5.224104634298336,
+        "coverage": 0.8480105600603433
+      },
+      "action": {
+        "count": 978,
+        "top1": 0.4100204498977505,
+        "top3": 0.7638036809815951,
+        "top5": 0.8742331288343558,
+        "nll": 2.212546788960524,
+        "coverage": 0.9744376278118609,
+        "brier": 0.7306427326471641,
+        "ece_valid_predictions": 0.06551618784417274,
+        "calibration_count": 953
+      }
+    },
+    "workers": 2,
+    "peak_memory_mb_per_worker": {
+      "python_peak_rss": 2473.8671875,
+      "engine_peak_rss": 8647.19921875,
+      "cuda_peak_allocated": 1258.7548828125
+    },
+    "by_phase": {
+      "preview": {
+        "count": 28,
+        "top1": 0.14285714285714285,
+        "top3": 0.5,
+        "top5": 0.8928571428571429,
+        "nll": 1.7856357518288362,
+        "coverage": 1.0,
+        "brier": 0.8339553044626913,
+        "ece_valid_predictions": 0.11368334934453972,
+        "calibration_count": 28
+      },
+      "turn": {
+        "count": 847,
+        "top1": 0.39669421487603307,
+        "top3": 0.7378984651711924,
+        "top5": 0.859504132231405,
+        "nll": 2.2678697170092685,
+        "coverage": 0.9752066115702479,
+        "brier": 0.7467552166756124,
+        "ece_valid_predictions": 0.07656610099399429,
+        "calibration_count": 826
+      },
+      "forced": {
+        "count": 131,
+        "top1": 0.4961832061068702,
+        "top3": 0.9312977099236641,
+        "top5": 0.9694656488549618,
+        "nll": 1.8548481625690243,
+        "coverage": 0.9694656488549618,
+        "brier": 0.6264650687380369,
+        "ece_valid_predictions": 0.11877422387712035,
+        "calibration_count": 127
+      }
+    },
+    "update_failure_rate": 0.0009009009009009009,
+    "unprocessed_window_rate": 0.024626209322779244,
+    "valid_prediction_rate": 0.9762532981530343,
+    "median_update_seconds": 8.635340690612793,
+    "p95_update_seconds": 32.2500795841217,
+    "scope": "Actual joint C/X/M/Z filtering. Opponent truth is scoring-only. Hidden fields scored before decisions; moves are micro recall. Actions merge Tera and use original roster switch identity; preview is reported separately. Invalid full-history posteriors count as misses.",
+    "by_group": {
+      "known": {
+        "metrics": {
+          "moves": {
+            "count": 2119,
+            "top1": 0.2991977347805569,
+            "top3": 0.7385559226050024,
+            "top5": 0.901840490797546,
+            "nll": 0.6844848311265919,
+            "coverage": 0.9924492685228882
+          },
+          "item": {
+            "count": 514,
+            "top1": 0.7101167315175098,
+            "top3": 0.914396887159533,
+            "top5": 0.9824902723735408,
+            "nll": 1.378290586065897,
+            "coverage": 0.9824902723735408
+          },
+          "ability": {
+            "count": 491,
+            "top1": 0.9857433808553971,
+            "top3": 1.0,
+            "top5": 1.0,
+            "nll": 0.021429188048523853,
+            "coverage": 1.0
+          },
+          "tera": {
+            "count": 631,
+            "top1": 0.4976228209191759,
+            "top3": 0.9223454833597464,
+            "top5": 0.936608557844691,
+            "nll": 2.902536856984819,
+            "coverage": 0.936608557844691
+          },
+          "action": {
+            "count": 112,
+            "top1": 0.44642857142857145,
+            "top3": 0.8214285714285714,
+            "top5": 0.8928571428571429,
+            "nll": 1.6072248111292775,
+            "coverage": 1.0,
+            "brier": 0.6891068813405381,
+            "ece_valid_predictions": 0.0900615679152984,
+            "calibration_count": 112
+          }
+        },
+        "windows": 138,
+        "invalid_updates": 0,
+        "update_seconds": 1538.3324744701385
+      },
+      "unseen_team": {
+        "metrics": {
+          "moves": {
+            "count": 2645,
+            "top1": 0.34215500945179583,
+            "top3": 0.7512287334593573,
+            "top5": 0.9315689981096408,
+            "nll": 0.7141745957243785,
+            "coverage": 0.996219281663516
+          },
+          "item": {
+            "count": 668,
+            "top1": 0.8083832335329342,
+            "top3": 0.9446107784431138,
+            "top5": 0.9760479041916168,
+            "nll": 1.197745331358715,
+            "coverage": 0.9760479041916168
+          },
+          "ability": {
+            "count": 595,
+            "top1": 0.9949579831932773,
+            "top3": 1.0,
+            "top5": 1.0,
+            "nll": 0.005257410409252362,
+            "coverage": 1.0
+          },
+          "tera": {
+            "count": 852,
+            "top1": 0.6115023474178404,
+            "top3": 0.9577464788732394,
+            "top5": 0.965962441314554,
+            "nll": 2.156810071574874,
+            "coverage": 0.965962441314554
+          },
+          "action": {
+            "count": 163,
+            "top1": 0.38650306748466257,
+            "top3": 0.754601226993865,
+            "top5": 0.8895705521472392,
+            "nll": 1.644844378565097,
+            "coverage": 1.0,
+            "brier": 0.73187959759322,
+            "ece_valid_predictions": 0.1423750821432332,
+            "calibration_count": 163
+          }
+        },
+        "windows": 189,
+        "invalid_updates": 0,
+        "update_seconds": 1940.5219235420227
+      },
+      "unseen_set": {
+        "metrics": {
+          "moves": {
+            "count": 3870,
+            "top1": 0.3304909560723514,
+            "top3": 0.8392764857881136,
+            "top5": 0.9596899224806201,
+            "nll": 0.438604950461547,
+            "coverage": 0.9906976744186047
+          },
+          "item": {
+            "count": 898,
+            "top1": 0.8674832962138085,
+            "top3": 0.9665924276169265,
+            "top5": 0.9755011135857461,
+            "nll": 0.9907227968612133,
+            "coverage": 0.9755011135857461
+          },
+          "ability": {
+            "count": 844,
+            "top1": 0.9940758293838863,
+            "top3": 0.9988151658767772,
+            "top5": 0.9988151658767772,
+            "nll": 0.046186782473314564,
+            "coverage": 0.9988151658767772
+          },
+          "tera": {
+            "count": 1220,
+            "top1": 0.44754098360655736,
+            "top3": 0.5827868852459016,
+            "top5": 0.5827868852459016,
+            "nll": 12.226067874451868,
+            "coverage": 0.5827868852459016
+          },
+          "action": {
+            "count": 234,
+            "top1": 0.34615384615384615,
+            "top3": 0.7008547008547008,
+            "top5": 0.8290598290598291,
+            "nll": 1.7524562155236274,
+            "coverage": 1.0,
+            "brier": 0.769860212034695,
+            "ece_valid_predictions": 0.1026883544419288,
+            "calibration_count": 234
+          }
+        },
+        "windows": 256,
+        "invalid_updates": 0,
+        "update_seconds": 3088.9158062934875
+      },
+      "unseen_family": {
+        "metrics": {
+          "moves": {
+            "count": 2447,
+            "top1": 0.30935839803841436,
+            "top3": 0.7964854924397221,
+            "top5": 0.9546383326522272,
+            "nll": 0.2348955020416292,
+            "coverage": 0.9975480179812015
+          },
+          "item": {
+            "count": 649,
+            "top1": 0.8428351309707242,
+            "top3": 0.9784283513097073,
+            "top5": 0.9892141756548536,
+            "nll": 0.6401506341159866,
+            "coverage": 0.9892141756548536
+          },
+          "ability": {
+            "count": 627,
+            "top1": 1.0,
+            "top3": 1.0,
+            "top5": 1.0,
+            "nll": -1.2501075843466414e-16,
+            "coverage": 1.0
+          },
+          "tera": {
+            "count": 787,
+            "top1": 0.5324015247776366,
+            "top3": 0.9733163913595934,
+            "top5": 0.9733163913595934,
+            "nll": 1.7371742437192108,
+            "coverage": 0.9733163913595934
+          },
+          "action": {
+            "count": 135,
+            "top1": 0.5555555555555556,
+            "top3": 0.8888888888888888,
+            "top5": 0.9703703703703703,
+            "nll": 1.1899115327999816,
+            "coverage": 1.0,
+            "brier": 0.5888257784998459,
+            "ece_valid_predictions": 0.07902772651448295,
+            "calibration_count": 135
+          }
+        },
+        "windows": 155,
+        "invalid_updates": 0,
+        "update_seconds": 2572.305165052414
+      },
+      "abrupt": {
+        "metrics": {
+          "moves": {
+            "count": 2344,
+            "top1": 0.295221843003413,
+            "top3": 0.7747440273037542,
+            "top5": 0.9347269624573379,
+            "nll": 0.32310750911770625,
+            "coverage": 0.9965870307167235
+          },
+          "item": {
+            "count": 535,
+            "top1": 0.7700934579439253,
+            "top3": 0.9046728971962616,
+            "top5": 0.9514018691588785,
+            "nll": 2.0252350915792543,
+            "coverage": 0.9514018691588785
+          },
+          "ability": {
+            "count": 610,
+            "top1": 0.9147540983606557,
+            "top3": 0.9655737704918033,
+            "top5": 0.9655737704918033,
+            "nll": 1.1981488651896872,
+            "coverage": 0.9655737704918033
+          },
+          "tera": {
+            "count": 636,
+            "top1": 0.6367924528301887,
+            "top3": 0.9748427672955975,
+            "top5": 0.9842767295597484,
+            "nll": 1.408158492888473,
+            "coverage": 0.9842767295597484
+          },
+          "action": {
+            "count": 121,
+            "top1": 0.371900826446281,
+            "top3": 0.743801652892562,
+            "top5": 0.9338842975206612,
+            "nll": 1.5454000611967476,
+            "coverage": 1.0,
+            "brier": 0.7112360796347132,
+            "ece_valid_predictions": 0.08852197462857687,
+            "calibration_count": 121
+          }
+        },
+        "windows": 143,
+        "invalid_updates": 0,
+        "update_seconds": 1418.858298778534
+      },
+      "gradual": {
+        "metrics": {
+          "moves": {
+            "count": 2119,
+            "top1": 0.2873997168475696,
+            "top3": 0.7465785747994337,
+            "top5": 0.9466729589428976,
+            "nll": 0.589433223093436,
+            "coverage": 0.9915054270882492
+          },
+          "item": {
+            "count": 508,
+            "top1": 0.7952755905511811,
+            "top3": 0.9783464566929134,
+            "top5": 0.9822834645669292,
+            "nll": 1.0789073239280003,
+            "coverage": 0.9822834645669292
+          },
+          "ability": {
+            "count": 490,
+            "top1": 0.9612244897959183,
+            "top3": 1.0,
+            "top5": 1.0,
+            "nll": 0.042530912182784104,
+            "coverage": 1.0
+          },
+          "tera": {
+            "count": 585,
+            "top1": 0.4717948717948718,
+            "top3": 0.9504273504273504,
+            "top5": 0.9504273504273504,
+            "nll": 2.7989427003200977,
+            "coverage": 0.9504273504273504
+          },
+          "action": {
+            "count": 102,
+            "top1": 0.5392156862745098,
+            "top3": 0.8725490196078431,
+            "top5": 0.9215686274509803,
+            "nll": 1.257430563412508,
+            "coverage": 1.0,
+            "brier": 0.5760214592015873,
+            "ece_valid_predictions": 0.10900828105522638,
+            "calibration_count": 102
+          }
+        },
+        "windows": 126,
+        "invalid_updates": 0,
+        "update_seconds": 1078.8104016780853
+      },
+      "confounded": {
+        "metrics": {
+          "moves": {
+            "count": 2145,
+            "top1": 0.24475524475524477,
+            "top3": 0.6484848484848484,
+            "top5": 0.7613053613053613,
+            "nll": 5.540461697132588,
+            "coverage": 0.8074592074592074
+          },
+          "item": {
+            "count": 528,
+            "top1": 0.634469696969697,
+            "top3": 0.7159090909090909,
+            "top5": 0.7386363636363636,
+            "nll": 7.488001765894982,
+            "coverage": 0.7386363636363636
+          },
+          "ability": {
+            "count": 504,
+            "top1": 0.8571428571428571,
+            "top3": 0.8571428571428571,
+            "top5": 0.8571428571428571,
+            "nll": 3.955299875228885,
+            "coverage": 0.8571428571428571
+          },
+          "tera": {
+            "count": 592,
+            "top1": 0.36655405405405406,
+            "top3": 0.706081081081081,
+            "top5": 0.7162162162162162,
+            "nll": 8.81485594618621,
+            "coverage": 0.7162162162162162
+          },
+          "action": {
+            "count": 111,
+            "top1": 0.2882882882882883,
+            "top3": 0.6216216216216216,
+            "top5": 0.7027027027027027,
+            "nll": 7.475565863219768,
+            "coverage": 0.7747747747747747,
+            "brier": 1.0237812902984802,
+            "ece_valid_predictions": 0.15985158855756837,
+            "calibration_count": 86
+          }
+        },
+        "windows": 130,
+        "invalid_updates": 28,
+        "update_seconds": 1564.6502375602722
+      }
+    },
+    "action_by_encounter": {
+      "0": {
+        "count": 531,
+        "top1": 0.4086629001883239,
+        "top3": 0.7306967984934086,
+        "top5": 0.8531073446327684,
+        "nll": 2.7866549901732607,
+        "coverage": 0.9529190207156308,
+        "brier": 0.7611420168454068,
+        "ece_valid_predictions": 0.06679767216348584,
+        "calibration_count": 506
+      },
+      "1": {
+        "count": 447,
+        "top1": 0.4116331096196868,
+        "top3": 0.8031319910514542,
+        "top5": 0.8993288590604027,
+        "nll": 1.5305524828219048,
+        "coverage": 1.0,
+        "brier": 0.6944120393378422,
+        "ece_valid_predictions": 0.09753130317612259,
+        "calibration_count": 447
+      }
+    },
+    "latency_scope": "Wall-clock time with 2 concurrent filter workers on shared CPUs and two shared GPUs.",
+    "complete_player_games": 27,
+    "attempted_updates": 1110,
+    "failed_update_cases": [
+      {
+        "game": "test-83-8",
+        "window": 9,
+        "mismatch": {
+          "reason": "no particle explains this resolution window",
+          "at": "test-83-8:9",
+          "diagnosis": "no compatible joint history found in two completed proposal batches"
+        },
+        "cost": {
+          "observation_applied": false,
+          "observation_supported": false,
+          "calls": 5,
+          "total_seconds": 27.912596344947815,
+          "completed_actions": 16,
+          "total_actions": 16,
+          "reused_actions": 0,
+          "update_complete": true,
+          "prediction_seconds": 7.155910134315491e-05,
+          "seconds": 12.279294077306986,
+          "mechanics_runs": 240,
+          "mechanics_seconds": 0.297567468136549,
+          "distinct_states_before": 2,
+          "mechanics_retry": false,
+          "observation_probability_estimate": null,
+          "log_observation_probability_estimate": null,
+          "likelihood_is_exact": true,
+          "observation_estimator": "all legal actions marginalized; conditional state sampling",
+          "posterior_seconds": 0.009013228118419647,
+          "recovery_seconds": 27.495152477174997,
+          "recovery_batches": 2,
+          "recovery_mechanics_runs": 146867,
+          "completed_recovery_candidates": 0,
+          "total_recovery_candidates": 0,
+          "reused_recovery_histories": 0,
+          "complete_recovery_histories": 0,
+          "recovery_target": "p(C) times the causal actor and mechanics likelihood of the complete history",
+          "last_applied_window": 9
+        }
+      }
+    ],
+    "valid_decision_rate": 0.9751491053677932,
+    "valid_action_prediction_rate": 0.9744376278118609,
+    "metrics_on_valid_predictions": {
+      "moves": {
+        "count": 17330,
+        "top1": 0.31165608770917486,
+        "top3": 0.7811886901327179,
+        "top5": 0.9379688401615696,
+        "nll": 0.5529562824851835,
+        "coverage": 0.9914598961338719
+      },
+      "item": {
+        "count": 4200,
+        "top1": 0.8052380952380952,
+        "top3": 0.9435714285714286,
+        "top5": 0.9697619047619047,
+        "nll": 1.3418596645376566,
+        "coverage": 0.9697619047619047
+      },
+      "ability": {
+        "count": 4089,
+        "top1": 0.9789679628270971,
+        "top3": 0.9946197114208853,
+        "top5": 0.9946197114208853,
+        "nll": 0.1976962842838307,
+        "coverage": 0.9946197114208853
+      },
+      "tera": {
+        "count": 5178,
+        "top1": 0.5210505986867516,
+        "top3": 0.8630745461568173,
+        "top5": 0.8684820393974507,
+        "nll": 4.683188342254347,
+        "coverage": 0.8684820393974507
+      },
+      "action": {
+        "count": 953,
+        "top1": 0.42077649527806926,
+        "top3": 0.7838405036726128,
+        "top5": 0.8971668415529905,
+        "nll": 1.545745258872171,
+        "coverage": 1.0,
+        "brier": 0.6973437487187056,
+        "ece_valid_predictions": 0.06551618784417274,
+        "calibration_count": 953
+      }
+    },
+    "configuration_diversity": {
+      "median": 16.0,
+      "fraction_at_most_two": 0.018935978358881875
+    },
+    "initial_hidden_metrics": {
+      "moves": {
+        "count": 672,
+        "top1": 0.24553571428571427,
+        "top3": 0.6622023809523809,
+        "top5": 0.8988095238095238,
+        "nll": 0.3011734951445463,
+        "coverage": 1.0
+      },
+      "item": {
+        "count": 168,
+        "top1": 0.6666666666666666,
+        "top3": 0.9464285714285714,
+        "top5": 1.0,
+        "nll": 0.5868799828181853,
+        "coverage": 1.0
+      },
+      "ability": {
+        "count": 168,
+        "top1": 0.9761904761904762,
+        "top3": 1.0,
+        "top5": 1.0,
+        "nll": 0.0424884723224357,
+        "coverage": 1.0
+      },
+      "tera": {
+        "count": 168,
+        "top1": 0.47619047619047616,
+        "top3": 0.9285714285714286,
+        "top5": 0.9583333333333334,
+        "nll": 2.116676837509934,
+        "coverage": 0.9583333333333334
+      }
+    },
+    "true_attribute_support_loss": {
+      "moves": {
+        "ever_supported": 672,
+        "later_removed": 41,
+        "rate": 0.06101190476190476
+      },
+      "item": {
+        "ever_supported": 168,
+        "later_removed": 23,
+        "rate": 0.13690476190476192
+      },
+      "ability": {
+        "ever_supported": 168,
+        "later_removed": 2,
+        "rate": 0.011904761904761904
+      },
+      "tera": {
+        "ever_supported": 164,
+        "later_removed": 42,
+        "rate": 0.25609756097560976
+      }
+    }
+  },
+  "notes": [
+    "28 player-games from 14 players; this is a matched complete-game evaluation with limited population precision.",
+    "Moves use micro recall@k. Actions merge Tera, exclude preview and retain unexecuted submissions.",
+    "The public neural action head is trained on visible outcomes; the joint filter uses its conditional submitted-action head. This comparison is not an isolated ablation of filtering.",
+    "Encounter breakdowns describe different games; they do not by themselves establish a causal benefit from cross-game memory.",
+    "Unsupported targets are null; supported but missing/invalid predictions count as misses.",
+    "Missing predictions receive zero Top-k hits, NLL -log(1e-12), and action Brier penalty 2; valid-only metrics are retained separately.",
+    "After an unapplied resolution, the remaining decisions in that game count as missing predictions. Latency statistics include attempted updates only."
+  ]
+}

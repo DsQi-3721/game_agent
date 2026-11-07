@@ -19,6 +19,7 @@ import signal
 from pathlib import Path
 from typing import Optional
 
+from arena import showdown
 from arena.config.schema import ExternalConfig
 
 
@@ -38,7 +39,7 @@ class ExternalLauncher:
 
     # --- lifecycle -------------------------------------------------------
     async def start(self, fmt: str, opponent_username: str, run_dir: Path,
-                    username: Optional[str] = None) -> None:
+                    username: Optional[str] = None, team_file: Optional[str] = None) -> None:
         run_dir = Path(run_dir)
         run_dir.mkdir(parents=True, exist_ok=True)
         self._log_path = run_dir / f"external_{self.name}.log"
@@ -46,11 +47,13 @@ class ExternalLauncher:
         env = dict(os.environ)
         env.update(self.cfg.env)
         env.update({
-            "ARENA_SERVER": "ws://localhost:8000/showdown/websocket",
+            "ARENA_SERVER": showdown.websocket_url(),
             "ARENA_USERNAME": username or self.cfg.username,  # fresh name per launch
             "ARENA_OPPONENT": opponent_username,
             "ARENA_FORMAT": fmt,
         })
+        if team_file:                      # mirror teams: the bot must play this paste too
+            env["ARENA_TEAM_FILE"] = team_file
 
         if self.cfg.docker_image:
             argv = ["docker", "run", "--rm", "--network", "host"]
@@ -61,7 +64,7 @@ class ExternalLauncher:
         else:
             argv = list(self.cfg.launch_cmd)
 
-        self._logf = open(self._log_path, "wb")  # noqa: SIM115 (closed in stop())
+        self._logf = open(self._log_path, "ab")  # noqa: SIM115 (closed in stop()); one log over all launches
         self._proc = await asyncio.create_subprocess_exec(
             *argv, cwd=self.cfg.cwd, env=env,
             stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT,

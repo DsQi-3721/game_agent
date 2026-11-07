@@ -25,6 +25,9 @@ def _fmt(choices, k: int) -> str:
 def sets_text(battle: AbstractBattle, mon, k_moves: int = 8) -> str:
     if is_own(battle, mon):
         return f"{mon.species} is your own Pokemon (full set known)."
+    b = DEFAULT_MODEL.belief(battle, mon)
+    if b is not None:
+        return belief_sets_text(b, k_moves)
     prior = DEFAULT_MODEL.set_prior(battle, mon)
     if prior is None:
         return (f"No set data for {mon.species} in {battle.format} "
@@ -45,6 +48,25 @@ def sets_text(battle: AbstractBattle, mon, k_moves: int = 8) -> str:
         if seen.get(key):
             rev.append(f"{key} {seen[key]}")
     lines.append("  revealed: " + ("; ".join(rev) if rev else "nothing yet"))
+    return "\n".join(lines)
+
+
+def belief_sets_text(b, k_moves: int = 8) -> str:
+    """The team-aware model's view: usage + teammates + co-reveals + in-battle evidence."""
+    from arena.opponent.model import _name, spread_text
+    pct = lambda d, kind, k: ", ".join(f"{_name(kind, x) if kind != 'tera' else x.title()} {round(p * 100)}%"  # noqa: E731
+                                       for x, p in list(d.items())[:k]) or "?"
+    lines = [f"{b.name} (usage stats + teammates + what it showed{', ' + str(b.n) + ' teams' if b.n else ''}):"]
+    seen = set(b.revealed.get("moves") or ())
+    lines.append(f"  moves: {pct({m: p for m, p in b.moves.items() if m not in seen}, 'move', k_moves)}"
+                 + (f" (revealed: {', '.join(sorted(seen))})" if seen else ""))
+    item = (f"{_name('item', b.revealed['item'])} (revealed)" if b.revealed.get("item")
+            else f"none now (had {_name('item', b.original_item)})" if b.original_item else pct(b.items, "item", 4))
+    lines.append(f"  item: {item} | ability: {pct(b.abilities, 'ability', 3)} | tera: {pct(b.tera, 'tera', 4)}")
+    if b.spreads:
+        lines.append("  spreads: " + "; ".join(f"{spread_text(n, e)} {round(p * 100)}%" for n, e, p in b.spreads[:3]))
+    if b.notes:
+        lines.append("  evidence: " + "; ".join(b.notes[:6]))
     return "\n".join(lines)
 
 

@@ -1,0 +1,11 @@
+# Local System-1 student in Gen 9 OU.
+name: s1_student_ou
+format: gen9ou
+seed: 11
+agents:
+  - {name: v7_2b, type: jev_fast, params: {teacher: false, student_url: "http://127.0.0.1:8093", student_model: s1-v7-2b, s1_timeout_s: 20.0, max_hard: 1.0, record: true}}
+  - {name: heuristic, type: simple_heuristics}
+  - {name: maxpow, type: max_base_power}
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 30, anchors: [heuristic, maxpow]}
+guardrails: {max_cost_usd: 0.01}

@@ -21,6 +21,7 @@ from arena.teams.pool import TeamPool
 class AssignmentMode(str, Enum):
     MIRROR = "mirror"
     POOL_RANDOM = "pool_random"
+    POOLS = "pools"              # our team from ``teams.pool``, the opponent's from ``teams.opponent_pool``
     AGENT_BUILT = "agent_built"
 
 

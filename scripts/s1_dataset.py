@@ -28,14 +28,22 @@ def main() -> None:
     ap.add_argument("--max-per-request", type=int, default=24)
     ap.add_argument("--valid-frac", type=float, default=0.15)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--self-labels", action="store_true",
+                    help="teacher-free: label the student's own requests with System 2's choice (s2_key)")
+    ap.add_argument("--won-self-weight", type=float, default=0.0,
+                    help="with --self-labels: also reinforce the moves played in won battles (mixing weight)")
+    ap.add_argument("--debias-orders", action="store_true",
+                    help="train both option orders of a Choice toward the mean of the two teacher answers")
     args = ap.parse_args()
     paths = sorted({p for g in (args.experience or ["runs/**/s1exp_*.jsonl"]) for p in glob.glob(g, recursive=True)})
     if not paths:
         raise SystemExit("no experience logs found")
     records = load_records(paths)
-    cfg = ds.BuildConfig(teachers=tuple(args.teachers.split(",")), s2_weight=args.s2_weight,
+    cfg = ds.BuildConfig(teachers=tuple(t for t in args.teachers.split(",") if t), s2_weight=args.s2_weight,
+                         self_labels=args.self_labels, won_self_weight=args.won_self_weight,
                          purposes=tuple(args.purposes.split(",")) if args.purposes else None,
-                         max_per_request=args.max_per_request or None, valid_frac=args.valid_frac, seed=args.seed)
+                         max_per_request=args.max_per_request or None, valid_frac=args.valid_frac, seed=args.seed,
+                         debias_orders=args.debias_orders)
     examples = ds.build(records, cfg)
     out = Path(args.out)
     ds.write_jsonl([e for e in examples if e["split"] == "train"], out / "train.jsonl")

@@ -140,7 +140,8 @@ class MonitorScreen(Screen):
 
     def action_open_battle(self) -> None:
         if self.cur_tag:
-            webbrowser.open(f"http://localhost:8000/{self.cur_tag}")
+            from arena import showdown
+            webbrowser.open(f"{showdown.http_url()}/{self.cur_tag}")
 
     def action_results(self) -> None:
         from arena.tui.screens.results_screen import ResultsScreen

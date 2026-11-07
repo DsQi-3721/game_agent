@@ -1,0 +1,4181 @@
+{
+  "main_experiment": {
+    "source": "training/joint_validation/joint/parts",
+    "players": [
+      {
+        "alias": "M01",
+        "player": "test-70-12",
+        "scenario": "known",
+        "decisions": 33,
+        "excluded_invalid": 0,
+        "games": [
+          "test-70-7",
+          "test-70-16"
+        ],
+        "predicted": [
+          0.9090909090909091,
+          0.09090909090909091,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          0.9090909090909091,
+          0.09090909090909091,
+          0.0,
+          0.06060606060606061,
+          0.0
+        ]
+      },
+      {
+        "alias": "M02",
+        "player": "test-71-11",
+        "scenario": "unseen_team",
+        "decisions": 101,
+        "excluded_invalid": 0,
+        "games": [
+          "test-71-8",
+          "test-71-17"
+        ],
+        "predicted": [
+          0.8316831683168316,
+          0.10891089108910891,
+          0.0594059405940594,
+          0.06930693069306931,
+          0.0
+        ],
+        "observed": [
+          0.5445544554455446,
+          0.13861386138613863,
+          0.31683168316831684,
+          0.0594059405940594,
+          0.009900990099009901
+        ]
+      },
+      {
+        "alias": "M03",
+        "player": "test-72-10",
+        "scenario": "unseen_set",
+        "decisions": 127,
+        "excluded_invalid": 0,
+        "games": [
+          "test-72-9",
+          "test-72-18"
+        ],
+        "predicted": [
+          0.2755905511811024,
+          0.1889763779527559,
+          0.5354330708661418,
+          0.0,
+          0.06299212598425197
+        ],
+        "observed": [
+          0.33858267716535434,
+          0.2047244094488189,
+          0.4566929133858268,
+          0.0,
+          0.031496062992125984
+        ]
+      },
+      {
+        "alias": "M04",
+        "player": "test-73-9",
+        "scenario": "unseen_family",
+        "decisions": 41,
+        "excluded_invalid": 0,
+        "games": [
+          "test-73-9",
+          "test-73-19"
+        ],
+        "predicted": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          0.8536585365853658,
+          0.12195121951219512,
+          0.024390243902439025,
+          0.0,
+          0.024390243902439025
+        ]
+      },
+      {
+        "alias": "M05",
+        "player": "test-74-8",
+        "scenario": "abrupt",
+        "decisions": 69,
+        "excluded_invalid": 0,
+        "games": [
+          "test-74-8",
+          "test-74-19"
+        ],
+        "predicted": [
+          0.5072463768115942,
+          0.42028985507246375,
+          0.07246376811594203,
+          0.13043478260869565,
+          0.2898550724637681
+        ],
+        "observed": [
+          0.43478260869565216,
+          0.34782608695652173,
+          0.21739130434782608,
+          0.13043478260869565,
+          0.17391304347826086
+        ]
+      },
+      {
+        "alias": "M06",
+        "player": "test-75-7",
+        "scenario": "gradual",
+        "decisions": 57,
+        "excluded_invalid": 0,
+        "games": [
+          "test-75-7",
+          "test-75-18"
+        ],
+        "predicted": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          0.8771929824561403,
+          0.017543859649122806,
+          0.10526315789473684,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "alias": "M07",
+        "player": "test-76-6",
+        "scenario": "confounded",
+        "decisions": 36,
+        "excluded_invalid": 0,
+        "games": [
+          "test-76-6",
+          "test-76-17"
+        ],
+        "predicted": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "alias": "M08",
+        "player": "test-77-5",
+        "scenario": "known",
+        "decisions": 58,
+        "excluded_invalid": 0,
+        "games": [
+          "test-77-5",
+          "test-77-16"
+        ],
+        "predicted": [
+          0.8103448275862069,
+          0.1896551724137931,
+          0.0,
+          0.034482758620689655,
+          0.13793103448275862
+        ],
+        "observed": [
+          0.7068965517241379,
+          0.15517241379310345,
+          0.13793103448275862,
+          0.017241379310344827,
+          0.06896551724137931
+        ]
+      },
+      {
+        "alias": "M09",
+        "player": "test-78-4",
+        "scenario": "unseen_team",
+        "decisions": 48,
+        "excluded_invalid": 0,
+        "games": [
+          "test-78-4",
+          "test-78-15"
+        ],
+        "predicted": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          0.9375,
+          0.0625,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "alias": "M10",
+        "player": "test-79-3",
+        "scenario": "unseen_set",
+        "decisions": 81,
+        "excluded_invalid": 0,
+        "games": [
+          "test-79-3",
+          "test-79-14"
+        ],
+        "predicted": [
+          0.654320987654321,
+          0.1111111111111111,
+          0.2345679012345679,
+          0.07407407407407407,
+          0.037037037037037035
+        ],
+        "observed": [
+          0.6666666666666666,
+          0.07407407407407407,
+          0.25925925925925924,
+          0.024691358024691357,
+          0.012345679012345678
+        ]
+      },
+      {
+        "alias": "M11",
+        "player": "test-80-11",
+        "scenario": "unseen_family",
+        "decisions": 70,
+        "excluded_invalid": 0,
+        "games": [
+          "test-80-8",
+          "test-80-17"
+        ],
+        "predicted": [
+          0.9,
+          0.1,
+          0.0,
+          0.0,
+          0.04285714285714286
+        ],
+        "observed": [
+          0.5571428571428572,
+          0.35714285714285715,
+          0.08571428571428572,
+          0.0,
+          0.15714285714285714
+        ]
+      },
+      {
+        "alias": "M12",
+        "player": "test-81-10",
+        "scenario": "abrupt",
+        "decisions": 36,
+        "excluded_invalid": 0,
+        "games": [
+          "test-81-9",
+          "test-81-18"
+        ],
+        "predicted": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "observed": [
+          0.9722222222222222,
+          0.027777777777777776,
+          0.0,
+          0.027777777777777776,
+          0.0
+        ]
+      },
+      {
+        "alias": "M13",
+        "player": "test-82-9",
+        "scenario": "gradual",
+        "decisions": 33,
+        "excluded_invalid": 0,
+        "games": [
+          "test-82-9",
+          "test-82-19"
+        ],
+        "predicted": [
+          0.8181818181818182,
+          0.15151515151515152,
+          0.030303030303030304,
+          0.09090909090909091,
+          0.0
+        ],
+        "observed": [
+          0.696969696969697,
+          0.15151515151515152,
+          0.15151515151515152,
+          0.06060606060606061,
+          0.0
+        ]
+      },
+      {
+        "alias": "M14",
+        "player": "test-83-8",
+        "scenario": "confounded",
+        "decisions": 36,
+        "excluded_invalid": 21,
+        "games": [
+          "test-83-8",
+          "test-83-19"
+        ],
+        "predicted": [
+          0.2777777777777778,
+          0.4166666666666667,
+          0.3055555555555556,
+          0.16666666666666666,
+          0.16666666666666666
+        ],
+        "observed": [
+          0.2777777777777778,
+          0.3333333333333333,
+          0.3888888888888889,
+          0.1111111111111111,
+          0.08333333333333333
+        ]
+      }
+    ],
+    "dimensions": [
+      "攻击",
+      "变化招式",
+      "主动换人",
+      "强化",
+      "回复"
+    ],
+    "ordinary_decisions": 847,
+    "used_decisions": 826,
+    "omitted_forced": 131,
+    "excluded_invalid": 21,
+    "definition": "各玩家有效普通决策中，模型Top-1行动或实际提交行动属于相应行为的比例。攻击、变化招式、主动换人合计100%；强化和回复为可重叠的附加标签。",
+    "limitations": "局面、队伍和行为机会不同会影响频率；这不是共同局面下的稳定玩家画像。原始行动评分合并了太晶选项，不能还原太晶预测概率。"
+  },
+  "standardized_memory": {
+    "source": "training/experiments/profile_transfer/memory",
+    "model": "training/adaptation/model.pt",
+    "players": [
+      {
+        "alias": "P01",
+        "player": "test-84-12",
+        "family": "learned",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 148,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.23213693499565125,
+            "posterior_interval_90": [
+              0.10595662891864777,
+              0.4333847761154175
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.12897171080112457,
+            "posterior_interval_90": [
+              0.03390403091907501,
+              0.20028163492679596
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.15599793195724487,
+            "posterior_interval_90": [
+              0.09441240131855011,
+              0.272341251373291
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.06865546852350235,
+            "posterior_interval_90": [
+              0.034321270883083344,
+              0.15346816182136536
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.23213693499565125,
+          0.12897171080112457,
+          0.15599793195724487,
+          0.06865546852350235
+        ],
+        "posterior_interval_90": [
+          [
+            0.10595662891864777,
+            0.4333847761154175
+          ],
+          [
+            0.03390403091907501,
+            0.20028163492679596
+          ],
+          [
+            0.09441240131855011,
+            0.272341251373291
+          ],
+          [
+            0.034321270883083344,
+            0.15346816182136536
+          ]
+        ],
+        "pca": [
+          -0.04449790502802121,
+          -0.16947172597837595
+        ]
+      },
+      {
+        "alias": "P02",
+        "player": "test-85-12",
+        "family": "learned",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 198,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.1996225118637085,
+            "posterior_interval_90": [
+              0.08820731937885284,
+              0.3623873293399811
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.1661897748708725,
+            "posterior_interval_90": [
+              0.04932631924748421,
+              0.3312895894050598
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.24251508712768555,
+            "posterior_interval_90": [
+              0.10391118377447128,
+              0.5121050477027893
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.22306349873542786,
+            "posterior_interval_90": [
+              0.12433560192584991,
+              0.40206804871559143
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.1996225118637085,
+          0.1661897748708725,
+          0.24251508712768555,
+          0.22306349873542786
+        ],
+        "posterior_interval_90": [
+          [
+            0.08820731937885284,
+            0.3623873293399811
+          ],
+          [
+            0.04932631924748421,
+            0.3312895894050598
+          ],
+          [
+            0.10391118377447128,
+            0.5121050477027893
+          ],
+          [
+            0.12433560192584991,
+            0.40206804871559143
+          ]
+        ],
+        "pca": [
+          -0.04677588922217069,
+          0.0032262365146914452
+        ]
+      },
+      {
+        "alias": "P03",
+        "player": "test-91-13",
+        "family": "random",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 223,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.6392019391059875,
+            "posterior_interval_90": [
+              0.4499467611312866,
+              0.7146555185317993
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.200984925031662,
+            "posterior_interval_90": [
+              0.13633164763450623,
+              0.28378379344940186
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.29249098896980286,
+            "posterior_interval_90": [
+              0.222495436668396,
+              0.3577699065208435
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.1853785514831543,
+            "posterior_interval_90": [
+              0.09061252325773239,
+              0.25981202721595764
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.6392019391059875,
+          0.200984925031662,
+          0.29249098896980286,
+          0.1853785514831543
+        ],
+        "posterior_interval_90": [
+          [
+            0.4499467611312866,
+            0.7146555185317993
+          ],
+          [
+            0.13633164763450623,
+            0.28378379344940186
+          ],
+          [
+            0.222495436668396,
+            0.3577699065208435
+          ],
+          [
+            0.09061252325773239,
+            0.25981202721595764
+          ]
+        ],
+        "pca": [
+          0.38935799356019074,
+          -0.058284061285240434
+        ]
+      },
+      {
+        "alias": "P04",
+        "player": "test-92-13",
+        "family": "random",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 152,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.21782076358795166,
+            "posterior_interval_90": [
+              0.21392926573753357,
+              0.22197745740413666
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.1674244999885559,
+            "posterior_interval_90": [
+              0.16285495460033417,
+              0.16585195064544678
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2901293635368347,
+            "posterior_interval_90": [
+              0.287492960691452,
+              0.2907225489616394
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.23624855279922485,
+            "posterior_interval_90": [
+              0.23405912518501282,
+              0.23525014519691467
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.21782076358795166,
+          0.1674244999885559,
+          0.2901293635368347,
+          0.23624855279922485
+        ],
+        "posterior_interval_90": [
+          [
+            0.21392926573753357,
+            0.22197745740413666
+          ],
+          [
+            0.16285495460033417,
+            0.16585195064544678
+          ],
+          [
+            0.287492960691452,
+            0.2907225489616394
+          ],
+          [
+            0.23405912518501282,
+            0.23525014519691467
+          ]
+        ],
+        "pca": [
+          -0.020178131238957193,
+          0.024118662362708685
+        ]
+      },
+      {
+        "alias": "P05",
+        "player": "test-98-14",
+        "family": "adaptive",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 147,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.18926919996738434,
+            "posterior_interval_90": [
+              0.08467473834753036,
+              0.26857125759124756
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.05885970592498779,
+            "posterior_interval_90": [
+              0.018713314086198807,
+              0.11062254011631012
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.1516437828540802,
+            "posterior_interval_90": [
+              0.08514217287302017,
+              0.22477933764457703
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2838934659957886,
+            "posterior_interval_90": [
+              0.1719348132610321,
+              0.45068860054016113
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.18926919996738434,
+          0.05885970592498779,
+          0.1516437828540802,
+          0.2838934659957886
+        ],
+        "posterior_interval_90": [
+          [
+            0.08467473834753036,
+            0.26857125759124756
+          ],
+          [
+            0.018713314086198807,
+            0.11062254011631012
+          ],
+          [
+            0.08514217287302017,
+            0.22477933764457703
+          ],
+          [
+            0.1719348132610321,
+            0.45068860054016113
+          ]
+        ],
+        "pca": [
+          -0.09551752280116364,
+          0.03873837082616316
+        ]
+      },
+      {
+        "alias": "P06",
+        "player": "test-99-14",
+        "family": "adaptive",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 231,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.14618059992790222,
+            "posterior_interval_90": [
+              0.10101170837879181,
+              0.29036298394203186
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.11124704778194427,
+            "posterior_interval_90": [
+              0.03763822466135025,
+              0.14568080008029938
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.19777482748031616,
+            "posterior_interval_90": [
+              0.10519509017467499,
+              0.2321263998746872
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.22557559609413147,
+            "posterior_interval_90": [
+              0.12301117181777954,
+              0.28758421540260315
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.14618059992790222,
+          0.11124704778194427,
+          0.19777482748031616,
+          0.22557559609413147
+        ],
+        "posterior_interval_90": [
+          [
+            0.10101170837879181,
+            0.29036298394203186
+          ],
+          [
+            0.03763822466135025,
+            0.14568080008029938
+          ],
+          [
+            0.10519509017467499,
+            0.2321263998746872
+          ],
+          [
+            0.12301117181777954,
+            0.28758421540260315
+          ]
+        ],
+        "pca": [
+          -0.1183611272407968,
+          -0.0020981429463153307
+        ]
+      },
+      {
+        "alias": "P07",
+        "player": "test-105-15",
+        "family": "rule",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 111,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.23729035258293152,
+            "posterior_interval_90": [
+              0.16347280144691467,
+              0.35565707087516785
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.0843297690153122,
+            "posterior_interval_90": [
+              0.04148344695568085,
+              0.12499647587537766
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.20264673233032227,
+            "posterior_interval_90": [
+              0.15178515017032623,
+              0.3228495121002197
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.3260626196861267,
+            "posterior_interval_90": [
+              0.21299053728580475,
+              0.3886263370513916
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.23729035258293152,
+          0.0843297690153122,
+          0.20264673233032227,
+          0.3260626196861267
+        ],
+        "posterior_interval_90": [
+          [
+            0.16347280144691467,
+            0.35565707087516785
+          ],
+          [
+            0.04148344695568085,
+            0.12499647587537766
+          ],
+          [
+            0.15178515017032623,
+            0.3228495121002197
+          ],
+          [
+            0.21299053728580475,
+            0.3886263370513916
+          ]
+        ],
+        "pca": [
+          -0.03333096098446407,
+          0.08751805025917857
+        ]
+      },
+      {
+        "alias": "P08",
+        "player": "test-106-15",
+        "family": "rule",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 129,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.2229294329881668,
+            "posterior_interval_90": [
+              0.15782585740089417,
+              0.3719039559364319
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.06174788996577263,
+            "posterior_interval_90": [
+              0.023667778819799423,
+              0.15958544611930847
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.24640929698944092,
+            "posterior_interval_90": [
+              0.11307785660028458,
+              0.399509072303772
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.24538856744766235,
+            "posterior_interval_90": [
+              0.1710117757320404,
+              0.3885934352874756
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.2229294329881668,
+          0.06174788996577263,
+          0.24640929698944092,
+          0.24538856744766235
+        ],
+        "posterior_interval_90": [
+          [
+            0.15782585740089417,
+            0.3719039559364319
+          ],
+          [
+            0.023667778819799423,
+            0.15958544611930847
+          ],
+          [
+            0.11307785660028458,
+            0.399509072303772
+          ],
+          [
+            0.1710117757320404,
+            0.3885934352874756
+          ]
+        ],
+        "pca": [
+          -0.04697487560434109,
+          0.017469504765076867
+        ]
+      },
+      {
+        "alias": "P09",
+        "player": "test-112-16",
+        "family": "search",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 244,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.32025283575057983,
+            "posterior_interval_90": [
+              0.16147814691066742,
+              0.6146426796913147
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.19439756870269775,
+            "posterior_interval_90": [
+              0.06089160963892937,
+              0.3857903480529785
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.29110631346702576,
+            "posterior_interval_90": [
+              0.13691291213035583,
+              0.43853825330734253
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.24480274319648743,
+            "posterior_interval_90": [
+              0.10068245232105255,
+              0.4144836366176605
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.32025283575057983,
+          0.19439756870269775,
+          0.29110631346702576,
+          0.24480274319648743
+        ],
+        "posterior_interval_90": [
+          [
+            0.16147814691066742,
+            0.6146426796913147
+          ],
+          [
+            0.06089160963892937,
+            0.3857903480529785
+          ],
+          [
+            0.13691291213035583,
+            0.43853825330734253
+          ],
+          [
+            0.10068245232105255,
+            0.4144836366176605
+          ]
+        ],
+        "pca": [
+          0.08441108872405693,
+          0.025693993606580628
+        ]
+      },
+      {
+        "alias": "P10",
+        "player": "test-113-16",
+        "family": "search",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 118,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.17089909315109253,
+            "posterior_interval_90": [
+              0.07911583036184311,
+              0.20078986883163452
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.13374611735343933,
+            "posterior_interval_90": [
+              0.08430396020412445,
+              0.1542605757713318
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.17036691308021545,
+            "posterior_interval_90": [
+              0.150837704539299,
+              0.20097367465496063
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.4656336307525635,
+            "posterior_interval_90": [
+              0.11215093731880188,
+              0.5051695108413696
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.17089909315109253,
+          0.13374611735343933,
+          0.17036691308021545,
+          0.4656336307525635
+        ],
+        "posterior_interval_90": [
+          [
+            0.07911583036184311,
+            0.20078986883163452
+          ],
+          [
+            0.08430396020412445,
+            0.1542605757713318
+          ],
+          [
+            0.150837704539299,
+            0.20097367465496063
+          ],
+          [
+            0.11215093731880188,
+            0.5051695108413696
+          ]
+        ],
+        "pca": [
+          -0.08687862871474256,
+          0.2256471394058206
+        ]
+      },
+      {
+        "alias": "P11",
+        "player": "test-119-17",
+        "family": "learned",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 129,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.13199086487293243,
+            "posterior_interval_90": [
+              0.05963427573442459,
+              0.17605943977832794
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.07882995158433914,
+            "posterior_interval_90": [
+              0.0437840037047863,
+              0.19257941842079163
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2599860429763794,
+            "posterior_interval_90": [
+              0.1045021116733551,
+              0.3412729799747467
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.10305966436862946,
+            "posterior_interval_90": [
+              0.040446460247039795,
+              0.13779215514659882
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.13199086487293243,
+          0.07882995158433914,
+          0.2599860429763794,
+          0.10305966436862946
+        ],
+        "posterior_interval_90": [
+          [
+            0.05963427573442459,
+            0.17605943977832794
+          ],
+          [
+            0.0437840037047863,
+            0.19257941842079163
+          ],
+          [
+            0.1045021116733551,
+            0.3412729799747467
+          ],
+          [
+            0.040446460247039795,
+            0.13779215514659882
+          ]
+        ],
+        "pca": [
+          -0.13212204348143541,
+          -0.1098501958043391
+        ]
+      },
+      {
+        "alias": "P12",
+        "player": "test-120-17",
+        "family": "learned",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 164,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.1497470587491989,
+            "posterior_interval_90": [
+              0.09479977935552597,
+              0.20902132987976074
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.12078572809696198,
+            "posterior_interval_90": [
+              0.07615402340888977,
+              0.21635137498378754
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.11740674823522568,
+            "posterior_interval_90": [
+              0.08718789368867874,
+              0.24020421504974365
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.12144675850868225,
+            "posterior_interval_90": [
+              0.03468875586986542,
+              0.15229138731956482
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.1497470587491989,
+          0.12078572809696198,
+          0.11740674823522568,
+          0.12144675850868225
+        ],
+        "posterior_interval_90": [
+          [
+            0.09479977935552597,
+            0.20902132987976074
+          ],
+          [
+            0.07615402340888977,
+            0.21635137498378754
+          ],
+          [
+            0.08718789368867874,
+            0.24020421504974365
+          ],
+          [
+            0.03468875586986542,
+            0.15229138731956482
+          ]
+        ],
+        "pca": [
+          -0.13039103091002638,
+          -0.11931326712754921
+        ]
+      },
+      {
+        "alias": "P13",
+        "player": "test-126-18",
+        "family": "random",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 222,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.5626288652420044,
+            "posterior_interval_90": [
+              0.36264893412590027,
+              0.8479090929031372
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.12979602813720703,
+            "posterior_interval_90": [
+              0.06386976689100266,
+              0.2717750370502472
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.29161399602890015,
+            "posterior_interval_90": [
+              0.12710005044937134,
+              0.3932621479034424
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.1799793243408203,
+            "posterior_interval_90": [
+              0.021294575184583664,
+              0.3211836814880371
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.5626288652420044,
+          0.12979602813720703,
+          0.29161399602890015,
+          0.1799793243408203
+        ],
+        "posterior_interval_90": [
+          [
+            0.36264893412590027,
+            0.8479090929031372
+          ],
+          [
+            0.06386976689100266,
+            0.2717750370502472
+          ],
+          [
+            0.12710005044937134,
+            0.3932621479034424
+          ],
+          [
+            0.021294575184583664,
+            0.3211836814880371
+          ]
+        ],
+        "pca": [
+          0.2995054882026142,
+          -0.061614923291961644
+        ]
+      },
+      {
+        "alias": "P14",
+        "player": "test-127-18",
+        "family": "random",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 180,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.5338609218597412,
+            "posterior_interval_90": [
+              0.5002623796463013,
+              0.5565406084060669
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09724356979131699,
+            "posterior_interval_90": [
+              0.05942296236753464,
+              0.139083132147789
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.22165903449058533,
+            "posterior_interval_90": [
+              0.1777665615081787,
+              0.2674049735069275
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.1661733239889145,
+            "posterior_interval_90": [
+              0.15314532816410065,
+              0.1739671230316162
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.5338609218597412,
+          0.09724356979131699,
+          0.22165903449058533,
+          0.1661733239889145
+        ],
+        "posterior_interval_90": [
+          [
+            0.5002623796463013,
+            0.5565406084060669
+          ],
+          [
+            0.05942296236753464,
+            0.139083132147789
+          ],
+          [
+            0.1777665615081787,
+            0.2674049735069275
+          ],
+          [
+            0.15314532816410065,
+            0.1739671230316162
+          ]
+        ],
+        "pca": [
+          0.2516296471037168,
+          -0.08858043338947914
+        ]
+      },
+      {
+        "alias": "P15",
+        "player": "test-133-19",
+        "family": "adaptive",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 146,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.24191439151763916,
+            "posterior_interval_90": [
+              0.10912258923053741,
+              0.30121558904647827
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.07608780264854431,
+            "posterior_interval_90": [
+              0.04971162974834442,
+              0.08474820852279663
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.17084333300590515,
+            "posterior_interval_90": [
+              0.11362484097480774,
+              0.19983306527137756
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.22057192027568817,
+            "posterior_interval_90": [
+              0.18344911932945251,
+              0.2877744734287262
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.24191439151763916,
+          0.07608780264854431,
+          0.17084333300590515,
+          0.22057192027568817
+        ],
+        "posterior_interval_90": [
+          [
+            0.10912258923053741,
+            0.30121558904647827
+          ],
+          [
+            0.04971162974834442,
+            0.08474820852279663
+          ],
+          [
+            0.11362484097480774,
+            0.19983306527137756
+          ],
+          [
+            0.18344911932945251,
+            0.2877744734287262
+          ]
+        ],
+        "pca": [
+          -0.03979760185331768,
+          -0.022505586996435366
+        ]
+      },
+      {
+        "alias": "P16",
+        "player": "test-134-19",
+        "family": "adaptive",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 165,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.5275375843048096,
+            "posterior_interval_90": [
+              0.20989422500133514,
+              0.5993346571922302
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.11087784171104431,
+            "posterior_interval_90": [
+              0.05215251445770264,
+              0.13239449262619019
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.16248562932014465,
+            "posterior_interval_90": [
+              0.12616181373596191,
+              0.2641454041004181
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.315155029296875,
+            "posterior_interval_90": [
+              0.21755297482013702,
+              0.44265156984329224
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.5275375843048096,
+          0.11087784171104431,
+          0.16248562932014465,
+          0.315155029296875
+        ],
+        "posterior_interval_90": [
+          [
+            0.20989422500133514,
+            0.5993346571922302
+          ],
+          [
+            0.05215251445770264,
+            0.13239449262619019
+          ],
+          [
+            0.12616181373596191,
+            0.2641454041004181
+          ],
+          [
+            0.21755297482013702,
+            0.44265156984329224
+          ]
+        ],
+        "pca": [
+          0.2428511823254213,
+          0.04614795774519595
+        ]
+      },
+      {
+        "alias": "P17",
+        "player": "test-140-0",
+        "family": "rule",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 158,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.3546353280544281,
+            "posterior_interval_90": [
+              0.28296157717704773,
+              0.40133947134017944
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09431114047765732,
+            "posterior_interval_90": [
+              0.05320800095796585,
+              0.12341418862342834
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.24201413989067078,
+            "posterior_interval_90": [
+              0.21735529601573944,
+              0.28150272369384766
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.27476999163627625,
+            "posterior_interval_90": [
+              0.14760997891426086,
+              0.32157230377197266
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.3546353280544281,
+          0.09431114047765732,
+          0.24201413989067078,
+          0.27476999163627625
+        ],
+        "posterior_interval_90": [
+          [
+            0.28296157717704773,
+            0.40133947134017944
+          ],
+          [
+            0.05320800095796585,
+            0.12341418862342834
+          ],
+          [
+            0.21735529601573944,
+            0.28150272369384766
+          ],
+          [
+            0.14760997891426086,
+            0.32157230377197266
+          ]
+        ],
+        "pca": [
+          0.0865926436315893,
+          0.03615207610706761
+        ]
+      },
+      {
+        "alias": "P18",
+        "player": "test-141-0",
+        "family": "rule",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 174,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.20817691087722778,
+            "posterior_interval_90": [
+              0.18957222998142242,
+              0.2754751145839691
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.0718449056148529,
+            "posterior_interval_90": [
+              0.05362484231591225,
+              0.0782700851559639
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2640402317047119,
+            "posterior_interval_90": [
+              0.24810010194778442,
+              0.2715948820114136
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2449394166469574,
+            "posterior_interval_90": [
+              0.19977259635925293,
+              0.39450526237487793
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.20817691087722778,
+          0.0718449056148529,
+          0.2640402317047119,
+          0.2449394166469574
+        ],
+        "posterior_interval_90": [
+          [
+            0.18957222998142242,
+            0.2754751145839691
+          ],
+          [
+            0.05362484231591225,
+            0.0782700851559639
+          ],
+          [
+            0.24810010194778442,
+            0.2715948820114136
+          ],
+          [
+            0.19977259635925293,
+            0.39450526237487793
+          ]
+        ],
+        "pca": [
+          -0.05564521465908303,
+          0.022397492316879763
+        ]
+      },
+      {
+        "alias": "P19",
+        "player": "test-147-1",
+        "family": "search",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 174,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.24833759665489197,
+            "posterior_interval_90": [
+              0.23435655236244202,
+              0.27450934052467346
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.10428078472614288,
+            "posterior_interval_90": [
+              0.04786849766969681,
+              0.29105228185653687
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.15153256058692932,
+            "posterior_interval_90": [
+              0.1053837463259697,
+              0.319781094789505
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.39769649505615234,
+            "posterior_interval_90": [
+              0.380614697933197,
+              0.4382131099700928
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.24833759665489197,
+          0.10428078472614288,
+          0.15153256058692932,
+          0.39769649505615234
+        ],
+        "posterior_interval_90": [
+          [
+            0.23435655236244202,
+            0.27450934052467346
+          ],
+          [
+            0.04786849766969681,
+            0.29105228185653687
+          ],
+          [
+            0.1053837463259697,
+            0.319781094789505
+          ],
+          [
+            0.380614697933197,
+            0.4382131099700928
+          ]
+        ],
+        "pca": [
+          -0.025055090958946636,
+          0.14740979215066677
+        ]
+      },
+      {
+        "alias": "P20",
+        "player": "test-148-1",
+        "family": "search",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 184,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.20234939455986023,
+            "posterior_interval_90": [
+              0.11587202548980713,
+              0.3414851725101471
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.04819425195455551,
+            "posterior_interval_90": [
+              0.02952433191239834,
+              0.07096069306135178
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.17103040218353271,
+            "posterior_interval_90": [
+              0.1315564513206482,
+              0.2647601366043091
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.3333943486213684,
+            "posterior_interval_90": [
+              0.26066601276397705,
+              0.42700624465942383
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.20234939455986023,
+          0.04819425195455551,
+          0.17103040218353271,
+          0.3333943486213684
+        ],
+        "posterior_interval_90": [
+          [
+            0.11587202548980713,
+            0.3414851725101471
+          ],
+          [
+            0.02952433191239834,
+            0.07096069306135178
+          ],
+          [
+            0.1315564513206482,
+            0.2647601366043091
+          ],
+          [
+            0.26066601276397705,
+            0.42700624465942383
+          ]
+        ],
+        "pca": [
+          -0.08042511542436558,
+          0.08909621467885308
+        ]
+      },
+      {
+        "alias": "P21",
+        "player": "test-154-2",
+        "family": "learned",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 157,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.10301005840301514,
+            "posterior_interval_90": [
+              0.0816592127084732,
+              0.10743565857410431
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09024149179458618,
+            "posterior_interval_90": [
+              0.013857943937182426,
+              0.11537232249975204
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.11018431931734085,
+            "posterior_interval_90": [
+              0.048312708735466,
+              0.1288193315267563
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.03176660090684891,
+            "posterior_interval_90": [
+              0.01869286224246025,
+              0.034112025052309036
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.10301005840301514,
+          0.09024149179458618,
+          0.11018431931734085,
+          0.03176660090684891
+        ],
+        "posterior_interval_90": [
+          [
+            0.0816592127084732,
+            0.10743565857410431
+          ],
+          [
+            0.013857943937182426,
+            0.11537232249975204
+          ],
+          [
+            0.048312708735466,
+            0.1288193315267563
+          ],
+          [
+            0.01869286224246025,
+            0.034112025052309036
+          ]
+        ],
+        "pca": [
+          -0.1862017633018042,
+          -0.20607327718150872
+        ]
+      },
+      {
+        "alias": "P22",
+        "player": "test-155-2",
+        "family": "learned",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 185,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.2658037543296814,
+            "posterior_interval_90": [
+              0.15992292761802673,
+              0.38929516077041626
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.2601107358932495,
+            "posterior_interval_90": [
+              0.07133091986179352,
+              0.40129101276397705
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.22818037867546082,
+            "posterior_interval_90": [
+              0.12020434439182281,
+              0.29054778814315796
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.15533368289470673,
+            "posterior_interval_90": [
+              0.08632346242666245,
+              0.25504037737846375
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.2658037543296814,
+          0.2601107358932495,
+          0.22818037867546082,
+          0.15533368289470673
+        ],
+        "posterior_interval_90": [
+          [
+            0.15992292761802673,
+            0.38929516077041626
+          ],
+          [
+            0.07133091986179352,
+            0.40129101276397705
+          ],
+          [
+            0.12020434439182281,
+            0.29054778814315796
+          ],
+          [
+            0.08632346242666245,
+            0.25504037737846375
+          ]
+        ],
+        "pca": [
+          0.03331427814705447,
+          -0.06548593910611107
+        ]
+      },
+      {
+        "alias": "P23",
+        "player": "test-161-3",
+        "family": "random",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 128,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.1901732087135315,
+            "posterior_interval_90": [
+              0.050633564591407776,
+              0.305583655834198
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.08466972410678864,
+            "posterior_interval_90": [
+              0.03990247845649719,
+              0.14428427815437317
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.19696077704429626,
+            "posterior_interval_90": [
+              0.10693221539258957,
+              0.34941011667251587
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2852756679058075,
+            "posterior_interval_90": [
+              0.13709081709384918,
+              0.3968208134174347
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.1901732087135315,
+          0.08466972410678864,
+          0.19696077704429626,
+          0.2852756679058075
+        ],
+        "posterior_interval_90": [
+          [
+            0.050633564591407776,
+            0.305583655834198
+          ],
+          [
+            0.03990247845649719,
+            0.14428427815437317
+          ],
+          [
+            0.10693221539258957,
+            0.34941011667251587
+          ],
+          [
+            0.13709081709384918,
+            0.3968208134174347
+          ]
+        ],
+        "pca": [
+          -0.08062228000927914,
+          0.05061211905197415
+        ]
+      },
+      {
+        "alias": "P24",
+        "player": "test-162-3",
+        "family": "random",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 252,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.48688405752182007,
+            "posterior_interval_90": [
+              0.33526021242141724,
+              0.5851362347602844
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.16087287664413452,
+            "posterior_interval_90": [
+              0.08276302367448807,
+              0.29670897126197815
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.21167993545532227,
+            "posterior_interval_90": [
+              0.16614648699760437,
+              0.24845242500305176
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.32517772912979126,
+            "posterior_interval_90": [
+              0.2259977161884308,
+              0.5018563270568848
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.48688405752182007,
+          0.16087287664413452,
+          0.21167993545532227,
+          0.32517772912979126
+        ],
+        "posterior_interval_90": [
+          [
+            0.33526021242141724,
+            0.5851362347602844
+          ],
+          [
+            0.08276302367448807,
+            0.29670897126197815
+          ],
+          [
+            0.16614648699760437,
+            0.24845242500305176
+          ],
+          [
+            0.2259977161884308,
+            0.5018563270568848
+          ]
+        ],
+        "pca": [
+          0.22449412554956577,
+          0.07216627397225536
+        ]
+      },
+      {
+        "alias": "P25",
+        "player": "test-168-4",
+        "family": "adaptive",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 230,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.25058478116989136,
+            "posterior_interval_90": [
+              0.15948368608951569,
+              0.4284927546977997
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.08982867747545242,
+            "posterior_interval_90": [
+              0.033543821424245834,
+              0.16853980720043182
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2930237948894501,
+            "posterior_interval_90": [
+              0.15156352519989014,
+              0.3743172287940979
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.3364347815513611,
+            "posterior_interval_90": [
+              0.15239137411117554,
+              0.46979743242263794
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.25058478116989136,
+          0.08982867747545242,
+          0.2930237948894501,
+          0.3364347815513611
+        ],
+        "posterior_interval_90": [
+          [
+            0.15948368608951569,
+            0.4284927546977997
+          ],
+          [
+            0.033543821424245834,
+            0.16853980720043182
+          ],
+          [
+            0.15156352519989014,
+            0.3743172287940979
+          ],
+          [
+            0.15239137411117554,
+            0.46979743242263794
+          ]
+        ],
+        "pca": [
+          -0.0029097824026933245,
+          0.11486761949960721
+        ]
+      },
+      {
+        "alias": "P26",
+        "player": "test-169-4",
+        "family": "adaptive",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 181,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.18160639703273773,
+            "posterior_interval_90": [
+              0.11409171670675278,
+              0.2395138144493103
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.252239465713501,
+            "posterior_interval_90": [
+              0.066615991294384,
+              0.3567008376121521
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.26274675130844116,
+            "posterior_interval_90": [
+              0.17394939064979553,
+              0.3311823010444641
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2684663236141205,
+            "posterior_interval_90": [
+              0.21863949298858643,
+              0.40192484855651855
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.18160639703273773,
+          0.252239465713501,
+          0.26274675130844116,
+          0.2684663236141205
+        ],
+        "posterior_interval_90": [
+          [
+            0.11409171670675278,
+            0.2395138144493103
+          ],
+          [
+            0.066615991294384,
+            0.3567008376121521
+          ],
+          [
+            0.17394939064979553,
+            0.3311823010444641
+          ],
+          [
+            0.21863949298858643,
+            0.40192484855651855
+          ]
+        ],
+        "pca": [
+          -0.039281489823058575,
+          0.05823168555730871
+        ]
+      },
+      {
+        "alias": "P27",
+        "player": "test-175-5",
+        "family": "rule",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 107,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.15477067232131958,
+            "posterior_interval_90": [
+              0.08880680054426193,
+              0.22111815214157104
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.05531463772058487,
+            "posterior_interval_90": [
+              0.03589370474219322,
+              0.10771716386079788
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.12265326082706451,
+            "posterior_interval_90": [
+              0.09228783845901489,
+              0.2641919255256653
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2895519733428955,
+            "posterior_interval_90": [
+              0.17192159593105316,
+              0.34706318378448486
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.15477067232131958,
+          0.05531463772058487,
+          0.12265326082706451,
+          0.2895519733428955
+        ],
+        "posterior_interval_90": [
+          [
+            0.08880680054426193,
+            0.22111815214157104
+          ],
+          [
+            0.03589370474219322,
+            0.10771716386079788
+          ],
+          [
+            0.09228783845901489,
+            0.2641919255256653
+          ],
+          [
+            0.17192159593105316,
+            0.34706318378448486
+          ]
+        ],
+        "pca": [
+          -0.13431785598750048,
+          0.04114882472331817
+        ]
+      },
+      {
+        "alias": "P28",
+        "player": "test-176-5",
+        "family": "rule",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 147,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.11782702803611755,
+            "posterior_interval_90": [
+              0.03705579414963722,
+              0.22657299041748047
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.05659627914428711,
+            "posterior_interval_90": [
+              0.01180892065167427,
+              0.21910886466503143
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.266255259513855,
+            "posterior_interval_90": [
+              0.08816002309322357,
+              0.3864319622516632
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2110985815525055,
+            "posterior_interval_90": [
+              0.15401658415794373,
+              0.35427361726760864
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.11782702803611755,
+          0.05659627914428711,
+          0.266255259513855,
+          0.2110985815525055
+        ],
+        "posterior_interval_90": [
+          [
+            0.03705579414963722,
+            0.22657299041748047
+          ],
+          [
+            0.01180892065167427,
+            0.21910886466503143
+          ],
+          [
+            0.08816002309322357,
+            0.3864319622516632
+          ],
+          [
+            0.15401658415794373,
+            0.35427361726760864
+          ]
+        ],
+        "pca": [
+          -0.14622528742605728,
+          -0.003483708174794233
+        ]
+      },
+      {
+        "alias": "P29",
+        "player": "test-182-6",
+        "family": "search",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 139,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.2454264760017395,
+            "posterior_interval_90": [
+              0.14165984094142914,
+              0.3194326162338257
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09018851816654205,
+            "posterior_interval_90": [
+              0.07543239742517471,
+              0.09942936897277832
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.1428907811641693,
+            "posterior_interval_90": [
+              0.13358497619628906,
+              0.16044358909130096
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2343355417251587,
+            "posterior_interval_90": [
+              0.19896748661994934,
+              0.2602709233760834
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.2454264760017395,
+          0.09018851816654205,
+          0.1428907811641693,
+          0.2343355417251587
+        ],
+        "posterior_interval_90": [
+          [
+            0.14165984094142914,
+            0.3194326162338257
+          ],
+          [
+            0.07543239742517471,
+            0.09942936897277832
+          ],
+          [
+            0.13358497619628906,
+            0.16044358909130096
+          ],
+          [
+            0.19896748661994934,
+            0.2602709233760834
+          ]
+        ],
+        "pca": [
+          -0.03776376170627274,
+          -0.014108057255671737
+        ]
+      },
+      {
+        "alias": "P30",
+        "player": "test-183-6",
+        "family": "search",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 252,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.4797385632991791,
+            "posterior_interval_90": [
+              0.33926716446876526,
+              0.5754538774490356
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.22498492896556854,
+            "posterior_interval_90": [
+              0.07369008660316467,
+              0.26760709285736084
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.34570854902267456,
+            "posterior_interval_90": [
+              0.17217740416526794,
+              0.39565303921699524
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2337537407875061,
+            "posterior_interval_90": [
+              0.16148404777050018,
+              0.3550279140472412
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.4797385632991791,
+          0.22498492896556854,
+          0.34570854902267456,
+          0.2337537407875061
+        ],
+        "posterior_interval_90": [
+          [
+            0.33926716446876526,
+            0.5754538774490356
+          ],
+          [
+            0.07369008660316467,
+            0.26760709285736084
+          ],
+          [
+            0.17217740416526794,
+            0.39565303921699524
+          ],
+          [
+            0.16148404777050018,
+            0.3550279140472412
+          ]
+        ],
+        "pca": [
+          0.253343601183137,
+          0.014296303006616377
+        ]
+      },
+      {
+        "alias": "P31",
+        "player": "test-189-7",
+        "family": "learned",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 105,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.05441947653889656,
+            "posterior_interval_90": [
+              0.03854266181588173,
+              0.07289975136518478
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.021347079426050186,
+            "posterior_interval_90": [
+              0.01029095146805048,
+              0.04699329286813736
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.08237755298614502,
+            "posterior_interval_90": [
+              0.04291953518986702,
+              0.14476639032363892
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.08799878507852554,
+            "posterior_interval_90": [
+              0.02589436247944832,
+              0.24030300974845886
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.05441947653889656,
+          0.021347079426050186,
+          0.08237755298614502,
+          0.08799878507852554
+        ],
+        "posterior_interval_90": [
+          [
+            0.03854266181588173,
+            0.07289975136518478
+          ],
+          [
+            0.01029095146805048,
+            0.04699329286813736
+          ],
+          [
+            0.04291953518986702,
+            0.14476639032363892
+          ],
+          [
+            0.02589436247944832,
+            0.24030300974845886
+          ]
+        ],
+        "pca": [
+          -0.2516213999992367,
+          -0.1569268673471673
+        ]
+      },
+      {
+        "alias": "P32",
+        "player": "test-190-7",
+        "family": "learned",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 130,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.06845644116401672,
+            "posterior_interval_90": [
+              0.05689983814954758,
+              0.0976739302277565
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.027041755616664886,
+            "posterior_interval_90": [
+              0.017650196328759193,
+              0.06789915263652802
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.10950358211994171,
+            "posterior_interval_90": [
+              0.08936094492673874,
+              0.2122216820716858
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.06244874745607376,
+            "posterior_interval_90": [
+              0.032650429755449295,
+              0.1751481592655182
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.06845644116401672,
+          0.027041755616664886,
+          0.10950358211994171,
+          0.06244874745607376
+        ],
+        "posterior_interval_90": [
+          [
+            0.05689983814954758,
+            0.0976739302277565
+          ],
+          [
+            0.017650196328759193,
+            0.06789915263652802
+          ],
+          [
+            0.08936094492673874,
+            0.2122216820716858
+          ],
+          [
+            0.032650429755449295,
+            0.1751481592655182
+          ]
+        ],
+        "pca": [
+          -0.23286126446729355,
+          -0.177245728645951
+        ]
+      },
+      {
+        "alias": "P33",
+        "player": "test-196-8",
+        "family": "random",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 315,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.6192785501480103,
+            "posterior_interval_90": [
+              0.4228675663471222,
+              0.8177928328514099
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.16350781917572021,
+            "posterior_interval_90": [
+              0.0453035943210125,
+              0.342767596244812
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.22913524508476257,
+            "posterior_interval_90": [
+              0.1120438352227211,
+              0.40184497833251953
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.17453432083129883,
+            "posterior_interval_90": [
+              0.05641937255859375,
+              0.3119019865989685
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.6192785501480103,
+          0.16350781917572021,
+          0.22913524508476257,
+          0.17453432083129883
+        ],
+        "posterior_interval_90": [
+          [
+            0.4228675663471222,
+            0.8177928328514099
+          ],
+          [
+            0.0453035943210125,
+            0.342767596244812
+          ],
+          [
+            0.1120438352227211,
+            0.40184497833251953
+          ],
+          [
+            0.05641937255859375,
+            0.3119019865989685
+          ]
+        ],
+        "pca": [
+          0.3500858898474313,
+          -0.08208779727678422
+        ]
+      },
+      {
+        "alias": "P34",
+        "player": "test-197-8",
+        "family": "random",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 153,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.4705771803855896,
+            "posterior_interval_90": [
+              0.32362866401672363,
+              0.6318875551223755
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.1892881989479065,
+            "posterior_interval_90": [
+              0.06018539518117905,
+              0.28569161891937256
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.1846017837524414,
+            "posterior_interval_90": [
+              0.11899712681770325,
+              0.30454492568969727
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.27132999897003174,
+            "posterior_interval_90": [
+              0.12536479532718658,
+              0.48144859075546265
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.4705771803855896,
+          0.1892881989479065,
+          0.1846017837524414,
+          0.27132999897003174
+        ],
+        "posterior_interval_90": [
+          [
+            0.32362866401672363,
+            0.6318875551223755
+          ],
+          [
+            0.06018539518117905,
+            0.28569161891937256
+          ],
+          [
+            0.11899712681770325,
+            0.30454492568969727
+          ],
+          [
+            0.12536479532718658,
+            0.48144859075546265
+          ]
+        ],
+        "pca": [
+          0.2088666161490917,
+          0.01738567701860922
+        ]
+      },
+      {
+        "alias": "P35",
+        "player": "test-203-9",
+        "family": "adaptive",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 181,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.15369626879692078,
+            "posterior_interval_90": [
+              0.09210966527462006,
+              0.292326420545578
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.05999112129211426,
+            "posterior_interval_90": [
+              0.010111508890986443,
+              0.1232241690158844
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.15383274853229523,
+            "posterior_interval_90": [
+              0.09418235719203949,
+              0.251484751701355
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.22304001450538635,
+            "posterior_interval_90": [
+              0.06151521950960159,
+              0.4433898329734802
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.15369626879692078,
+          0.05999112129211426,
+          0.15383274853229523,
+          0.22304001450538635
+        ],
+        "posterior_interval_90": [
+          [
+            0.09210966527462006,
+            0.292326420545578
+          ],
+          [
+            0.010111508890986443,
+            0.1232241690158844
+          ],
+          [
+            0.09418235719203949,
+            0.251484751701355
+          ],
+          [
+            0.06151521950960159,
+            0.4433898329734802
+          ]
+        ],
+        "pca": [
+          -0.13081508739397796,
+          -0.017070642885752548
+        ]
+      },
+      {
+        "alias": "P36",
+        "player": "test-204-9",
+        "family": "adaptive",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 188,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.339672327041626,
+            "posterior_interval_90": [
+              0.21927188336849213,
+              0.5117679834365845
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.18296097218990326,
+            "posterior_interval_90": [
+              0.09317434579133987,
+              0.30379199981689453
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.33477145433425903,
+            "posterior_interval_90": [
+              0.18611548840999603,
+              0.4319734275341034
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.20454876124858856,
+            "posterior_interval_90": [
+              0.12475694715976715,
+              0.41806405782699585
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.339672327041626,
+          0.18296097218990326,
+          0.33477145433425903,
+          0.20454876124858856
+        ],
+        "posterior_interval_90": [
+          [
+            0.21927188336849213,
+            0.5117679834365845
+          ],
+          [
+            0.09317434579133987,
+            0.30379199981689453
+          ],
+          [
+            0.18611548840999603,
+            0.4319734275341034
+          ],
+          [
+            0.12475694715976715,
+            0.41806405782699585
+          ]
+        ],
+        "pca": [
+          0.10688627413634358,
+          -0.007144601066893696
+        ]
+      },
+      {
+        "alias": "P37",
+        "player": "test-210-10",
+        "family": "rule",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 230,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.4243834316730499,
+            "posterior_interval_90": [
+              0.16264766454696655,
+              0.6801025867462158
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.16048577427864075,
+            "posterior_interval_90": [
+              0.06668851524591446,
+              0.34356558322906494
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2276819348335266,
+            "posterior_interval_90": [
+              0.1283082813024521,
+              0.4030384123325348
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.21523673832416534,
+            "posterior_interval_90": [
+              0.11553904414176941,
+              0.38814347982406616
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.4243834316730499,
+          0.16048577427864075,
+          0.2276819348335266,
+          0.21523673832416534
+        ],
+        "posterior_interval_90": [
+          [
+            0.16264766454696655,
+            0.6801025867462158
+          ],
+          [
+            0.06668851524591446,
+            0.34356558322906494
+          ],
+          [
+            0.1283082813024521,
+            0.4030384123325348
+          ],
+          [
+            0.11553904414176941,
+            0.38814347982406616
+          ]
+        ],
+        "pca": [
+          0.16400672697296,
+          -0.026554182324238874
+        ]
+      },
+      {
+        "alias": "P38",
+        "player": "test-211-10",
+        "family": "rule",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 166,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.16745002567768097,
+            "posterior_interval_90": [
+              0.06197550520300865,
+              0.22776716947555542
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09735316783189774,
+            "posterior_interval_90": [
+              0.04674811661243439,
+              0.2355654537677765
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2412039041519165,
+            "posterior_interval_90": [
+              0.15776297450065613,
+              0.35153597593307495
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.27567005157470703,
+            "posterior_interval_90": [
+              0.16414672136306763,
+              0.41700810194015503
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.16745002567768097,
+          0.09735316783189774,
+          0.2412039041519165,
+          0.27567005157470703
+        ],
+        "posterior_interval_90": [
+          [
+            0.06197550520300865,
+            0.22776716947555542
+          ],
+          [
+            0.04674811661243439,
+            0.2355654537677765
+          ],
+          [
+            0.15776297450065613,
+            0.35153597593307495
+          ],
+          [
+            0.16414672136306763,
+            0.41700810194015503
+          ]
+        ],
+        "pca": [
+          -0.09186735976952462,
+          0.05275038957672489
+        ]
+      },
+      {
+        "alias": "P39",
+        "player": "test-217-11",
+        "family": "search",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 136,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.07632145285606384,
+            "posterior_interval_90": [
+              0.04688474163413048,
+              0.12948696315288544
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.03827376291155815,
+            "posterior_interval_90": [
+              0.0101090082898736,
+              0.08477502316236496
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.23478823900222778,
+            "posterior_interval_90": [
+              0.0783366858959198,
+              0.35711854696273804
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2631579041481018,
+            "posterior_interval_90": [
+              0.14639055728912354,
+              0.3790283203125
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.07632145285606384,
+          0.03827376291155815,
+          0.23478823900222778,
+          0.2631579041481018
+        ],
+        "posterior_interval_90": [
+          [
+            0.04688474163413048,
+            0.12948696315288544
+          ],
+          [
+            0.0101090082898736,
+            0.08477502316236496
+          ],
+          [
+            0.0783366858959198,
+            0.35711854696273804
+          ],
+          [
+            0.14639055728912354,
+            0.3790283203125
+          ]
+        ],
+        "pca": [
+          -0.19408442033028853,
+          0.043338862717454366
+        ]
+      },
+      {
+        "alias": "P40",
+        "player": "test-218-11",
+        "family": "search",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 154,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.30322903394699097,
+            "posterior_interval_90": [
+              0.14828196167945862,
+              0.3852999210357666
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.13655170798301697,
+            "posterior_interval_90": [
+              0.05042600631713867,
+              0.19389109313488007
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.18067967891693115,
+            "posterior_interval_90": [
+              0.1379043161869049,
+              0.33517903089523315
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.3098400831222534,
+            "posterior_interval_90": [
+              0.19319085776805878,
+              0.4133753180503845
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.30322903394699097,
+          0.13655170798301697,
+          0.18067967891693115,
+          0.3098400831222534
+        ],
+        "posterior_interval_90": [
+          [
+            0.14828196167945862,
+            0.3852999210357666
+          ],
+          [
+            0.05042600631713867,
+            0.19389109313488007
+          ],
+          [
+            0.1379043161869049,
+            0.33517903089523315
+          ],
+          [
+            0.19319085776805878,
+            0.4133753180503845
+          ]
+        ],
+        "pca": [
+          0.037253822072790786,
+          0.06496591679836869
+        ]
+      },
+      {
+        "alias": "P41",
+        "player": "test-224-12",
+        "family": "learned",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 223,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.45139604806900024,
+            "posterior_interval_90": [
+              0.15594130754470825,
+              0.7716942429542542
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.11937233805656433,
+            "posterior_interval_90": [
+              0.04406438022851944,
+              0.23013028502464294
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.15500408411026,
+            "posterior_interval_90": [
+              0.06141041964292526,
+              0.27979815006256104
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.14641907811164856,
+            "posterior_interval_90": [
+              0.06919077038764954,
+              0.22607576847076416
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.45139604806900024,
+          0.11937233805656433,
+          0.15500408411026,
+          0.14641907811164856
+        ],
+        "posterior_interval_90": [
+          [
+            0.15594130754470825,
+            0.7716942429542542
+          ],
+          [
+            0.04406438022851944,
+            0.23013028502464294
+          ],
+          [
+            0.06141041964292526,
+            0.27979815006256104
+          ],
+          [
+            0.06919077038764954,
+            0.22607576847076416
+          ]
+        ],
+        "pca": [
+          0.16530274139506942,
+          -0.11286498484341204
+        ]
+      },
+      {
+        "alias": "P42",
+        "player": "test-225-12",
+        "family": "learned",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 166,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.06678084284067154,
+            "posterior_interval_90": [
+              0.04440785571932793,
+              0.10077959299087524
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.04022935777902603,
+            "posterior_interval_90": [
+              0.01634892076253891,
+              0.1181817576289177
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.11902091652154922,
+            "posterior_interval_90": [
+              0.07562278211116791,
+              0.21829451620578766
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.12730132043361664,
+            "posterior_interval_90": [
+              0.021754827350378036,
+              0.21137838065624237
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.06678084284067154,
+          0.04022935777902603,
+          0.11902091652154922,
+          0.12730132043361664
+        ],
+        "posterior_interval_90": [
+          [
+            0.04440785571932793,
+            0.10077959299087524
+          ],
+          [
+            0.01634892076253891,
+            0.1181817576289177
+          ],
+          [
+            0.07562278211116791,
+            0.21829451620578766
+          ],
+          [
+            0.021754827350378036,
+            0.21137838065624237
+          ]
+        ],
+        "pca": [
+          -0.22770156529801489,
+          -0.11121310959317947
+        ]
+      },
+      {
+        "alias": "P43",
+        "player": "test-231-13",
+        "family": "random",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 191,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.4919929504394531,
+            "posterior_interval_90": [
+              0.24896126985549927,
+              0.6688176393508911
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.1198434978723526,
+            "posterior_interval_90": [
+              0.08349643647670746,
+              0.22543931007385254
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.17516043782234192,
+            "posterior_interval_90": [
+              0.08315445482730865,
+              0.2832590937614441
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.19810056686401367,
+            "posterior_interval_90": [
+              0.12199146300554276,
+              0.4303487241268158
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.4919929504394531,
+          0.1198434978723526,
+          0.17516043782234192,
+          0.19810056686401367
+        ],
+        "posterior_interval_90": [
+          [
+            0.24896126985549927,
+            0.6688176393508911
+          ],
+          [
+            0.08349643647670746,
+            0.22543931007385254
+          ],
+          [
+            0.08315445482730865,
+            0.2832590937614441
+          ],
+          [
+            0.12199146300554276,
+            0.4303487241268158
+          ]
+        ],
+        "pca": [
+          0.209468130717277,
+          -0.06186120115789073
+        ]
+      },
+      {
+        "alias": "P44",
+        "player": "test-232-13",
+        "family": "random",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 201,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.38054248690605164,
+            "posterior_interval_90": [
+              0.17182189226150513,
+              0.5820391774177551
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.1014695018529892,
+            "posterior_interval_90": [
+              0.03638258948922157,
+              0.31599095463752747
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.18920081853866577,
+            "posterior_interval_90": [
+              0.10560062527656555,
+              0.3260475695133209
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2433166652917862,
+            "posterior_interval_90": [
+              0.136270210146904,
+              0.5207300186157227
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.38054248690605164,
+          0.1014695018529892,
+          0.18920081853866577,
+          0.2433166652917862
+        ],
+        "posterior_interval_90": [
+          [
+            0.17182189226150513,
+            0.5820391774177551
+          ],
+          [
+            0.03638258948922157,
+            0.31599095463752747
+          ],
+          [
+            0.10560062527656555,
+            0.3260475695133209
+          ],
+          [
+            0.136270210146904,
+            0.5207300186157227
+          ]
+        ],
+        "pca": [
+          0.10259669791349652,
+          -0.006768384788160573
+        ]
+      },
+      {
+        "alias": "P45",
+        "player": "test-238-14",
+        "family": "adaptive",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 141,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.08061587065458298,
+            "posterior_interval_90": [
+              0.05549042671918869,
+              0.10227920114994049
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.029408453032374382,
+            "posterior_interval_90": [
+              0.021170921623706818,
+              0.05158945918083191
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.16820399463176727,
+            "posterior_interval_90": [
+              0.12443788349628448,
+              0.25602853298187256
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.3271823525428772,
+            "posterior_interval_90": [
+              0.23328492045402527,
+              0.3860419988632202
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.08061587065458298,
+          0.029408453032374382,
+          0.16820399463176727,
+          0.3271823525428772
+        ],
+        "posterior_interval_90": [
+          [
+            0.05549042671918869,
+            0.10227920114994049
+          ],
+          [
+            0.021170921623706818,
+            0.05158945918083191
+          ],
+          [
+            0.12443788349628448,
+            0.25602853298187256
+          ],
+          [
+            0.23328492045402527,
+            0.3860419988632202
+          ]
+        ],
+        "pca": [
+          -0.20185891331339226,
+          0.09154952118094521
+        ]
+      },
+      {
+        "alias": "P46",
+        "player": "test-239-14",
+        "family": "adaptive",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 127,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.31501054763793945,
+            "posterior_interval_90": [
+              0.0568690299987793,
+              0.4493124783039093
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.2611403167247772,
+            "posterior_interval_90": [
+              0.10790453851222992,
+              0.40496987104415894
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.2748683989048004,
+            "posterior_interval_90": [
+              0.1555696278810501,
+              0.35671231150627136
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.305451363325119,
+            "posterior_interval_90": [
+              0.20738229155540466,
+              0.4865395426750183
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.31501054763793945,
+          0.2611403167247772,
+          0.2748683989048004,
+          0.305451363325119
+        ],
+        "posterior_interval_90": [
+          [
+            0.0568690299987793,
+            0.4493124783039093
+          ],
+          [
+            0.10790453851222992,
+            0.40496987104415894
+          ],
+          [
+            0.1555696278810501,
+            0.35671231150627136
+          ],
+          [
+            0.20738229155540466,
+            0.4865395426750183
+          ]
+        ],
+        "pca": [
+          0.09368365468513912,
+          0.08604022143694216
+        ]
+      },
+      {
+        "alias": "P47",
+        "player": "test-245-15",
+        "family": "rule",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 132,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.15483523905277252,
+            "posterior_interval_90": [
+              0.08943088352680206,
+              0.308437705039978
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.08219466358423233,
+            "posterior_interval_90": [
+              0.03288579359650612,
+              0.17789971828460693
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.15943075716495514,
+            "posterior_interval_90": [
+              0.10719536244869232,
+              0.29533830285072327
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.29371628165245056,
+            "posterior_interval_90": [
+              0.21406704187393188,
+              0.5305399894714355
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.15483523905277252,
+          0.08219466358423233,
+          0.15943075716495514,
+          0.29371628165245056
+        ],
+        "posterior_interval_90": [
+          [
+            0.08943088352680206,
+            0.308437705039978
+          ],
+          [
+            0.03288579359650612,
+            0.17789971828460693
+          ],
+          [
+            0.10719536244869232,
+            0.29533830285072327
+          ],
+          [
+            0.21406704187393188,
+            0.5305399894714355
+          ]
+        ],
+        "pca": [
+          -0.1214160150583346,
+          0.0541657730947793
+        ]
+      },
+      {
+        "alias": "P48",
+        "player": "test-246-15",
+        "family": "rule",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 137,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.1814248114824295,
+            "posterior_interval_90": [
+              0.10557767003774643,
+              0.27651166915893555
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.06463684886693954,
+            "posterior_interval_90": [
+              0.029567040503025055,
+              0.20169493556022644
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.24549007415771484,
+            "posterior_interval_90": [
+              0.12063556909561157,
+              0.36117225885391235
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.26267558336257935,
+            "posterior_interval_90": [
+              0.22196364402770996,
+              0.3553907573223114
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.1814248114824295,
+          0.06463684886693954,
+          0.24549007415771484,
+          0.26267558336257935
+        ],
+        "posterior_interval_90": [
+          [
+            0.10557767003774643,
+            0.27651166915893555
+          ],
+          [
+            0.029567040503025055,
+            0.20169493556022644
+          ],
+          [
+            0.12063556909561157,
+            0.36117225885391235
+          ],
+          [
+            0.22196364402770996,
+            0.3553907573223114
+          ]
+        ],
+        "pca": [
+          -0.08563053384811857,
+          0.03778717583538622
+        ]
+      },
+      {
+        "alias": "P49",
+        "player": "test-252-16",
+        "family": "search",
+        "scenario": "known",
+        "histories": 5,
+        "effective_decisions": 138,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.09690652787685394,
+            "posterior_interval_90": [
+              0.060219697654247284,
+              0.17875564098358154
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.09050431847572327,
+            "posterior_interval_90": [
+              0.060183264315128326,
+              0.19515518844127655
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.1806470900774002,
+            "posterior_interval_90": [
+              0.12457296997308731,
+              0.29561305046081543
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2940632104873657,
+            "posterior_interval_90": [
+              0.15248256921768188,
+              0.4075731635093689
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.09690652787685394,
+          0.09050431847572327,
+          0.1806470900774002,
+          0.2940632104873657
+        ],
+        "posterior_interval_90": [
+          [
+            0.060219697654247284,
+            0.17875564098358154
+          ],
+          [
+            0.060183264315128326,
+            0.19515518844127655
+          ],
+          [
+            0.12457296997308731,
+            0.29561305046081543
+          ],
+          [
+            0.15248256921768188,
+            0.4075731635093689
+          ]
+        ],
+        "pca": [
+          -0.1711279206086241,
+          0.06409714613243889
+        ]
+      },
+      {
+        "alias": "P50",
+        "player": "test-253-16",
+        "family": "search",
+        "scenario": "unseen_team",
+        "histories": 5,
+        "effective_decisions": 141,
+        "profile": {
+          "switch_when_threatened": {
+            "description": "受到属性威胁且可以自主换人时的换人概率",
+            "probability": 0.24370700120925903,
+            "posterior_interval_90": [
+              0.10431165993213654,
+              0.33789145946502686
+            ],
+            "reference_situations": 16
+          },
+          "setup_with_high_hp": {
+            "description": "高血量且无明显属性威胁、可以强化时的强化概率",
+            "probability": 0.0994812622666359,
+            "posterior_interval_90": [
+              0.06833021342754364,
+              0.20711490511894226
+            ],
+            "reference_situations": 16
+          },
+          "recover_with_low_hp": {
+            "description": "血量不超过一半且可以回复时的回复概率",
+            "probability": 0.28087255358695984,
+            "posterior_interval_90": [
+              0.17018720507621765,
+              0.32059454917907715
+            ],
+            "reference_situations": 16
+          },
+          "tera_when_available": {
+            "description": "可以太晶化时的太晶化概率",
+            "probability": 0.2748413681983948,
+            "posterior_interval_90": [
+              0.17808006703853607,
+              0.47238725423812866
+            ],
+            "reference_situations": 16
+          }
+        },
+        "probabilities": [
+          0.24370700120925903,
+          0.0994812622666359,
+          0.28087255358695984,
+          0.2748413681983948
+        ],
+        "posterior_interval_90": [
+          [
+            0.10431165993213654,
+            0.33789145946502686
+          ],
+          [
+            0.06833021342754364,
+            0.20711490511894226
+          ],
+          [
+            0.17018720507621765,
+            0.32059454917907715
+          ],
+          [
+            0.17808006703853607,
+            0.47238725423812866
+          ]
+        ],
+        "pca": [
+          -0.01139276345164114,
+          0.05358781812560045
+        ]
+      }
+    ],
+    "dimensions": [
+      "受威胁时换人",
+      "高血量时强化",
+      "低血量时回复",
+      "可用时太晶化"
+    ],
+    "reference_situations": {
+      "switch_when_threatened": 16,
+      "setup_with_high_hp": 16,
+      "recover_with_low_hp": 16,
+      "tera_when_available": 16
+    },
+    "definition": "把每位玩家前5局积累的加权策略粒子Z放入完全相同的参考局面和动作空间，计算档案的四项行为概率。网络权重与参考局面固定。",
+    "limitations": "50名玩家来自已完成的画像与换队迁移实验，均为受控留出玩家；并非主实验14名玩家。概率差异表示模型画像不同，不等同于真实人格分类。",
+    "uncertainty": "90%区间为该玩家粒子后验的行为概率分位区间，不是跨玩家均值的置信区间。",
+    "spread": {
+      "switch_when_threatened": {
+        "minimum": 0.05441947653889656,
+        "maximum": 0.6392019391059875,
+        "mean": 0.2670660818368196,
+        "between_player_sd": 0.1558999447045289,
+        "median_posterior_interval_width": 0.19620051234960556
+      },
+      "setup_with_high_hp": {
+        "minimum": 0.021347079426050186,
+        "maximum": 0.2611403167247772,
+        "mean": 0.11380560535937548,
+        "between_player_sd": 0.060662287013285236,
+        "median_posterior_interval_width": 0.1394910216331482
+      },
+      "recover_with_low_hp": {
+        "minimum": 0.08237755298614502,
+        "maximum": 0.34570854902267456,
+        "mean": 0.2080090482532978,
+        "between_player_sd": 0.06259170816910282,
+        "median_posterior_interval_width": 0.17148422449827194
+      },
+      "tera_when_available": {
+        "minimum": 0.03176660090684891,
+        "maximum": 0.4656336307525635,
+        "mean": 0.23587913572788238,
+        "between_player_sd": 0.08567868852997687,
+        "median_posterior_interval_width": 0.20733284018933773
+      }
+    },
+    "mean_pairwise_absolute_difference": 0.10227630413194395,
+    "pca": {
+      "explained_variance_ratio": [
+        0.6674923478373841,
+        0.19145375781691337,
+        0.09818364903608262,
+        0.04287024530962002
+      ],
+      "center": [
+        0.2670660818368196,
+        0.11380560535937548,
+        0.2080090482532978,
+        0.23587913572788238
+      ],
+      "components": [
+        [
+          0.9564842037147955,
+          0.22875239524999208,
+          0.17836171599724998,
+          0.031581766543081126
+        ],
+        [
+          -0.08386554301831463,
+          0.060636242619710345,
+          0.1994324676058491,
+          0.974431376567816
+        ],
+        [
+          -0.2681848637899879,
+          0.5652055940546046,
+          0.7508066801570343,
+          -0.21191706942787863
+        ],
+        [
+          -0.07862199165795074,
+          0.7902773084163157,
+          -0.6039065475408685,
+          0.06765530331961511
+        ]
+      ],
+      "preprocessing": "概率直接中心化，不做逐维标准化；不聚类，控制器类别仅用于着色。"
+    },
+    "query_probability_agreement": {
+      "switch": {
+        "players": 50,
+        "mae": 0.06460852844553112
+      },
+      "setup": {
+        "players": 35,
+        "mae": 0.052708866047941845
+      },
+      "recovery": {
+        "players": 23,
+        "mae": 0.056099062919720354
+      },
+      "tera": {
+        "players": 50,
+        "mae": 0.06976510369980406
+      }
+    }
+  }
+}

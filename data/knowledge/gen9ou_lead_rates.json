@@ -1,0 +1,1924 @@
+{
+ "source": "Pok\u00e9Champ (milkkarten/pokechamp), public Showdown logs",
+ "format": "gen9ou",
+ "min_elo": 1600,
+ "held_out_battles": 1158,
+ "months": {
+  "April2024": 1502,
+  "August2024": 7792,
+  "December2023": 143,
+  "December2024": 7885,
+  "February2024": 119,
+  "February2025": 6365,
+  "January2024": 245,
+  "January2025": 7233,
+  "July2024": 9116,
+  "June2024": 7391,
+  "March2024": 715,
+  "March2025": 7973,
+  "May2024": 821,
+  "November2024": 6551,
+  "October2024": 7178,
+  "September2024": 6147
+ },
+ "counts": {
+  "below_elo": 433257,
+  "sides": 154352,
+  "battles": 77176,
+  "unparsable": 54
+ },
+ "species": {
+  "greattusk": {
+   "team": 51146,
+   "lead": 4006
+  },
+  "kingambit": {
+   "team": 38402,
+   "lead": 721
+  },
+  "gholdengo": {
+   "team": 29843,
+   "lead": 1890
+  },
+  "zamazenta": {
+   "team": 26371,
+   "lead": 951
+  },
+  "ragingbolt": {
+   "team": 26007,
+   "lead": 2404
+  },
+  "dragapult": {
+   "team": 25599,
+   "lead": 6256
+  },
+  "ironvaliant": {
+   "team": 24875,
+   "lead": 1737
+  },
+  "landorustherian": {
+   "team": 24114,
+   "lead": 6927
+  },
+  "slowkinggalar": {
+   "team": 23704,
+   "lead": 3474
+  },
+  "dragonite": {
+   "team": 22555,
+   "lead": 1104
+  },
+  "roaringmoon": {
+   "team": 21767,
+   "lead": 1853
+  },
+  "ogerponwellspring": {
+   "team": 21509,
+   "lead": 4296
+  },
+  "samurotthisui": {
+   "team": 19630,
+   "lead": 7186
+  },
+  "ironmoth": {
+   "team": 18704,
+   "lead": 1272
+  },
+  "gliscor": {
+   "team": 18281,
+   "lead": 7104
+  },
+  "kyurem": {
+   "team": 18272,
+   "lead": 4199
+  },
+  "corviknight": {
+   "team": 17015,
+   "lead": 929
+  },
+  "cinderace": {
+   "team": 16565,
+   "lead": 3326
+  },
+  "tinglu": {
+   "team": 16058,
+   "lead": 2320
+  },
+  "darkrai": {
+   "team": 15661,
+   "lead": 4790
+  },
+  "hatterene": {
+   "team": 14532,
+   "lead": 2023
+  },
+  "irontreads": {
+   "team": 14485,
+   "lead": 3581
+  },
+  "primarina": {
+   "team": 13435,
+   "lead": 3042
+  },
+  "glimmora": {
+   "team": 12294,
+   "lead": 4165
+  },
+  "moltres": {
+   "team": 11930,
+   "lead": 1028
+  },
+  "ironcrown": {
+   "team": 11830,
+   "lead": 2810
+  },
+  "alomomola": {
+   "team": 10161,
+   "lead": 999
+  },
+  "garganacl": {
+   "team": 9805,
+   "lead": 1792
+  },
+  "dondozo": {
+   "team": 9565,
+   "lead": 59
+  },
+  "clefable": {
+   "team": 9439,
+   "lead": 1465
+  },
+  "rillaboom": {
+   "team": 9427,
+   "lead": 2354
+  },
+  "zapdos": {
+   "team": 8931,
+   "lead": 1757
+  },
+  "walkingwake": {
+   "team": 8449,
+   "lead": 1389
+  },
+  "meowscarada": {
+   "team": 8264,
+   "lead": 3344
+  },
+  "enamorus": {
+   "team": 8130,
+   "lead": 1110
+  },
+  "clodsire": {
+   "team": 7875,
+   "lead": 385
+  },
+  "blissey": {
+   "team": 7550,
+   "lead": 259
+  },
+  "pecharunt": {
+   "team": 7164,
+   "lead": 615
+  },
+  "torkoal": {
+   "team": 6926,
+   "lead": 2855
+  },
+  "scizor": {
+   "team": 5846,
+   "lead": 1628
+  },
+  "deoxysspeed": {
+   "team": 5708,
+   "lead": 2294
+  },
+  "garchomp": {
+   "team": 5682,
+   "lead": 1175
+  },
+  "toxapex": {
+   "team": 5627,
+   "lead": 1074
+  },
+  "gougingfire": {
+   "team": 5610,
+   "lead": 149
+  },
+  "tinkaton": {
+   "team": 5551,
+   "lead": 1910
+  },
+  "ribombee": {
+   "team": 5381,
+   "lead": 3821
+  },
+  "araquanid": {
+   "team": 5380,
+   "lead": 3244
+  },
+  "weavile": {
+   "team": 5366,
+   "lead": 905
+  },
+  "heatran": {
+   "team": 5243,
+   "lead": 849
+  },
+  "ursaluna": {
+   "team": 5151,
+   "lead": 334
+  },
+  "sinistcha": {
+   "team": 4936,
+   "lead": 158
+  },
+  "weezinggalar": {
+   "team": 4747,
+   "lead": 604
+  },
+  "hoopaunbound": {
+   "team": 4651,
+   "lead": 805
+  },
+  "pelipper": {
+   "team": 4518,
+   "lead": 1994
+  },
+  "tyranitar": {
+   "team": 4327,
+   "lead": 881
+  },
+  "skarmory": {
+   "team": 3990,
+   "lead": 358
+  },
+  "ninetalesalola": {
+   "team": 3845,
+   "lead": 1299
+  },
+  "serperior": {
+   "team": 3765,
+   "lead": 713
+  },
+  "hawlucha": {
+   "team": 3758,
+   "lead": 69
+  },
+  "ogerponcornerstone": {
+   "team": 3690,
+   "lead": 799
+  },
+  "ceruledge": {
+   "team": 3497,
+   "lead": 283
+  },
+  "greninja": {
+   "team": 3451,
+   "lead": 591
+  },
+  "skeledirge": {
+   "team": 3442,
+   "lead": 122
+  },
+  "excadrill": {
+   "team": 3422,
+   "lead": 190
+  },
+  "hydrapple": {
+   "team": 3390,
+   "lead": 451
+  },
+  "ironhands": {
+   "team": 3337,
+   "lead": 513
+  },
+  "latios": {
+   "team": 3248,
+   "lead": 530
+  },
+  "lokix": {
+   "team": 3211,
+   "lead": 736
+  },
+  "manaphy": {
+   "team": 2888,
+   "lead": 333
+  },
+  "ogerpon": {
+   "team": 2743,
+   "lead": 652
+  },
+  "barraskewda": {
+   "team": 2672,
+   "lead": 250
+  },
+  "rotomwash": {
+   "team": 2655,
+   "lead": 931
+  },
+  "cresselia": {
+   "team": 2641,
+   "lead": 95
+  },
+  "goodrahisui": {
+   "team": 2400,
+   "lead": 367
+  },
+  "keldeoresolute": {
+   "team": 2382,
+   "lead": 622
+  },
+  "azumarill": {
+   "team": 2340,
+   "lead": 1051
+  },
+  "okidogi": {
+   "team": 2264,
+   "lead": 445
+  },
+  "ninetales": {
+   "team": 2243,
+   "lead": 1067
+  },
+  "thundurustherian": {
+   "team": 2211,
+   "lead": 602
+  },
+  "latias": {
+   "team": 2176,
+   "lead": 60
+  },
+  "tornadustherian": {
+   "team": 2173,
+   "lead": 720
+  },
+  "grimmsnarl": {
+   "team": 2137,
+   "lead": 874
+  },
+  "volcanion": {
+   "team": 2116,
+   "lead": 488
+  },
+  "blaziken": {
+   "team": 2084,
+   "lead": 246
+  },
+  "ironboulder": {
+   "team": 1998,
+   "lead": 77
+  },
+  "mandibuzz": {
+   "team": 1956,
+   "lead": 108
+  },
+  "venusaur": {
+   "team": 1836,
+   "lead": 23
+  },
+  "amoonguss": {
+   "team": 1819,
+   "lead": 182
+  },
+  "quaquaval": {
+   "team": 1817,
+   "lead": 199
+  },
+  "slitherwing": {
+   "team": 1780,
+   "lead": 349
+  },
+  "mimikyu": {
+   "team": 1775,
+   "lead": 38
+  },
+  "mausholdfour": {
+   "team": 1579,
+   "lead": 192
+  },
+  "palafin": {
+   "team": 1561,
+   "lead": 805
+  },
+  "indeedee": {
+   "team": 1496,
+   "lead": 657
+  },
+  "keldeo": {
+   "team": 1449,
+   "lead": 374
+  },
+  "klefki": {
+   "team": 1408,
+   "lead": 982
+  },
+  "sinistchamasterpiece": {
+   "team": 1404,
+   "lead": 50
+  },
+  "diancie": {
+   "team": 1309,
+   "lead": 164
+  },
+  "armarouge": {
+   "team": 1286,
+   "lead": 42
+  },
+  "arcaninehisui": {
+   "team": 1261,
+   "lead": 227
+  },
+  "hydreigon": {
+   "team": 1253,
+   "lead": 221
+  },
+  "comfey": {
+   "team": 1234,
+   "lead": 29
+  },
+  "breloom": {
+   "team": 1222,
+   "lead": 175
+  },
+  "pawmot": {
+   "team": 1195,
+   "lead": 38
+  },
+  "talonflame": {
+   "team": 1156,
+   "lead": 181
+  },
+  "typhlosionhisui": {
+   "team": 1137,
+   "lead": 75
+  },
+  "mamoswine": {
+   "team": 1074,
+   "lead": 289
+  },
+  "chansey": {
+   "team": 1055,
+   "lead": 122
+  },
+  "ironjugulis": {
+   "team": 1051,
+   "lead": 133
+  },
+  "sandyshocks": {
+   "team": 994,
+   "lead": 376
+  },
+  "umbreon": {
+   "team": 974,
+   "lead": 69
+  },
+  "magnezone": {
+   "team": 956,
+   "lead": 159
+  },
+  "overqwil": {
+   "team": 940,
+   "lead": 25
+  },
+  "enamorustherian": {
+   "team": 931,
+   "lead": 165
+  },
+  "moltresgalar": {
+   "team": 918,
+   "lead": 46
+  },
+  "reuniclus": {
+   "team": 904,
+   "lead": 43
+  },
+  "kommoo": {
+   "team": 901,
+   "lead": 100
+  },
+  "maushold": {
+   "team": 886,
+   "lead": 105
+  },
+  "ditto": {
+   "team": 883,
+   "lead": 93
+  },
+  "fezandipiti": {
+   "team": 881,
+   "lead": 195
+  },
+  "chesnaught": {
+   "team": 855,
+   "lead": 110
+  },
+  "slowking": {
+   "team": 844,
+   "lead": 147
+  },
+  "zapdosgalar": {
+   "team": 819,
+   "lead": 292
+  },
+  "incineroar": {
+   "team": 799,
+   "lead": 240
+  },
+  "basculegion": {
+   "team": 787,
+   "lead": 27
+  },
+  "necrozma": {
+   "team": 785,
+   "lead": 206
+  },
+  "conkeldurr": {
+   "team": 783,
+   "lead": 212
+  },
+  "quagsire": {
+   "team": 780,
+   "lead": 37
+  },
+  "cloyster": {
+   "team": 777,
+   "lead": 190
+  },
+  "mukalola": {
+   "team": 768,
+   "lead": 136
+  },
+  "lilliganthisui": {
+   "team": 756,
+   "lead": 19
+  },
+  "frosmoth": {
+   "team": 728,
+   "lead": 84
+  },
+  "polteageist": {
+   "team": 716,
+   "lead": 6
+  },
+  "yanmega": {
+   "team": 705,
+   "lead": 37
+  },
+  "empoleon": {
+   "team": 675,
+   "lead": 164
+  },
+  "gengar": {
+   "team": 655,
+   "lead": 91
+  },
+  "bellibolt": {
+   "team": 632,
+   "lead": 70
+  },
+  "haxorus": {
+   "team": 613,
+   "lead": 99
+  },
+  "rabsca": {
+   "team": 589,
+   "lead": 5
+  },
+  "screamtail": {
+   "team": 579,
+   "lead": 59
+  },
+  "porygon2": {
+   "team": 544,
+   "lead": 67
+  },
+  "salamence": {
+   "team": 530,
+   "lead": 62
+  },
+  "volcarona": {
+   "team": 529,
+   "lead": 25
+  },
+  "charizard": {
+   "team": 515,
+   "lead": 9
+  },
+  "gallade": {
+   "team": 511,
+   "lead": 95
+  },
+  "metagross": {
+   "team": 486,
+   "lead": 151
+  },
+  "mew": {
+   "team": 485,
+   "lead": 111
+  },
+  "jirachi": {
+   "team": 475,
+   "lead": 101
+  },
+  "porygonz": {
+   "team": 462,
+   "lead": 90
+  },
+  "kingdra": {
+   "team": 461,
+   "lead": 16
+  },
+  "deoxysdefense": {
+   "team": 446,
+   "lead": 97
+  },
+  "pincurchin": {
+   "team": 444,
+   "lead": 244
+  },
+  "bronzong": {
+   "team": 441,
+   "lead": 41
+  },
+  "zoroarkhisui": {
+   "team": 438,
+   "lead": 0
+  },
+  "cobalion": {
+   "team": 429,
+   "lead": 60
+  },
+  "slowbro": {
+   "team": 421,
+   "lead": 48
+  },
+  "staraptor": {
+   "team": 417,
+   "lead": 146
+  },
+  "gardevoir": {
+   "team": 392,
+   "lead": 73
+  },
+  "thundurus": {
+   "team": 389,
+   "lead": 136
+  },
+  "regidrago": {
+   "team": 382,
+   "lead": 84
+  },
+  "whimsicott": {
+   "team": 372,
+   "lead": 24
+  },
+  "gyarados": {
+   "team": 360,
+   "lead": 37
+  },
+  "wochien": {
+   "team": 356,
+   "lead": 54
+  },
+  "sylveon": {
+   "team": 353,
+   "lead": 34
+  },
+  "crawdaunt": {
+   "team": 352,
+   "lead": 59
+  },
+  "jolteon": {
+   "team": 346,
+   "lead": 42
+  },
+  "hippowdon": {
+   "team": 345,
+   "lead": 69
+  },
+  "basculegionf": {
+   "team": 330,
+   "lead": 20
+  },
+  "cyclizar": {
+   "team": 328,
+   "lead": 77
+  },
+  "kleavor": {
+   "team": 323,
+   "lead": 196
+  },
+  "galvantula": {
+   "team": 319,
+   "lead": 192
+  },
+  "tentacruel": {
+   "team": 312,
+   "lead": 71
+  },
+  "ironthorns": {
+   "team": 301,
+   "lead": 8
+  },
+  "milotic": {
+   "team": 291,
+   "lead": 29
+  },
+  "slowbrogalar": {
+   "team": 285,
+   "lead": 18
+  },
+  "rotomheat": {
+   "team": 282,
+   "lead": 47
+  },
+  "polteageistantique": {
+   "team": 276,
+   "lead": 10
+  },
+  "masquerain": {
+   "team": 254,
+   "lead": 189
+  },
+  "leavanny": {
+   "team": 243,
+   "lead": 63
+  },
+  "azelf": {
+   "team": 241,
+   "lead": 86
+  },
+  "forretress": {
+   "team": 239,
+   "lead": 38
+  },
+  "cetitan": {
+   "team": 238,
+   "lead": 15
+  },
+  "chandelure": {
+   "team": 238,
+   "lead": 26
+  },
+  "orthworm": {
+   "team": 238,
+   "lead": 38
+  },
+  "entei": {
+   "team": 233,
+   "lead": 62
+  },
+  "houndstone": {
+   "team": 227,
+   "lead": 15
+  },
+  "vileplume": {
+   "team": 221,
+   "lead": 21
+  },
+  "blastoise": {
+   "team": 219,
+   "lead": 30
+  },
+  "arboliva": {
+   "team": 212,
+   "lead": 67
+  },
+  "scovillain": {
+   "team": 208,
+   "lead": 0
+  },
+  "lapras": {
+   "team": 200,
+   "lead": 31
+  },
+  "zarude": {
+   "team": 194,
+   "lead": 17
+  },
+  "suicune": {
+   "team": 194,
+   "lead": 19
+  },
+  "toxtricity": {
+   "team": 194,
+   "lead": 30
+  },
+  "infernape": {
+   "team": 188,
+   "lead": 87
+  },
+  "espeon": {
+   "team": 186,
+   "lead": 30
+  },
+  "cinccino": {
+   "team": 183,
+   "lead": 47
+  },
+  "ironleaves": {
+   "team": 181,
+   "lead": 1
+  },
+  "seviper": {
+   "team": 181,
+   "lead": 156
+  },
+  "goodra": {
+   "team": 179,
+   "lead": 3
+  },
+  "cramorant": {
+   "team": 178,
+   "lead": 107
+  },
+  "vaporeon": {
+   "team": 174,
+   "lead": 11
+  },
+  "trevenant": {
+   "team": 174,
+   "lead": 4
+  },
+  "dudunsparce": {
+   "team": 170,
+   "lead": 70
+  },
+  "hitmontop": {
+   "team": 170,
+   "lead": 13
+  },
+  "swampert": {
+   "team": 163,
+   "lead": 35
+  },
+  "toedscruel": {
+   "team": 163,
+   "lead": 16
+  },
+  "rhyperior": {
+   "team": 161,
+   "lead": 13
+  },
+  "drifblim": {
+   "team": 158,
+   "lead": 71
+  },
+  "donphan": {
+   "team": 158,
+   "lead": 73
+  },
+  "snorlax": {
+   "team": 155,
+   "lead": 39
+  },
+  "hitmonlee": {
+   "team": 155,
+   "lead": 2
+  },
+  "glastrier": {
+   "team": 150,
+   "lead": 13
+  },
+  "bisharp": {
+   "team": 149,
+   "lead": 25
+  },
+  "inteleon": {
+   "team": 146,
+   "lead": 29
+  },
+  "smeargle": {
+   "team": 144,
+   "lead": 93
+  },
+  "sableye": {
+   "team": 143,
+   "lead": 8
+  },
+  "lucario": {
+   "team": 143,
+   "lead": 19
+  },
+  "toxicroak": {
+   "team": 142,
+   "lead": 17
+  },
+  "tornadus": {
+   "team": 140,
+   "lead": 39
+  },
+  "tsareena": {
+   "team": 137,
+   "lead": 26
+  },
+  "golduck": {
+   "team": 136,
+   "lead": 1
+  },
+  "mienshao": {
+   "team": 136,
+   "lead": 42
+  },
+  "brutebonnet": {
+   "team": 136,
+   "lead": 5
+  },
+  "vikavolt": {
+   "team": 133,
+   "lead": 74
+  },
+  "avalugg": {
+   "team": 131,
+   "lead": 11
+  },
+  "probopass": {
+   "team": 131,
+   "lead": 17
+  },
+  "braviaryhisui": {
+   "team": 128,
+   "lead": 11
+  },
+  "torterra": {
+   "team": 127,
+   "lead": 20
+  },
+  "feraligatr": {
+   "team": 123,
+   "lead": 9
+  },
+  "mesprit": {
+   "team": 121,
+   "lead": 14
+  },
+  "abomasnow": {
+   "team": 115,
+   "lead": 25
+  },
+  "heracross": {
+   "team": 115,
+   "lead": 12
+  },
+  "krookodile": {
+   "team": 114,
+   "lead": 23
+  },
+  "decidueyehisui": {
+   "team": 114,
+   "lead": 28
+  },
+  "klawf": {
+   "team": 101,
+   "lead": 38
+  },
+  "hoopa": {
+   "team": 99,
+   "lead": 8
+  },
+  "brambleghast": {
+   "team": 99,
+   "lead": 11
+  },
+  "ludicolo": {
+   "team": 96,
+   "lead": 0
+  },
+  "lycanrocdusk": {
+   "team": 96,
+   "lead": 29
+  },
+  "arcanine": {
+   "team": 94,
+   "lead": 33
+  },
+  "kilowattrel": {
+   "team": 94,
+   "lead": 23
+  },
+  "revavroom": {
+   "team": 91,
+   "lead": 6
+  },
+  "muk": {
+   "team": 90,
+   "lead": 9
+  },
+  "regirock": {
+   "team": 87,
+   "lead": 4
+  },
+  "munkidori": {
+   "team": 86,
+   "lead": 25
+  },
+  "salazzle": {
+   "team": 83,
+   "lead": 21
+  },
+  "oricoriopompom": {
+   "team": 82,
+   "lead": 4
+  },
+  "archaludon": {
+   "team": 81,
+   "lead": 6
+  },
+  "meloetta": {
+   "team": 80,
+   "lead": 8
+  },
+  "sandaconda": {
+   "team": 78,
+   "lead": 48
+  },
+  "shiftry": {
+   "team": 75,
+   "lead": 34
+  },
+  "delphox": {
+   "team": 74,
+   "lead": 14
+  },
+  "regice": {
+   "team": 73,
+   "lead": 5
+  },
+  "zarudedada": {
+   "team": 73,
+   "lead": 13
+  },
+  "glaceon": {
+   "team": 72,
+   "lead": 10
+  },
+  "mabosstiff": {
+   "team": 71,
+   "lead": 8
+  },
+  "cryogonal": {
+   "team": 69,
+   "lead": 5
+  },
+  "primeape": {
+   "team": 69,
+   "lead": 28
+  },
+  "gastrodon": {
+   "team": 69,
+   "lead": 11
+  },
+  "minior": {
+   "team": 69,
+   "lead": 15
+  },
+  "sandslashalola": {
+   "team": 68,
+   "lead": 2
+  },
+  "dusclops": {
+   "team": 65,
+   "lead": 3
+  },
+  "tatsugiri": {
+   "team": 65,
+   "lead": 6
+  },
+  "beartic": {
+   "team": 65,
+   "lead": 2
+  },
+  "froslass": {
+   "team": 65,
+   "lead": 26
+  },
+  "zoroark": {
+   "team": 65,
+   "lead": 0
+  },
+  "raikou": {
+   "team": 62,
+   "lead": 21
+  },
+  "taurospaldeablaze": {
+   "team": 62,
+   "lead": 14
+  },
+  "copperajah": {
+   "team": 62,
+   "lead": 16
+  },
+  "flamigo": {
+   "team": 62,
+   "lead": 16
+  },
+  "medicham": {
+   "team": 61,
+   "lead": 11
+  },
+  "indeedeef": {
+   "team": 61,
+   "lead": 31
+  },
+  "farigiraf": {
+   "team": 60,
+   "lead": 2
+  },
+  "politoed": {
+   "team": 60,
+   "lead": 15
+  },
+  "floatzel": {
+   "team": 59,
+   "lead": 4
+  },
+  "flygon": {
+   "team": 59,
+   "lead": 12
+  },
+  "vigoroth": {
+   "team": 59,
+   "lead": 3
+  },
+  "honchkrow": {
+   "team": 57,
+   "lead": 8
+  },
+  "florges": {
+   "team": 56,
+   "lead": 1
+  },
+  "electivire": {
+   "team": 54,
+   "lead": 7
+  },
+  "mudsdale": {
+   "team": 54,
+   "lead": 4
+  },
+  "noivern": {
+   "team": 52,
+   "lead": 12
+  },
+  "articunogalar": {
+   "team": 52,
+   "lead": 3
+  },
+  "dragalge": {
+   "team": 51,
+   "lead": 7
+  },
+  "grafaiai": {
+   "team": 49,
+   "lead": 10
+  },
+  "exeggutoralola": {
+   "team": 49,
+   "lead": 6
+  },
+  "regigigas": {
+   "team": 49,
+   "lead": 7
+  },
+  "rampardos": {
+   "team": 48,
+   "lead": 6
+  },
+  "rotomfrost": {
+   "team": 47,
+   "lead": 9
+  },
+  "ampharos": {
+   "team": 47,
+   "lead": 14
+  },
+  "crabominable": {
+   "team": 46,
+   "lead": 6
+  },
+  "electrodehisui": {
+   "team": 44,
+   "lead": 20
+  },
+  "taurospaldeaaqua": {
+   "team": 44,
+   "lead": 4
+  },
+  "poliwrath": {
+   "team": 43,
+   "lead": 4
+  },
+  "duraludon": {
+   "team": 43,
+   "lead": 13
+  },
+  "meganium": {
+   "team": 42,
+   "lead": 0
+  },
+  "uxie": {
+   "team": 42,
+   "lead": 10
+  },
+  "pikachu": {
+   "team": 42,
+   "lead": 7
+  },
+  "bellossom": {
+   "team": 41,
+   "lead": 0
+  },
+  "sudowoodo": {
+   "team": 40,
+   "lead": 30
+  },
+  "lilligant": {
+   "team": 40,
+   "lead": 0
+  },
+  "raichualola": {
+   "team": 40,
+   "lead": 0
+  },
+  "scyther": {
+   "team": 40,
+   "lead": 6
+  },
+  "toucannon": {
+   "team": 37,
+   "lead": 10
+  },
+  "spidops": {
+   "team": 36,
+   "lead": 29
+  },
+  "sneaselhisui": {
+   "team": 33,
+   "lead": 7
+  },
+  "alcremie": {
+   "team": 32,
+   "lead": 1
+  },
+  "articuno": {
+   "team": 32,
+   "lead": 6
+  },
+  "exeggutor": {
+   "team": 31,
+   "lead": 0
+  },
+  "malamar": {
+   "team": 31,
+   "lead": 1
+  },
+  "veluza": {
+   "team": 30,
+   "lead": 17
+  },
+  "emboar": {
+   "team": 30,
+   "lead": 3
+  },
+  "weezing": {
+   "team": 30,
+   "lead": 12
+  },
+  "carbink": {
+   "team": 29,
+   "lead": 13
+  },
+  "palossand": {
+   "team": 29,
+   "lead": 4
+  },
+  "avalugghisui": {
+   "team": 29,
+   "lead": 15
+  },
+  "zangoose": {
+   "team": 28,
+   "lead": 6
+  },
+  "volbeat": {
+   "team": 28,
+   "lead": 12
+  },
+  "komala": {
+   "team": 28,
+   "lead": 8
+  },
+  "lycanroc": {
+   "team": 28,
+   "lead": 3
+  },
+  "golurk": {
+   "team": 27,
+   "lead": 12
+  },
+  "gastrodoneast": {
+   "team": 26,
+   "lead": 4
+  },
+  "typhlosion": {
+   "team": 26,
+   "lead": 1
+  },
+  "coalossal": {
+   "team": 26,
+   "lead": 2
+  },
+  "oricorio": {
+   "team": 26,
+   "lead": 0
+  },
+  "eelektross": {
+   "team": 26,
+   "lead": 8
+  },
+  "toxtricitylowkey": {
+   "team": 25,
+   "lead": 5
+  },
+  "flapple": {
+   "team": 25,
+   "lead": 2
+  },
+  "qwilfish": {
+   "team": 25,
+   "lead": 1
+  },
+  "leafeon": {
+   "team": 24,
+   "lead": 2
+  },
+  "morpeko": {
+   "team": 24,
+   "lead": 8
+  },
+  "venomoth": {
+   "team": 23,
+   "lead": 1
+  },
+  "rotommow": {
+   "team": 23,
+   "lead": 5
+  },
+  "sceptile": {
+   "team": 23,
+   "lead": 2
+  },
+  "ambipom": {
+   "team": 23,
+   "lead": 13
+  },
+  "houndoom": {
+   "team": 22,
+   "lead": 1
+  },
+  "terrakion": {
+   "team": 22,
+   "lead": 10
+  },
+  "zebstrika": {
+   "team": 22,
+   "lead": 9
+  },
+  "gogoat": {
+   "team": 22,
+   "lead": 0
+  },
+  "rhydon": {
+   "team": 22,
+   "lead": 3
+  },
+  "oricoriosensu": {
+   "team": 21,
+   "lead": 0
+  },
+  "ariados": {
+   "team": 21,
+   "lead": 12
+  },
+  "registeel": {
+   "team": 21,
+   "lead": 3
+  },
+  "qwilfishhisui": {
+   "team": 21,
+   "lead": 8
+  },
+  "flareon": {
+   "team": 21,
+   "lead": 2
+  },
+  "mightyena": {
+   "team": 21,
+   "lead": 3
+  },
+  "golemalola": {
+   "team": 20,
+   "lead": 8
+  },
+  "raichu": {
+   "team": 20,
+   "lead": 0
+  },
+  "bruxish": {
+   "team": 20,
+   "lead": 5
+  },
+  "mismagius": {
+   "team": 19,
+   "lead": 3
+  },
+  "drednaw": {
+   "team": 19,
+   "lead": 4
+  },
+  "dewgong": {
+   "team": 18,
+   "lead": 1
+  },
+  "miniorindigo": {
+   "team": 17,
+   "lead": 1
+  },
+  "alcremiesaltedcream": {
+   "team": 17,
+   "lead": 0
+  },
+  "tauros": {
+   "team": 17,
+   "lead": 3
+  },
+  "pikachuoriginal": {
+   "team": 17,
+   "lead": 0
+  },
+  "scrafty": {
+   "team": 16,
+   "lead": 2
+  },
+  "shaymin": {
+   "team": 16,
+   "lead": 2
+  },
+  "alcremierubyswirl": {
+   "team": 16,
+   "lead": 0
+  },
+  "squawkabillyblue": {
+   "team": 16,
+   "lead": 6
+  },
+  "dachsbun": {
+   "team": 16,
+   "lead": 0
+  },
+  "hariyama": {
+   "team": 15,
+   "lead": 1
+  },
+  "alcremiematchacream": {
+   "team": 15,
+   "lead": 1
+  },
+  "slaking": {
+   "team": 15,
+   "lead": 6
+  },
+  "florgeswhite": {
+   "team": 15,
+   "lead": 3
+  },
+  "miniorviolet": {
+   "team": 15,
+   "lead": 5
+  },
+  "wugtrio": {
+   "team": 14,
+   "lead": 4
+  },
+  "lanturn": {
+   "team": 14,
+   "lead": 4
+  },
+  "spiritomb": {
+   "team": 13,
+   "lead": 1
+  },
+  "chimecho": {
+   "team": 12,
+   "lead": 0
+  },
+  "bastiodon": {
+   "team": 12,
+   "lead": 0
+  },
+  "dedenne": {
+   "team": 12,
+   "lead": 5
+  },
+  "magneton": {
+   "team": 12,
+   "lead": 5
+  },
+  "dusknoir": {
+   "team": 12,
+   "lead": 1
+  },
+  "pyroar": {
+   "team": 11,
+   "lead": 2
+  },
+  "jumpluff": {
+   "team": 10,
+   "lead": 1
+  },
+  "decidueye": {
+   "team": 10,
+   "lead": 1
+  },
+  "sandslash": {
+   "team": 10,
+   "lead": 1
+  },
+  "wigglytuff": {
+   "team": 9,
+   "lead": 7
+  },
+  "whiscash": {
+   "team": 9,
+   "lead": 4
+  },
+  "bombirdier": {
+   "team": 9,
+   "lead": 4
+  },
+  "golem": {
+   "team": 9,
+   "lead": 2
+  },
+  "terapagos": {
+   "team": 9,
+   "lead": 0
+  },
+  "camerupt": {
+   "team": 9,
+   "lead": 4
+  },
+  "clawitzer": {
+   "team": 8,
+   "lead": 0
+  },
+  "dodrio": {
+   "team": 8,
+   "lead": 2
+  },
+  "granbull": {
+   "team": 8,
+   "lead": 2
+  },
+  "lycanrocmidnight": {
+   "team": 8,
+   "lead": 0
+  },
+  "ursaring": {
+   "team": 8,
+   "lead": 2
+  },
+  "eiscue": {
+   "team": 7,
+   "lead": 2
+  },
+  "pignite": {
+   "team": 7,
+   "lead": 0
+  },
+  "swalot": {
+   "team": 7,
+   "lead": 1
+  },
+  "perrserker": {
+   "team": 7,
+   "lead": 3
+  },
+  "luxray": {
+   "team": 7,
+   "lead": 2
+  },
+  "wyrdeer": {
+   "team": 6,
+   "lead": 1
+  },
+  "passimian": {
+   "team": 6,
+   "lead": 0
+  },
+  "altaria": {
+   "team": 6,
+   "lead": 2
+  },
+  "kricketune": {
+   "team": 6,
+   "lead": 5
+  },
+  "skuntank": {
+   "team": 6,
+   "lead": 2
+  },
+  "delibird": {
+   "team": 6,
+   "lead": 4
+  },
+  "braviary": {
+   "team": 6,
+   "lead": 3
+  },
+  "tatsugiridroopy": {
+   "team": 6,
+   "lead": 0
+  },
+  "meowstic": {
+   "team": 6,
+   "lead": 3
+  },
+  "miniororange": {
+   "team": 5,
+   "lead": 1
+  },
+  "banette": {
+   "team": 5,
+   "lead": 1
+  },
+  "florgesblue": {
+   "team": 5,
+   "lead": 0
+  },
+  "sunflora": {
+   "team": 5,
+   "lead": 0
+  },
+  "squawkabilly": {
+   "team": 5,
+   "lead": 0
+  },
+  "dugtrioalola": {
+   "team": 4,
+   "lead": 3
+  },
+  "charjabug": {
+   "team": 4,
+   "lead": 3
+  },
+  "virizion": {
+   "team": 4,
+   "lead": 0
+  },
+  "sawsbuckwinter": {
+   "team": 4,
+   "lead": 0
+  },
+  "dipplin": {
+   "team": 4,
+   "lead": 1
+  },
+  "sawsbucksummer": {
+   "team": 4,
+   "lead": 1
+  },
+  "greedent": {
+   "team": 4,
+   "lead": 0
+  },
+  "thwackey": {
+   "team": 4,
+   "lead": 1
+  },
+  "haunter": {
+   "team": 4,
+   "lead": 1
+  },
+  "tatsugiristretchy": {
+   "team": 4,
+   "lead": 0
+  },
+  "basculin": {
+   "team": 3,
+   "lead": 0
+  },
+  "furret": {
+   "team": 3,
+   "lead": 0
+  },
+  "cacturne": {
+   "team": 3,
+   "lead": 0
+  },
+  "misdreavus": {
+   "team": 3,
+   "lead": 2
+  },
+  "hitmonchan": {
+   "team": 3,
+   "lead": 3
+  },
+  "taurospaldeacombat": {
+   "team": 3,
+   "lead": 0
+  },
+  "surskit": {
+   "team": 3,
+   "lead": 2
+  },
+  "hypno": {
+   "team": 3,
+   "lead": 0
+  },
+  "alcremierainbowswirl": {
+   "team": 3,
+   "lead": 0
+  },
+  "piloswine": {
+   "team": 3,
+   "lead": 0
+  },
+  "glalie": {
+   "team": 2,
+   "lead": 2
+  },
+  "appletun": {
+   "team": 2,
+   "lead": 1
+  },
+  "noctowl": {
+   "team": 2,
+   "lead": 0
+  },
+  "persianalola": {
+   "team": 2,
+   "lead": 1
+  },
+  "sawsbuck": {
+   "team": 2,
+   "lead": 0
+  },
+  "gloom": {
+   "team": 2,
+   "lead": 1
+  },
+  "crocalor": {
+   "team": 2,
+   "lead": 0
+  },
+  "illumise": {
+   "team": 2,
+   "lead": 0
+  },
+  "lumineon": {
+   "team": 2,
+   "lead": 1
+  },
+  "arbok": {
+   "team": 2,
+   "lead": 0
+  },
+  "victreebel": {
+   "team": 2,
+   "lead": 0
+  },
+  "vespiquen": {
+   "team": 2,
+   "lead": 0
+  },
+  "gothitelle": {
+   "team": 2,
+   "lead": 0
+  },
+  "pikachuhoenn": {
+   "team": 2,
+   "lead": 0
+  },
+  "rotom": {
+   "team": 2,
+   "lead": 0
+  },
+  "dartrix": {
+   "team": 2,
+   "lead": 0
+  },
+  "oranguru": {
+   "team": 1,
+   "lead": 0
+  },
+  "tropius": {
+   "team": 1,
+   "lead": 0
+  },
+  "psyduck": {
+   "team": 1,
+   "lead": 0
+  },
+  "hattrem": {
+   "team": 1,
+   "lead": 1
+  },
+  "flittle": {
+   "team": 1,
+   "lead": 1
+  },
+  "falinks": {
+   "team": 1,
+   "lead": 0
+  },
+  "solosis": {
+   "team": 1,
+   "lead": 0
+  },
+  "nosepass": {
+   "team": 1,
+   "lead": 1
+  },
+  "meowsticf": {
+   "team": 1,
+   "lead": 0
+  },
+  "magcargo": {
+   "team": 1,
+   "lead": 1
+  },
+  "jigglypuff": {
+   "team": 1,
+   "lead": 0
+  },
+  "stonjourner": {
+   "team": 1,
+   "lead": 1
+  },
+  "grumpig": {
+   "team": 1,
+   "lead": 1
+  },
+  "vivillongarden": {
+   "team": 1,
+   "lead": 1
+  },
+  "florgesyellow": {
+   "team": 1,
+   "lead": 0
+  },
+  "luvdisc": {
+   "team": 1,
+   "lead": 1
+  },
+  "alcremiemintcream": {
+   "team": 1,
+   "lead": 0
+  },
+  "sawsbuckautumn": {
+   "team": 1,
+   "lead": 0
+  },
+  "miniorblue": {
+   "team": 1,
+   "lead": 0
+  },
+  "ralts": {
+   "team": 1,
+   "lead": 1
+  },
+  "weepinbell": {
+   "team": 1,
+   "lead": 0
+  },
+  "pawniard": {
+   "team": 1,
+   "lead": 1
+  },
+  "alcremierubycream": {
+   "team": 1,
+   "lead": 0
+  },
+  "persian": {
+   "team": 1,
+   "lead": 1
+  },
+  "electrode": {
+   "team": 1,
+   "lead": 0
+  },
+  "pikachualola": {
+   "team": 1,
+   "lead": 0
+  },
+  "electabuzz": {
+   "team": 1,
+   "lead": 0
+  },
+  "minioryellow": {
+   "team": 1,
+   "lead": 0
+  }
+ }
+}

@@ -1,0 +1,71 @@
+root: artifacts/s1_policy_retraining/action_ppo
+base_model: models/Qwen3.5-2B
+init_adapter: runs/s1_models/s1-v7-2b
+seed: 61107
+max_tokens: 16384
+history_events: 8
+data:
+  quality_root: artifacts/s1_policy_retraining/source_quality
+  policy: artifacts/s1_policy_retraining/round1/policy
+  native: artifacts/s1_policy_retraining/input_history_repair/native/observations.jsonl
+  teams: artifacts/s1_policy_retraining/teams/ours
+  dev_team_indices: [0, 5, 10, 15, 20, 25]
+  source_mass: {kakuna_executed: 0.40, native: 0.40, historical: 0.20}
+sft:
+  devices: [0, 1]
+  learning_rate: 0.00002
+  min_lr_frac: 0.1
+  batch_size: 8
+  grad_accum: 2
+  epochs: 8
+  min_epochs: 2
+  eval_every: 500
+  eval_batch_size: 16
+  patience: 4
+  min_delta: 0.002
+  warmup_frac: 0.05
+  grad_ckpt: true
+  max_grad_norm: 1.0
+  rank: 16
+  alpha: 32
+  bucket_window: 64
+  log_every: 10
+  battle_eval_every: 2000
+ppo:
+  device: cuda:0
+  teacher_device: '1'
+  teacher_checkpoint: 34
+  actor_lr: 0.000005
+  value_lr: 0.0001
+  min_actor_lr: 0.0000005
+  decisions_per_round: 4096
+  update_epochs: 2
+  minibatch_size: 64
+  microbatch_size: 2
+  clip_ratio: 0.1
+  target_kl: 0.02
+  gamma: 1.0
+  gae_lambda: 0.97
+  entropy_coef: 0.005
+  max_grad_norm: 1.0
+  max_rounds: 100
+  min_rounds: 10
+  eval_every: 5
+  plateau_checks: 6
+  min_score_gain: 0.03
+  parallel_matches: 4
+  inference_batch_size: 8
+  inference_wait_ms: 5
+  opponent_cycle: [kakuna, heuristic, kakuna, frozen]
+  temperature: 1.0
+  showdown_url: http://127.0.0.1:8100
+evaluation:
+  games_per_team: 2
+  opponents: [kakuna, frozen]
+  score_weights: {kakuna: 0.75, frozen: 0.25}
+  final_pool: data/teams/gen9ou
+  final_games_per_team: 2
+  latency_ratio_limit: 1.10
+logging:
+  wandb_project: game-agent-policy-training
+  wandb_mode: offline

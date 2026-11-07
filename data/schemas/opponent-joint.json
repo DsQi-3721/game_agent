@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Joint opponent belief",
+  "description": "可持续更新的 C/X/M/Z 联合信念。边缘分布用于查看；需要一致的完整假设时调用 sample_joint，不能独立拼接各字段的最大概率值。",
+  "type": "object",
+  "required": ["format", "rules_version", "model_version", "snapshot_id", "opponent", "joint_posterior", "prediction", "uncertainty", "coverage", "model_mismatch", "prediction_valid", "updated_at", "inference_cost"],
+  "properties": {
+    "format": {"type": "string"},
+    "rules_version": {"type": "string", "description": "当前 Showdown 机制版本和赛制。"},
+    "model_version": {"type": "string"},
+    "prototype_version": {"type": "string"},
+    "snapshot_id": {"type": "string", "description": "对局、历史修订号、已处理结算窗口数。"},
+    "opponent": {
+      "type": "object",
+      "required": ["games_observed", "facts", "initial_configuration", "current_state", "information", "strategy"],
+      "properties": {
+        "games_observed": {"type": "integer"},
+        "facts": {"type": "array", "description": "直接观测到的协议事实；event 为结算窗口号:窗口内事件号。事实优先于预测；道具交换后的事实不等于原始道具。", "items": {"type": "object", "required": ["event", "kind", "subject", "value"]}},
+        "initial_configuration": {"type": "array", "minItems": 6, "maxItems": 6, "description": "C：初始配置。slot 为队伍预览中的 1–6 号位置。字段值均为 value/probability 数组；EV、IV 的 value 是完整六维向量。moves 表示每个招式的携带概率，各招式概率之和可以大于 1。", "items": {"type": "object", "required": ["slot", "species", "item", "ability", "nature", "teraType", "moves", "evs", "ivs"]}},
+        "current_state": {"type": "array", "minItems": 6, "maxItems": 6, "description": "X：当前状态的 value/probability 数组。hp_fraction 为 0–1 血量比例；pp 为招式到剩余 PP 的映射；boosts 为能力等级；volatiles 为暂时状态；tera 为已经发动的太晶属性。交换或消耗后的 item 只在这里更新。", "items": {"type": "object", "required": ["slot", "hp_fraction", "item", "ability", "status", "locked_move", "pp", "boosts", "volatiles", "tera"]}},
+        "information": {"type": "object", "description": "M 的可读摘要；完整记忆在信念实例或快照中。", "properties": {
+          "observed_about_us": {"type": "array", "description": "对手已经公开见到的我方信息，不包含我方未公开配置。"},
+          "public_events_observed": {"type": "integer", "description": "已处理的公开事件数；记忆表示保存在模型状态中，不赋予未经监督的心理含义。"}
+        }},
+        "strategy": {"type": "object", "description": "Z 的预测摘要，不能作为确定的玩家身份判断。", "properties": {
+          "prototype_probabilities": {"type": "array", "items": {"type": "number"}, "description": "学习到的行为原型的概率；数组位置对应当前原型库。"},
+          "current_action_tendencies": {"type": "object", "description": "由当前联合行动分布求得的攻击、状态、换人、太晶、回复、强化概率；类别有重叠，不应相加为 1。这些是当前局面的预测，不是固定人格标签。"},
+          "transition": {"type": "object", "description": "保持、突变、渐变的预测概率；其检测准确性由独立变化评测衡量。", "required": ["keep", "abrupt", "gradual"]}
+        }}
+      }
+    },
+    "joint_posterior": {"type": "object", "description": "handle 标识当前模型实例内的信念快照，不是外部服务地址。调用该实例的 sample_joint 获取一致样本；跨进程保存和恢复使用 snapshot/restore，不能仅凭此 JSON 重建粒子。", "required": ["handle", "particles", "distinct_configurations", "distinct_states"]},
+    "prediction": {"type": "object", "required": ["actions"], "properties": {"actions": {"type": "array", "items": {"type": "object", "required": ["action", "probability"], "properties": {"action": {"type": "string"}, "probability": {"type": "number", "minimum": 0, "maximum": 1.00001}}}}}},
+    "prediction_valid": {"type": "boolean", "description": "false 表示当前粒子未解释完整观测历史，不能把返回的预测当成该历史下有效的后验。超时还需查看 inference_cost.observation_applied。"},
+    "model_mismatch": {"type": ["null", "object"], "description": "观测失配原因及事件位置；有限采样下的零覆盖不等于规则上不可能。"},
+    "uncertainty": {"type": "object", "description": "熵以自然对数计算。粒子 ESS 与配置 ESS 分开报告；重采样后的高粒子 ESS 不代表配置覆盖充分。"},
+    "coverage": {"type": "object", "description": "合法候选接受数、未训练物种、候选补充记录和重要性校正方式。"},
+    "inference_cost": {"type": "object", "description": "耗时单位秒；机制分支数和回放成本。超时保留旧快照时 observation_applied=false，pending_event_id 标明尚未纳入的证据。"},
+    "updated_at": {"type": "string"}
+  }
+}

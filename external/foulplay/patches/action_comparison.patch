@@ -1,0 +1,37 @@
+--- a/poke-engine-py/src/lib.rs
++++ b/poke-engine-py/src/lib.rs
+@@ -952,6 +952,26 @@
+ }
+ 
+ #[pyfunction]
++fn mcts_compare(
++    py_state: PyState,
++    duration_ms: u64,
++    actions: Vec<String>,
++) -> PyResult<PyMctsResult> {
++    let mut state: State = py_state.into();
++    let (mut ours, theirs) = state.root_get_all_options();
++    ours.retain(|choice| actions.contains(&movechoice_to_string(&state.side_one, choice)));
++    if ours.len() < 2 {
++        return Err(pyo3::exceptions::PyValueError::new_err(
++            "action comparison requires at least two legal root actions",
++        ));
++    }
++    // Only the root allocation is restricted. Descendants retain all legal actions,
++    // and every rollout uses the same unmodified root evaluation.
++    let result = perform_mcts(&mut state, ours, theirs, Duration::from_millis(duration_ms), 0);
++    Ok(PyMctsResult::from_mcts_result(result, &state))
++}
++
++#[pyfunction]
+ fn id(py_state: PyState, duration_ms: u64) -> PyResult<PyIterativeDeepeningResult> {
+     let mut state: State = py_state.into();
+     let duration = Duration::from_millis(duration_ms);
+@@ -1130,6 +1150,7 @@
+     m.add_function(wrap_pyfunction!(generate_instructions, m)?)?;
+     m.add_function(wrap_pyfunction!(id, m)?)?;
+     m.add_function(wrap_pyfunction!(mcts, m)?)?;
++    m.add_function(wrap_pyfunction!(mcts_compare, m)?)?;
+     m.add_class::<PyState>()?;
+     m.add_class::<PySide>()?;
+     m.add_class::<PySideConditions>()?;

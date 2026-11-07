@@ -22,6 +22,9 @@ from typing import Optional
 from arena.s1.context import current
 
 SCHEMA = 1
+# requests a local student serves in its low-priority lane (src/arena/s1/server.py): background work, never the
+# decision being made
+LOW_PRIORITY_PURPOSES = ("memory", "tool_plan", "shadow")
 
 
 def answer_dict(a) -> dict:
@@ -70,12 +73,18 @@ class RecordingClient:
         self.recorder = recorder
         self.backend = backend
         self.role = role
+        self.n_ok = 0
+        self.input_tokens_total = 0          # what this client was billed for (Jev: $ per input token)
 
     def __getattr__(self, name):          # configured, n_calls, latencies, aclose, ...
         return getattr(self.inner, name)
 
     async def system_one(self, state, questions, model=None, headers=None):
         t0 = time.perf_counter()
+        lane = None
+        if self.backend.startswith("local:"):
+            lane = "low" if current().get("purpose") in LOW_PRIORITY_PURPOSES else "high"
+            headers = {**(headers or {}), "X-S1-Priority": lane}
         try:
             res = await self.inner.system_one(state, questions, model=model, headers=headers)
         except Exception as e:  # noqa: BLE001
@@ -84,12 +93,14 @@ class RecordingClient:
                                      "error": f"{type(e).__name__}: {str(e)[:200]}",
                                      "latency_s": round(time.perf_counter() - t0, 4)})
             raise
+        self.n_ok += 1
+        self.input_tokens_total += int(res.input_tokens or 0)
         if self.recorder is not None:
             self.recorder.write({"type": "s1", **current(), "backend": self.backend, "role": self.role,
                                  "model": res.model, "state": state, "questions": questions,
                                  "answers": {q: answer_dict(a) for q, a in res.answers.items()},
                                  "latency_s": round(res.latency_s or time.perf_counter() - t0, 4),
-                                 "input_tokens": res.input_tokens})
+                                 "input_tokens": res.input_tokens, **({"lane": lane} if lane else {})})
         return res
 
 

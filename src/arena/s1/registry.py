@@ -5,9 +5,11 @@
    "models": {"<id>": {"id", "base_model", "adapter", "backend", "parent", "dataset", "n_train",
                         "created", "metrics": {"valid": {...}, "online": {...}}, "status", "notes"}}}
 
-Promotion compares a candidate with the current champion on the SAME held-out set: it must agree
-with the teacher more (by ``min_gain``) without getting less calibrated (ECE up by at most
-``max_ece_increase``). Online battle results, when recorded, must not be worse either.
+Promotion compares a candidate with the current champion on the SAME held-out set (pass the
+champion's re-score on the candidate's valid split as ``champion_valid``; its stored metrics are
+from an older, smaller split): it must agree with the teacher more (by ``min_gain``) without getting
+less calibrated (ECE up by at most ``max_ece_increase``). Online battle results, when recorded, must
+not be worse either.
 """
 
 from __future__ import annotations
@@ -63,7 +65,7 @@ class Registry:
 
 
 def decide_promotion(candidate: dict, champion: Optional[dict], *, min_gain: float = 0.01,
-                     max_ece_increase: float = 0.02) -> tuple[bool, str]:
+                     max_ece_increase: float = 0.02, champion_valid: Optional[dict] = None) -> tuple[bool, str]:
     cv = (candidate.get("metrics") or {}).get("valid", {}).get("overall", {})
     if not cv:
         return False, "candidate has no validation metrics"
@@ -72,7 +74,7 @@ def decide_promotion(candidate: dict, champion: Optional[dict], *, min_gain: flo
         if base and cv.get("agree", 0) < base.get("agree", 0) + min_gain:
             return False, f"no better than its untrained base ({cv.get('agree')} vs {base.get('agree')})"
         return True, "first model that beats its untrained base" if base else "first model"
-    chv = (champion.get("metrics") or {}).get("valid", {}).get("overall", {})
+    chv = (champion_valid or (champion.get("metrics") or {}).get("valid", {})).get("overall", {})
     if cv.get("agree", 0) < chv.get("agree", 0) + min_gain:
         return False, f"agreement {cv.get('agree')} not above champion {chv.get('agree')} + {min_gain}"
     if (cv.get("ece") or 0) > (chv.get("ece") or 0) + max_ece_increase:

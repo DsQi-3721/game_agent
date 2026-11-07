@@ -42,7 +42,7 @@ def wants_thinking_flag(client, model: str) -> bool:
 
 
 async def complete_in_space(client, model: str, messages: list[dict], sc: SpaceConfig, *,
-                            tools=None) -> tuple[LLMResponse, float]:
+                            tools=None, extra_body=None) -> tuple[LLMResponse, float]:
     """-> (response, wall-clock latency)."""
     kw: dict = {"temperature": sc.temperature, "max_tokens": sc.max_tokens}
     if sc.top_p is not None:
@@ -51,6 +51,9 @@ async def complete_in_space(client, model: str, messages: list[dict], sc: SpaceC
         kw["presence_penalty"] = sc.presence_penalty
     if wants_thinking_flag(client, model):
         kw["extra_body"] = {"chat_template_kwargs": {"enable_thinking": bool(sc.thinking)}}
+    if extra_body:
+        from arena.llm.client import deep_merge
+        kw["extra_body"] = deep_merge(kw.get("extra_body"), extra_body)
     if sc.timeout_s:
         kw["timeout"] = sc.timeout_s
     t0 = time.monotonic()

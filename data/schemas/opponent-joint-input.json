@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observer history for the gen9ou joint opponent model",
+  "type": "object",
+  "required": ["initial", "windows"],
+  "properties": {
+    "initial": {
+      "type": "object",
+      "required": ["format", "game_id", "observer", "observer_team", "opponent_preview", "public_events"],
+      "properties": {
+        "format": {"const": "gen9ou"},
+        "game_id": {"type": "string"},
+        "opponent_id": {"type": "string", "description": "Use a separate belief instance for each opponent; new_game preserves this player's memory."},
+        "observer": {"enum": ["p1", "p2"]},
+        "observer_team": {"type": "array", "minItems": 6, "maxItems": 6, "description": "Our own original Showdown sets; available to mechanics inference, never directly to the opponent policy."},
+        "opponent_preview": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "string"}, "description": "Public species in preview order; no true hidden opponent sets."},
+        "public_events": {"type": "array", "items": {"type": "string"}, "description": "Public protocol before the first decision, including preview details."},
+        "seed": {"type": "integer", "description": "Research inference seed; not the simulator's hidden battle RNG."}
+      }
+    },
+    "windows": {
+      "type": "array",
+      "description": "Chronological complete simulator resolution windows, including separate forced-switch decisions; do not split a damage packet into independent evidence.",
+      "items": {
+        "type": "object",
+        "required": ["public_events"],
+        "properties": {
+          "public_events": {"type": "array", "items": {"type": "string"}},
+          "our_submitted_action": {"type": ["string", "null"], "description": "Our already submitted command used only for mechanics settlement."},
+          "observer_private_events": {"type": ["array", "null"], "items": {"type": "string"}, "description": "The same resolution window in our legal private view, e.g. exact own HP. Not the opponent's private log."},
+          "event_id": {"type": "string"},
+          "sequence": {"type": "integer", "minimum": 0, "description": "Zero-based window index; replacing an earlier index replays the affected history."}
+        }
+      }
+    }
+  }
+}

@@ -38,3 +38,18 @@ class TeamPool:
         if not self.root.is_dir():
             return []
         return sorted(p.name for p in self.root.iterdir() if p.is_dir() and self._load(p.name))
+
+
+class DirTeamPool:
+    """Every *.txt paste of one directory, sorted by file name, whatever the tier (``teams.pool`` in a config)."""
+
+    def __init__(self, path: Path | str):
+        self.path = Path(path)
+        texts = (p.read_text(encoding="utf-8").strip() for p in sorted(self.path.glob("*.txt")))
+        self._teams = tuple(t for t in texts if t)
+
+    def get(self, tier: str) -> list[str]:
+        return list(self._teams)
+
+    def has(self, tier: str) -> bool:
+        return bool(self._teams)

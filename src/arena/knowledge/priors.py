@@ -28,7 +28,7 @@ class SetPrior:
     species: str
     name: str
     level: int
-    source: str                       # "randbats" | "gen9ou" | "none"
+    source: str                       # "randbats" | "gen9ou" | "gen9ou+team" | "none"
     n: int = 0                        # sample size behind the prior (0 = unknown)
     moves: tuple[Choice, ...] = ()
     items: tuple[Choice, ...] = ()
@@ -36,6 +36,8 @@ class SetPrior:
     tera: tuple[Choice, ...] = ()
     spreads: tuple[dict, ...] = ()    # {nature, evs[6], ivs[6], p}
     revealed: dict = field(default_factory=dict)  # moves(list)/item/ability/tera actually seen
+    notes: tuple[str, ...] = ()       # in-battle evidence behind the probabilities (team-aware model)
+    original_item: Optional[str] = None   # the item it started with, once known (knocked off, tricked away ...)
 
     def likely_moves(self, k: int = 4) -> list[Choice]:
         """Revealed moves first, then the most probable others, up to ``k``."""

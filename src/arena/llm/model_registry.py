@@ -7,6 +7,7 @@ time (a project-root .env is loaded if present), so secrets never live in YAML.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -27,6 +28,21 @@ def _load_dotenv(path: Path = _ENV_FILE) -> None:
             continue
         k, v = line.split("=", 1)
         os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_VAR = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(?::-([^}]*))?\}")
+
+
+def expand_vars(value):
+    """``${VAR}`` / ``${VAR:-default}`` in registry values: machine-specific ports and paths
+    (e.g. ``api_base: ${ARENA_VLLM_BASE:-http://localhost:8001/v1}``) without editing the YAML."""
+    if isinstance(value, str):
+        return _VAR.sub(lambda m: os.environ.get(m.group(1)) or (m.group(2) or ""), value)
+    if isinstance(value, dict):
+        return {k: expand_vars(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [expand_vars(v) for v in value]
+    return value
 
 
 @dataclass
@@ -79,7 +95,7 @@ class ModelRegistry:
         data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         specs = {}
         for name, cfg in (data.get("models") or {}).items():
-            specs[name] = ModelSpec(name=name, **cfg)
+            specs[name] = ModelSpec(name=name, **expand_vars(cfg))
         return cls(specs)
 
     def get(self, name: str) -> ModelSpec:

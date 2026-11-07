@@ -30,7 +30,7 @@ class IsolatedReasoner:
         recent = sess.history_text(sess.entries[-cfg.tau_k:]) if cfg.tau_k > 0 else ""
         user = P.ISO_USER.format(
             memory=(a.memory_text(sess, "iso") if cfg.memory_enabled else "") or P.MEMORY_EMPTY,
-            history=recent or P.HISTORY_EMPTY, state=render_state(battle, dossier=cfg.dossier),
+            history=recent or P.HISTORY_EMPTY, state=render_state(battle, dossier=cfg.dossier, extended=cfg.state_view == "obs1"),
             options=render_options(options), description=description, prompt=prompt)
         messages = [{"role": "system", "content": P.ISO_SYSTEM.format(brief=sess.brief)},
                     {"role": "user", "content": user}]

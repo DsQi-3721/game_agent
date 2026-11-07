@@ -19,13 +19,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "pytest-asyncio>=0.23"]
-viz = ["plotly>=5.20", "wandb>=0.16"]
+viz = ["plotly>=5.20", "matplotlib>=3.8", "wandb>=0.21.3"]
 # System-1 layer: TypeSafe / local System-One client + the local student server
 s1 = ["httpx>=0.27", "aiohttp>=3.9"]
 # local students on Apple silicon (training + serving with mlx)
 s1-mlx = ["mlx-lm>=0.31"]
 # local students on GPU servers (training + serving with torch / peft)
 s1-gpu = ["torch>=2.4", "transformers>=5.0", "peft>=0.15", "accelerate>=1.0"]
+opponent = ["numpy>=1.26", "scipy>=1.11", "torch>=2.4", "pyarrow>=14", "orjson>=3", "pandas>=2"]
 
 [project.scripts]
 arena = "arena.cli:main"

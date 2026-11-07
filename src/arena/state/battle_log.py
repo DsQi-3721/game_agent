@@ -19,17 +19,15 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
-from poke_env.data import to_id_str
+from poke_env.data import GenData, to_id_str
 
-# protocol message types that never matter for a decision
-NOISE_KINDS = {
-    "", "t:", "upkeep", "j", "J", "l", "L", "n", "N", "raw", "c", "c:", "chat", "inactive",
-    "inactiveoff", "-hint", "-anim", "-message", "html", "uhtml", "uhtmlchange", "rated",
-    "rule", "title", "gametype", "gen", "tier", "player", "teamsize", "start", "init",
-    "seed", "clearpoke", "poke", "teampreview", "badge", "debug", "split", "request",
-    "-nothing", "-center", "-combine", "-waiting", "-zbroken", "-primal", "-burst",
-    "-hitcount", "-ohko", "-notarget", "-block", "-candynamax", "timestamp", "bigerror",
-}
+from arena.observation.events import OBSERVATION_ONLY, ROLE, is_ignorable
+from arena.observation.tracker import effect_holder
+
+# protocol message kinds the turn narrative leaves out: presentation / chat / timing / out of scope, and the
+# format, preview and request lines the PlayerObservation reads (``arena.observation.events`` lists every
+# kind with its role and the reason it may be left out)
+NOISE_KINDS = {k for k in ROLE if is_ignorable(k)} | OBSERVATION_ONLY | {"seed", "-center", "-combine", "-waiting"}
 
 # attachments merged into the action line that caused them
 _ATTACH = {
@@ -39,6 +37,9 @@ _ATTACH = {
     "-miss": "missed",
     "-fail": "failed",
     "-immune": "no effect",
+    "-notarget": "no target",
+    "-ohko": "one-hit KO",
+    "-nothing": "nothing happened",
 }
 
 
@@ -61,11 +62,20 @@ class TurnResult:
         return f"<TURN_RESULT turn={self.turn}>\n{body}\n</TURN_RESULT>"
 
 
-@dataclass(frozen=True)
+@dataclass
 class KeyFact:
+    """A rule-extracted fact. ``scope``: "event" (something that happened: true for good) or "state" (true
+    while it lasts: an item held, a hazard on a side, a status); a state fact gets ``ended_turn`` when an
+    event makes it false, and the change itself is recorded as an event fact."""
     turn: int
-    kind: str   # opp_move | opp_item | opp_ability | tera | faint | hazard | status
+    kind: str   # opp_move | opp_item | opp_item_lost | opp_ability | tera | faint | hazard | hazard_removed | status
     text: str
+    scope: str = "event"
+    ended_turn: Optional[int] = None
+
+    @property
+    def current(self) -> bool:
+        return self.scope == "event" or self.ended_turn is None
 
 
 def _strip_prefix(effect: str) -> str:
@@ -105,6 +115,12 @@ class LogDigester:
     def __init__(self):
         self.hp: dict[str, float] = {}      # 'p2: Garganacl' -> last known HP fraction
         self._facts: set[tuple] = set()
+        self._live: dict[tuple, KeyFact] = {}    # state facts still true, by what they are about
+        self._layers: dict[tuple, int] = {}      # (side, condition) -> layers set so far
+        self._lost: dict[str, str] = {}          # Pokemon -> item it last lost
+        self._transformed: set[str] = set()      # Pokemon currently transformed (its moves are borrowed)
+        self._as_one: set[str] = set()           # Pokemon that showed As One (its Unnerve line is part of it)
+        self._ending: list[tuple] = []           # (label, fact) ended in the current slice
 
     # --- naming -----------------------------------------------------------
     @staticmethod
@@ -130,29 +146,61 @@ class LogDigester:
         side, name, key = self._key(ident)
         return self._who(battle, side), self._display(battle, key, name), key
 
-    def _fact(self, facts: list, label: Optional[int], kind: str, text: str, dedupe: tuple) -> None:
-        """Queue a fact; ``label`` may be None (pre-marker) and ``text`` may contain
-        ``{turn}`` -- both are resolved once the whole slice has been seen."""
-        if dedupe in self._facts:
-            return
+    def _fact(self, facts: list, label: Optional[int], kind: str, text: str, dedupe: tuple,
+              state_key: Optional[tuple] = None) -> Optional[KeyFact]:
+        """Queue a fact; ``label`` may be None (pre-marker) and ``text`` may contain ``{turn}`` -- both are
+        resolved once the whole slice has been seen. ``state_key``: the fact is a current state (an item
+        held, a hazard, a status) that a later event can end; an earlier live fact on the same key ends."""
+        if dedupe in self._facts and state_key is None:
+            return None
+        if state_key is not None and state_key in self._live:
+            if self._live[state_key].text == text:
+                return None
+            self._end(state_key, label, facts)
         self._facts.add(dedupe)
-        facts.append((label, kind, text))
+        kf = KeyFact(-1, kind, text, scope="state" if state_key is not None else "event")
+        facts.append((label, kf))
+        if state_key is not None:
+            self._live[state_key] = kf
+        return kf
 
-    def _reveal_from(self, facts, label, who, name, src: str) -> None:
-        """'[from] item: Life Orb' / '[from] ability: Rough Skin' reveal opp info."""
-        if who != "opp" or not src:
+    def _end(self, state_key: tuple, label: Optional[int], facts: list, kind: str = "", text: str = "") -> None:
+        """End a live state fact (its turn is resolved with the slice) and record the change as an event."""
+        kf = self._live.pop(state_key, None)
+        if kf is None:
+            return
+        self._ending.append((label, kf))
+        if kind:
+            facts.append((label, KeyFact(-1, kind, text)))
+
+    def _reveal_from(self, facts, label, battle, ev: list[str], tags: dict) -> None:
+        """'[from] item: Life Orb' / '[from] ability: Rough Skin' reveal who holds what; the holder follows
+        ``tracker.effect_holder`` (``[of]`` for effects on someone else, the line's Pokemon otherwise)."""
+        src = tags.get("from", "")
+        if not src.startswith(("item: ", "ability: ")):
+            return
+        holder = effect_holder(ev[1] if len(ev) > 1 else "", ev, tags)
+        if not holder:
+            return
+        who, name, key = self._mon(battle, holder)
+        if who != "opp":
             return
         if src.startswith("item: "):
             item = src[len("item: "):]
-            self._fact(facts, label, "opp_item", f"opp {name} holds {item}", ("item", name, item))
-        elif src.startswith("ability: "):
+            if self._lost.get(key) == item:        # Sitrus Berry: -enditem [eat], then -heal [from] item: ...
+                return
+            self._fact(facts, label, "opp_item", f"opp {name} holds {item}", ("item", key, item),
+                       state_key=("item", key))
+        else:
             ab = src[len("ability: "):]
-            self._fact(facts, label, "opp_ability", f"opp {name} has ability {ab}", ("ability", name, ab))
+            self._fact(facts, label, "opp_ability", f"opp {name} has ability {ab}", ("ability", key, ab),
+                       state_key=("ability", key))
 
     # --- main pass --------------------------------------------------------
     def ingest(self, events: list[list[str]], battle) -> tuple[list[TurnResult], list[KeyFact]]:
         labelled: list[tuple[Optional[int], str]] = []
-        facts: list[tuple] = []           # (label | None, kind, text template)
+        facts: list[tuple] = []           # (label | None, KeyFact with a {turn} template)
+        self._ending = []
         label: Optional[int] = None
         first_marker: Optional[int] = None
         cur: Optional[list[str]] = None
@@ -197,7 +245,7 @@ class LogDigester:
                 cur, cur_label = [line], label
                 if "miss" in tags:
                     cur.append("missed")
-                if who == "opp" and "from" not in tags:
+                if who == "opp" and "from" not in tags and self._key(ev[2])[2] not in self._transformed:
                     self._fact(facts, label, "opp_move", f"opp {name} has {move}", ("move", name, move))
                 continue
 
@@ -215,6 +263,8 @@ class LogDigester:
                 continue
 
             if kind in ("switch", "drag", "replace") and len(ev) >= 3:
+                side = ev[2][:2]
+                self._transformed = {k for k in self._transformed if not k.startswith(side)}
                 who, name, key = self._mon(battle, ev[2])
                 frac, _ = _hp_of(ev[4] if len(ev) >= 5 else "")
                 if frac is not None:
@@ -234,7 +284,10 @@ class LogDigester:
                 after_s = "fainted" if status == "fnt" else (f"{round(frac * 100)}%" if frac is not None else "?")
                 delta = f"{round(before * 100)}%->{after_s}" if before is not None else after_s
                 src = tags.get("from", "")
-                self._reveal_from(facts, label, who, name, src)
+                self._reveal_from(facts, label, battle, ev, tags)
+                if kind == "-heal" and src == "move: Revival Blessing":
+                    self._fact(facts, label, "revived", f"{who} {name} was revived (Revival Blessing, turn {{turn}})",
+                               ("revived", key, label))
                 if kind == "-damage" and not src and cur is not None:
                     cur.append(f"{who} {name} {delta}")
                 else:
@@ -249,17 +302,55 @@ class LogDigester:
                 emit(f"{who} {name} fainted")
                 self._fact(facts, label, "faint", f"{who} {name} fainted (turn {{turn}})",
                            ("faint", key))
+                self._end(("status", key), label, facts)
                 continue
 
             if kind in ("-status", "-curestatus") and len(ev) >= 4:
-                who, name, _ = self._mon(battle, ev[2])
+                who, name, key = self._mon(battle, ev[2])
                 st = ev[3].upper()
-                self._reveal_from(facts, label, who, name, tags.get("from", ""))
+                self._reveal_from(facts, label, battle, ev, tags)
                 if kind == "-status":
                     emit(f"{who} {name} is now {st}")
-                    self._fact(facts, label, "status", f"{who} {name} is {st}", ("status", name, st))
+                    self._fact(facts, label, "status", f"{who} {name} is {st}", ("status", key, st),
+                               state_key=("status", key))
                 else:
                     emit(f"{who} {name} cured of {st}")
+                    self._end(("status", key), label, facts)
+                continue
+
+            if kind == "-cureteam" and len(ev) >= 3:
+                who, name, _ = self._mon(battle, ev[2])
+                emit(f"{who} team cured of status ({name})")
+                side = ev[2][:2]
+                for k in [k for k in self._live if k[0] == "status" and k[1].startswith(side)]:
+                    self._end(k, label, facts)
+                continue
+
+            if kind in ("-setboost", "-swapboost", "-invertboost", "-copyboost", "-clearpositiveboost") and len(ev) >= 3:
+                who, name, _ = self._mon(battle, ev[2])
+                what = {"-setboost": f"{ev[3] if len(ev) > 3 else ''} set to {ev[4] if len(ev) > 4 else ''}",
+                        "-swapboost": "stat changes swapped", "-invertboost": "stat changes inverted",
+                        "-copyboost": "copied stat changes", "-clearpositiveboost": "positive stat changes cleared"}[kind]
+                emit(f"{who} {name} {what}".strip())
+                continue
+
+            if kind == "-hitcount" and len(ev) >= 4:
+                note = f"hit {ev[3]} times"
+                if cur is not None:
+                    cur.append(note)
+                else:
+                    emit(note)
+                continue
+
+            if kind == "-block" and len(ev) >= 4:
+                who, name, _ = self._mon(battle, ev[2])
+                note = f"blocked by {who} {name}'s {_strip_prefix(ev[3])}"
+                self._reveal_from(facts, label, battle, [*ev[:3], *ev[4:], f"[from] {ev[3]}"],
+                                  {**tags, "from": ev[3]} if ev[3].startswith(("ability: ", "item: ")) else tags)
+                if cur is not None:
+                    cur.append(note)
+                else:
+                    emit(note)
                 continue
 
             if kind in ("-boost", "-unboost") and len(ev) >= 5:
@@ -298,10 +389,30 @@ class LogDigester:
                 cond = _strip_prefix(ev[3])
                 if kind == "-sidestart":
                     emit(f"{who} side: {cond} set")
-                    self._fact(facts, label, "hazard", f"{who} side has {cond}",
-                               ("side", side, cond, label))
+                    layers = self._layers.get((side, cond), 0) + 1
+                    self._layers[(side, cond)] = layers
+                    text = f"{who} side has {cond}" + (f" x{layers}" if cond in ("Spikes", "Toxic Spikes") else "")
+                    self._fact(facts, label, "hazard", text, ("side", side, cond, layers),
+                               state_key=("side", side, cond))
                 else:
-                    emit(f"{who} side: {cond} ended")
+                    how = _strip_prefix(tags.get("from", "")) or "ended"
+                    emit(f"{who} side: {cond} ended" + (f" ({how})" if how != "ended" else ""))
+                    self._layers.pop((side, cond), None)
+                    self._end(("side", side, cond), label, facts, "hazard_removed",
+                              f"{cond} removed from {who} side ({how}, turn {{turn}})")
+                continue
+
+            if kind == "-swapsideconditions":
+                emit("side conditions swapped (Court Change)")
+                me = getattr(battle, "player_role", "p1")
+                for k in [k for k in self._live if k[0] == "side"]:
+                    self._end(k, label, facts)
+                swapped = {(("p2" if sd == "p1" else "p1"), c): n for (sd, c), n in self._layers.items()}
+                self._layers = swapped
+                for (sd, c), n in swapped.items():
+                    w = "your" if sd == me else "opp"
+                    self._fact(facts, label, "hazard", f"{w} side has {c}" + (f" x{n}" if c in ("Spikes", "Toxic Spikes") else ""),
+                               ("side", sd, c, n, "swap", label), state_key=("side", sd, c))
                 continue
 
             if kind in ("-start", "-end") and len(ev) >= 4:
@@ -309,7 +420,7 @@ class LogDigester:
                 eff = _strip_prefix(ev[3])
                 if "silent" in tags and kind == "-end":
                     continue
-                self._reveal_from(facts, label, who, name, tags.get("from", ""))
+                self._reveal_from(facts, label, battle, ev, tags)
                 text = f"{who} {name}: {eff} {'started' if kind == '-start' else 'ended'}"
                 if cur is not None and kind == "-start":
                     cur.append(f"{eff} on {who} {name}")
@@ -325,24 +436,39 @@ class LogDigester:
                 continue
 
             if kind in ("-item", "-enditem") and len(ev) >= 4:
-                who, name, _ = self._mon(battle, ev[2])
+                who, name, key = self._mon(battle, ev[2])
                 item = ev[3]
                 src = tags.get("from", "")
                 if kind == "-item":
                     emit(f"{who} {name} has {item}" + (f" ({_strip_prefix(src)})" if src else ""))
+                    self._lost.pop(key, None)
+                    if who == "opp":
+                        self._fact(facts, label, "opp_item", f"opp {name} holds {item}", ("item", key, item),
+                                   state_key=("item", key))
                 else:
-                    how = " (eaten)" if "eat" in tags else (f" ({_strip_prefix(src)})" if src else "")
-                    emit(f"{who} {name} lost {item}{how}")
-                if who == "opp":
-                    self._fact(facts, label, "opp_item", f"opp {name} holds {item}", ("item", name, item))
+                    how = "eaten" if "eat" in tags else (_strip_prefix(src) if src else "used up")
+                    emit(f"{who} {name} lost {item} ({how})")
+                    self._end(("item", key), label, facts)
+                    self._lost[key] = item
+                    self._fact(facts, label, "item_lost", f"{who} {name} lost {item} ({how}, turn {{turn}})",
+                               ("lost", key, item, label))
                 continue
 
             if kind == "-ability" and len(ev) >= 4:
-                who, name, _ = self._mon(battle, ev[2])
+                who, name, key = self._mon(battle, ev[2])
                 emit(f"{who} {name} ability {ev[3]}")
+                if ev[3] == "As One":
+                    self._as_one.add(key)
+                elif ev[3] == "Unnerve" and key in self._as_one:
+                    continue                        # As One announces Unnerve with itself
                 if who == "opp":
                     self._fact(facts, label, "opp_ability", f"opp {name} has ability {ev[3]}",
-                               ("ability", name, ev[3]))
+                               ("ability", key, ev[3]), state_key=("ability", key))
+                continue
+
+            if kind == "-endability" and len(ev) >= 3:
+                who, name, key = self._mon(battle, ev[2])
+                emit(f"{who} {name}'s ability stopped working")
                 continue
 
             if kind == "cant" and len(ev) >= 4:
@@ -351,12 +477,12 @@ class LogDigester:
                 emit(f"{who} {name} could not move ({reason})")
                 continue
 
-            if kind in ("-activate", "-singleturn") and len(ev) >= 4:
+            if kind in ("-activate", "-singleturn", "-singlemove") and len(ev) >= 4:
                 who, name, _ = self._mon(battle, ev[2]) if ev[2][:1] == "p" else ("", ev[2], "")
                 eff = _strip_prefix(ev[3])
                 src = ev[3]
                 if src.startswith(("item: ", "ability: ")):
-                    self._reveal_from(facts, label, who, name, src)
+                    self._reveal_from(facts, label, battle, ev[:3], {"from": src, **({"of": tags["of"]} if "of" in tags else {})})
                 text = f"{who} {name}: {eff}".strip()
                 if cur is not None:
                     cur.append(text)
@@ -365,14 +491,22 @@ class LogDigester:
                 continue
 
             if kind in ("detailschange", "-formechange") and len(ev) >= 4:
-                who, name, _ = self._mon(battle, ev[2])
-                emit(f"{who} {name} changed form to {ev[3].split(',')[0]}")
+                who, name, key = self._mon(battle, ev[2])
+                forme = ev[3].split(",")[0]
+                emit(f"{who} {name} changed form to {forme}")
+                live = self._live.get(("ability", key))
+                if live is not None:              # Tera Shift -> Tera Shell: the new forme's ability differs
+                    dex = GenData.from_gen(getattr(battle, "gen", 9) or 9).pokedex.get(to_id_str(forme)) or {}
+                    allowed = {to_id_str(a) for a in (dex.get("abilities") or {}).values()}
+                    if allowed and to_id_str(live.text.rsplit(" has ability ", 1)[-1]) not in allowed:
+                        self._end(("ability", key), label, facts)
                 continue
 
             if kind == "-transform" and len(ev) >= 4:
-                who, name, _ = self._mon(battle, ev[2])
+                who, name, key = self._mon(battle, ev[2])
                 twho, tname, _ = self._mon(battle, ev[3])
                 emit(f"{who} {name} transformed into {tname}")
+                self._transformed.add(key)
                 continue
 
             if kind == "-mustrecharge" and len(ev) >= 3:
@@ -383,6 +517,10 @@ class LogDigester:
             if kind == "-prepare" and len(ev) >= 4:
                 who, name, _ = self._mon(battle, ev[2])
                 emit(f"{who} {name} is charging {ev[3]}")
+                continue
+
+            if kind == "-hint" and len(ev) >= 3:
+                emit(f"(hint: {ev[2]})")
                 continue
 
             if kind == "win" and len(ev) >= 3:
@@ -401,7 +539,10 @@ class LogDigester:
             grouped.setdefault(lab if lab is not None else default, []).append(text)
         results = [TurnResult(t, lines) for t, lines in sorted(grouped.items())]
         resolved = []
-        for lab, kind, text in facts:
-            turn = lab if lab is not None else default
-            resolved.append(KeyFact(turn, kind, text.replace("{turn}", str(turn))))
+        for lab, kf in facts:
+            kf.turn = lab if lab is not None else default
+            kf.text = kf.text.replace("{turn}", str(kf.turn))
+            resolved.append(kf)
+        for lab, kf in self._ending:
+            kf.ended_turn = lab if lab is not None else default
         return results, resolved

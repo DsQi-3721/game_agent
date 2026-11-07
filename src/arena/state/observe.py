@@ -68,6 +68,17 @@ def known_ability(mon: Pokemon) -> str | None:
     return mon.ability or None
 
 
+def bench_seen_turn(battle, mon: Pokemon):
+    """The turn a benched opponent's HP was last shown (it can change unseen: Regenerator, Wish ...); None if
+    it is active or fainted or the battle has no protocol history."""
+    if mon.active or mon.fainted:
+        return None
+    from arena.observation.tracker import mon_key, tracker_for
+    key = next((k for k, m in battle.opponent_team.items() if m is mon), None)
+    h = tracker_for(battle).mons.get(mon_key(key)) if key else None
+    return h.hp_turn if h else None
+
+
 def mon_label(mon: Pokemon) -> str:
     hp = f"{round(mon.current_hp_fraction * 100)}%" if mon.current_hp_fraction is not None else "?%"
     status = f" {mon.status.name}" if mon.status else ""

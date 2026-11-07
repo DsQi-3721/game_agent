@@ -28,6 +28,7 @@ from arena.events.schema import EventType
 from arena.logging.trajectory import TrajectoryLogger
 from arena.state.renderer import DefaultRenderer
 from arena.teams.manager import AssignmentMode, TeamManager
+from arena.teams.pool import DirTeamPool
 
 
 def merge_extra_metrics(into: dict, new: Optional[dict]) -> dict:
@@ -51,6 +52,37 @@ def _scalar_extra(extra) -> dict:
     if not isinstance(extra, dict):
         return {}
     return {k: v for k, v in extra.items() if isinstance(v, (int, float, bool))}
+
+
+def team_blocks(n_battles: int, per_team: int, offset: int, n_teams: int) -> list[tuple[int, int]]:
+    """Mirror-team blocks of one pairing -> [(team index, battles)]. Battle g of the global sequence (this run's
+    battles are g = offset .. offset + n_battles - 1) plays team (g // per_team) % n_teams; consecutive battles
+    with the same team form one block (one match). ``per_team`` 0: a single block, the runner draws the team."""
+    if per_team <= 0 or n_teams <= 0:
+        return [(-1, n_battles)] if n_battles > 0 else []
+    out: list[tuple[int, int]] = []
+    for g in range(offset, offset + n_battles):
+        t = (g // per_team) % n_teams
+        if out and out[-1][0] == t:
+            out[-1] = (t, out[-1][1] + 1)
+        else:
+            out.append((t, 1))
+    return out
+
+
+def pool_blocks(n_battles: int, per_team: int, offset: int, n_a: int, n_b: int) -> list[tuple[tuple[int, int], int]]:
+    """Two-pool blocks -> [((our team, their team), battles)]: battle g plays block b = g // per_team, our team
+    b % n_a against their team b % n_b."""
+    per_team = max(per_team, 1)
+    out: list = []
+    for g in range(offset, offset + n_battles):
+        b = g // per_team
+        key = (b % n_a, b % n_b, b)
+        if out and out[-1][0] == key:
+            out[-1] = (key, out[-1][1] + 1)
+        else:
+            out.append((key, 1))
+    return [((a, t), nb) for (a, t, _b), nb in out]
 
 
 class Evaluator:
@@ -160,9 +192,18 @@ class Evaluator:
         if self.guard.dry_run:
             return self._dry_run_report()
 
-        runner = MatchRunner(team_manager=TeamManager(rng=random.Random(self.cfg.seed)),
-                             rng=random.Random(self.cfg.seed))
+        tc = self.cfg.teams
+        pool = DirTeamPool(tc.pool) if tc.pool else None
+        tm = TeamManager(pool=pool, rng=random.Random(self.cfg.seed))
+        runner = MatchRunner(team_manager=tm, rng=random.Random(self.cfg.seed))
         mode = AssignmentMode(self.cfg.teams.mode)
+        teams = tm.pool.get(self.cfg.format) if (mode == AssignmentMode.MIRROR and tc.per_team > 0) else []
+        blocks = team_blocks(self.cfg.evaluation.n_battles, tc.per_team if teams else 0, tc.offset, len(teams))
+        if mode == AssignmentMode.POOLS:
+            if not (tc.pool and tc.opponent_pool):
+                raise ValueError("teams.mode pools needs teams.pool and teams.opponent_pool")
+            ours, theirs = DirTeamPool(tc.pool).get(self.cfg.format), DirTeamPool(tc.opponent_pool).get(self.cfg.format)
+            blocks = pool_blocks(self.cfg.evaluation.n_battles, tc.per_team, tc.offset, len(ours), len(theirs))
         pairings = self._pairings()
         self.emitter.emit(
             EventType.RUN_STARTED, agents=[c.name for c in self.cfg.agents],
@@ -183,28 +224,35 @@ class Evaluator:
                 if ext_name:
                     self.emitter.emit(EventType.EXTERNAL_STARTED, name=ext_name,
                                       username=self.cfg_by_name[ext_name].external.username)
-                try:
-                    res = await runner.run_match(
-                        self.specs[a], self.specs[b], self.cfg.format, mode,
-                        self.cfg.evaluation.n_battles, self._ctx(a), self._ctx(b),
-                        save_replays=self.replay_dir, announce=self.watch,
-                        turn_delay=self.turn_delay, run_dir=str(self.run_dir),
-                        ext_logger=ext_logger)
-                except Exception as e:  # noqa: BLE001  (a dead external aborts only its pairing)
-                    if ext_name is None:
-                        raise
-                    self.emitter.emit(EventType.EXTERNAL_DIED, name=ext_name,
-                                      message=f"{type(e).__name__}: {e}")
-                    continue
-                self.results.append(res)
-                self._account(res)
-                for _ in range(res.n_battles):
-                    self.guard.battle_done()
-                self.emitter.emit(
-                    EventType.MATCH_FINISHED, a=res.a, b=res.b, a_wins=res.a_wins,
-                    b_wins=res.b_wins, ties=res.ties, avg_turns=round(res.avg_turns, 1),
-                    totals={k: dict(v) for k, v in self.totals.items()})
-                self.emitter.emit(EventType.METRIC, **self._rolling_metrics())
+                for t_idx, nb in blocks:          # one match per mirror team (a single block by default)
+                    if mode == AssignmentMode.POOLS:   # (our team, their team); the first agent plays ``pool``
+                        team = (ours[t_idx[0]], theirs[t_idx[1]])
+                    else:
+                        team = teams[t_idx] if t_idx >= 0 else None
+                    try:
+                        res = await runner.run_match(
+                            self.specs[a], self.specs[b], self.cfg.format, mode,
+                            nb, self._ctx(a), self._ctx(b),
+                            save_replays=self.replay_dir, announce=self.watch,
+                            turn_delay=self.turn_delay, run_dir=str(self.run_dir),
+                            ext_logger=ext_logger, team=team)
+                    except Exception as e:  # noqa: BLE001  (a dead external aborts only this match)
+                        if ext_name is None:
+                            raise
+                        self.emitter.emit(EventType.EXTERNAL_DIED, name=ext_name,
+                                          message=f"{type(e).__name__}: {e}")
+                        continue
+                    res.team_index = t_idx[0] if isinstance(t_idx, tuple) else t_idx
+                    res.opp_team_index = t_idx[1] if isinstance(t_idx, tuple) else None
+                    self.results.append(res)
+                    self._account(res)
+                    for _ in range(res.n_battles):
+                        self.guard.battle_done()
+                    self.emitter.emit(
+                        EventType.MATCH_FINISHED, a=res.a, b=res.b, a_wins=res.a_wins,
+                        b_wins=res.b_wins, ties=res.ties, avg_turns=round(res.avg_turns, 1),
+                        totals={k: dict(v) for k, v in self.totals.items()})
+                    self.emitter.emit(EventType.METRIC, **self._rolling_metrics())
         except Exception as e:  # noqa: BLE001
             aborted = f"{type(e).__name__}: {e}"
             self.emitter.emit(EventType.ERROR, message=aborted)
@@ -227,9 +275,12 @@ class Evaluator:
 
     def _report(self, aborted: Optional[str]) -> dict:
         matrix: dict = defaultdict(dict)
-        for r in self.results:
-            matrix[r.a][r.b] = {"wins": r.a_wins, "losses": r.b_wins, "n": r.n_battles}
-            matrix[r.b][r.a] = {"wins": r.b_wins, "losses": r.a_wins, "n": r.n_battles}
+        for r in self.results:                  # a pairing can be several matches (one per mirror team)
+            for x, y, w, l in ((r.a, r.b, r.a_wins, r.b_wins), (r.b, r.a, r.b_wins, r.a_wins)):
+                cell = matrix[x].setdefault(y, {"wins": 0, "losses": 0, "n": 0})
+                cell["wins"] += w
+                cell["losses"] += l
+                cell["n"] += r.n_battles
 
         elo = elo_from_results(self.results)
         agents = {}
@@ -253,6 +304,10 @@ class Evaluator:
             "n_battles": self.cfg.evaluation.n_battles,
             "agents": agents,
             "matrix": {k: dict(v) for k, v in matrix.items()},
+            "matches": [{"a": r.a, "b": r.b, "team": getattr(r, "team_index", -1),
+                         "opp_team": getattr(r, "opp_team_index", None), "a_wins": r.a_wins,
+                         "b_wins": r.b_wins, "ties": r.ties, "n": r.n_battles, "avg_turns": round(r.avg_turns, 1)}
+                        for r in self.results],
             "total_cost_usd": round(self.guard.spent_usd, 4),
             "total_tokens": self.guard.spent_tokens,
             "aborted": aborted,

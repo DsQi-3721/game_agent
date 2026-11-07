@@ -283,18 +283,26 @@ def tool_stats(store: HyMemStore) -> str:
 
 
 def rule_episode(store: HyMemStore, previous: Optional[dict]) -> Optional[dict]:
-    """Fallback: previous episode memory + verified facts from the battle log."""
+    """Fallback: previous episode memory + verified facts from the battle log. A fact whose state has since
+    ended (an item lost, a hazard removed, a status cured) is dropped from the verified facts -- the change
+    itself is kept as a key event."""
     ep = dict(previous or {"task_description": "Win the battle.", "key_events": [], "verified_facts": [],
                            "current_progress": ""})
-    have = {f["fact"].lower() for f in ep.get("verified_facts", [])}
-    facts = list(ep.get("verified_facts", []))
+    ended = {kf.text.lower() for kf in store.key_facts if not getattr(kf, "current", True)}
+    facts = [f for f in ep.get("verified_facts", []) if f["fact"].lower() not in ended]
+    have = {f["fact"].lower() for f in facts}
     events = list(ep.get("key_events", []))
+    seen_events = {e["description"].lower() for e in events}
     for kf in store.key_facts:
-        if kf.text.lower() in have:
+        if kf.kind in ("faint", "tera", "item_lost", "hazard_removed"):
+            if kf.text.lower() not in seen_events:
+                seen_events.add(kf.text.lower())
+                events.append({"turn": kf.turn, "description": kf.text, "outcome": ""})
+            if kf.kind in ("item_lost", "hazard_removed"):
+                continue
+        if not getattr(kf, "current", True) or kf.text.lower() in have:
             continue
         have.add(kf.text.lower())
-        if kf.kind in ("faint", "tera"):
-            events.append({"turn": kf.turn, "description": kf.text, "outcome": ""})
         facts.append({"fact": kf.text, "turn": kf.turn, "confidence": "high"})
     ep["verified_facts"] = facts[-CAPS["verified_facts"]:]
     ep["key_events"] = events[-CAPS["key_events"]:]

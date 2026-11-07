@@ -70,7 +70,20 @@ if bad in t:
     t = t.replace(bad, good); p.write_text(t); print("[patch] llm_player minimax visual NameError")
 PY
 
-uv sync
+# Dependencies only (the repo is put on sys.path by bridge_accept.py), in a venv off the root disk.
+if [ -n "${POKECHAMP_BASE_PYTHON:-}" ]; then
+  # Over an existing environment that already has torch & co. (--system-site-packages: read-only, nothing is
+  # installed there); only the missing packages go into the venv. Used on the GPU server, where the CUDA wheels
+  # would take hours through the proxy. PokeChamp's own poke_env (repo/) still shadows any installed poke-env.
+  VENV="${POKECHAMP_VENV:-/data/wangxinqi/venvs/pokechamp_sys}"
+  "$POKECHAMP_BASE_PYTHON" -m venv --system-site-packages "$VENV"
+  "$VENV/bin/pip" install google-genai ollama fade termcolor evaluate
+else
+  # The pinned lock (torch & co. are several GB); --no-install-project skips building the package itself.
+  export UV_PROJECT_ENVIRONMENT="${POKECHAMP_VENV:-/data/wangxinqi/venvs/pokechamp}"
+  export UV_CACHE_DIR="${UV_CACHE_DIR:-/data/wangxinqi/uv/cache}" UV_HTTP_TIMEOUT="${UV_HTTP_TIMEOUT:-180}"
+  uv sync --frozen --no-install-project
+fi
 
 echo "PokeChamp setup complete."
 echo "Smoke test (needs a running Showdown server + an LLM key, e.g. OPENROUTER_API_KEY):"

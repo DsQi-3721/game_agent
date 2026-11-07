@@ -9,7 +9,9 @@ decision for it is still in flight.
 
 from __future__ import annotations
 
+import contextvars
 from collections import OrderedDict
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
@@ -42,6 +44,21 @@ class DecisionStats:
     extra: dict = field(default_factory=dict)   # subclass telemetry merged into the trajectory
 
 
+# Background work (folds, deep-thinking jobs) books its LLM calls and counters to its own DecisionStats instead of
+# whatever decision happens to be current (``sess.stats`` reads this scope first).
+_STATS_SCOPE: contextvars.ContextVar[Optional[DecisionStats]] = contextvars.ContextVar("hymem_stats_scope",
+                                                                                        default=None)
+
+
+@contextmanager
+def stats_scope(stats: DecisionStats):
+    token = _STATS_SCOPE.set(stats)
+    try:
+        yield stats
+    finally:
+        _STATS_SCOPE.reset(token)
+
+
 @dataclass
 class BattleSession:
     tag: str
@@ -59,7 +76,16 @@ class BattleSession:
     last_order: Optional[str] = None
     closed: bool = False
     in_flight: int = 0
-    stats: DecisionStats = field(default_factory=DecisionStats)
+    decision_stats: DecisionStats = field(default_factory=DecisionStats)
+
+    @property
+    def stats(self) -> DecisionStats:
+        """The current decision's stats, or the running background job's (``stats_scope``)."""
+        return _STATS_SCOPE.get() or self.decision_stats
+
+    @stats.setter
+    def stats(self, value: DecisionStats) -> None:
+        self.decision_stats = value
 
     def add(self, entry: Entry) -> None:
         self.entries.append(entry)
@@ -67,11 +93,16 @@ class BattleSession:
     def history_text(self, entries: Optional[list] = None) -> str:
         return "\n".join(e.render() for e in (self.entries if entries is None else entries))
 
-    def keep_recent(self, n: int) -> None:
-        """After a fold: keep this decision's entries plus the last ``n`` before them."""
-        cur = [e for e in self.entries if e.decision == self.decision_idx]
-        prev = [e for e in self.entries if e.decision != self.decision_idx][-n:] if n > 0 else []
-        self.entries = prev + cur
+    def keep_recent(self, n: int, cut: Optional[int] = None, decision: Optional[int] = None) -> None:
+        """After a fold: keep this decision's entries plus the last ``n`` before them. A fold that ran in the
+        background summarised only ``entries[:cut]`` (as of decision ``decision``): everything added after the cut
+        is kept untouched, it was never summarised."""
+        cut = len(self.entries) if cut is None else cut
+        d = self.decision_idx if decision is None else decision
+        old, new = self.entries[:cut], self.entries[cut:]
+        cur = [e for e in old if e.decision == d]
+        prev = [e for e in old if e.decision != d][-n:] if n > 0 else []
+        self.entries = prev + cur + new
 
 
 class SessionStore:

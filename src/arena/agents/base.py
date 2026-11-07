@@ -54,14 +54,31 @@ class Agent(ABC):
     async def act(self, battle: AbstractBattle) -> BattleOrder:
         """Return a legal order for this turn."""
 
+    #: team preview policy: "random" (poke-env's random order) | "lead_prior" (``arena.agents.team_preview``)
+    team_preview: str = "random"
+
+    #: opponent set model used by every tool / fact while this agent decides ("team" | "prior"; None: the
+    #: process default, ``ARENA_OPPONENT_MODEL``) -- see ``arena.knowledge.opponent_model``
+    opponent_model: Optional[str] = None
+
     async def choose_team(self, battle: AbstractBattle) -> Optional[str]:
         """Team-preview order, or ``None`` to let the adapter pick a default.
 
         Returning ``None`` means "no preference"; ``AgentPlayer`` then uses
-        poke-env's random team-preview. LLM/team-building agents (M3+) override
-        this. Random battles never call it.
+        poke-env's random team-preview and records that it did. Random battles never call it.
         """
+        if self.team_preview == "lead_prior":
+            from arena.agents.team_preview import teampreview_message
+            return teampreview_message(battle)
         return None
+
+    async def flush_background(self) -> None:
+        """Finish background persistence after the match's last battle."""
+
+    def on_battle_message(self, battle_tag: str, text: str, player) -> None:
+        """Every websocket message of a battle exactly as received, before the client handles it (so before any
+        ``act()`` it triggers). Default: no-op. Must not block: agents that run background work on the battle
+        stream (e.g. a look-ahead service that mirrors the battle) only enqueue here."""
 
     def on_battle_end(self, battle: AbstractBattle) -> None:
         """Called once when a battle finishes (win or tie). Default: no-op.

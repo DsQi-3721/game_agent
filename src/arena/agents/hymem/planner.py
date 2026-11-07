@@ -57,7 +57,7 @@ class Planner:
         user = P.PLANNER_USER.format(
             memory=memory or P.MEMORY_EMPTY,
             history=sess.history_text() or P.HISTORY_EMPTY,
-            state=render_state(battle, dossier=cfg.dossier),
+            state=render_state(battle, dossier=cfg.dossier, extended=cfg.state_view == "obs1"),
             passive=f"\n{passive}\n" if passive else "",
             options=render_options(options) if with_options else "(omitted)",
             instruction=instruction)
@@ -81,13 +81,14 @@ class Planner:
     async def fold(self, sess: "BattleSession", battle, options, reason: str) -> None:
         a, cfg = self.a, self.a.cfg
         before_entries, before_tokens = len(sess.entries), sess.last_planner_tokens
+        cut, d0 = len(sess.entries), sess.decision_idx      # entries added while folding stay unsummarised
         t_wall = time.time()
         summary_msgs = (self.messages(sess, battle, options, P.FOLD_SUMMARY_REQUEST, with_options=False)
                         if cfg.fold_mode in ("two_stage", "typed") else None)
         outcome = await a.memory.fold(
             sess.store, call=lambda space, m: a.call(space, m, sess=sess), reason=reason,
             task=self.task_line(battle), summary_messages=summary_msgs, history_text=sess.history_text())
-        sess.keep_recent(cfg.recent_buffer)
+        sess.keep_recent(cfg.recent_buffer, cut=cut, decision=d0)
         sess.trigger.reset(sess.planner_turns_total)
         sess.iso_used_window = 0
         sess.stats.folds.append(reason)

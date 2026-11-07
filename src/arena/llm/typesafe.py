@@ -221,6 +221,31 @@ class TypeSafeClient:
             self._http = None
 
 
+class ChunkedClient:
+    """Split each request into groups of at most ``chunk`` questions (same state) and merge the
+    answers -- for local servers that score a whole request in one batch and run out of memory on
+    large ones (memory routing: ~140 questions). Answers are per-question, so the result is the same;
+    latency is the sum of the parts."""
+
+    def __init__(self, inner, chunk: int):
+        self.inner = inner
+        self.chunk = chunk
+
+    def __getattr__(self, name):
+        return getattr(self.inner, name)
+
+    async def system_one(self, state, questions, model=None, headers=None) -> SystemOneResult:
+        items = list(questions.items())
+        answers, tokens, latency, model_id = {}, 0, 0.0, ""
+        for i in range(0, len(items), self.chunk):
+            res = await self.inner.system_one(state, dict(items[i:i + self.chunk]), model=model, headers=headers)
+            answers.update(res.answers)
+            tokens += res.input_tokens
+            latency += res.latency_s or 0.0
+            model_id = res.model
+        return SystemOneResult(model=model_id, answers=answers, input_tokens=tokens, latency_s=latency)
+
+
 class MockTypeSafeClient:
     """Offline stand-in: ``responder(state, questions) -> {qid: answer dict}`` (sync or async)."""
 

@@ -74,7 +74,8 @@ def main() -> None:
 
     run_dir = Path(args.run_dir or f"runs/{cfg.name}")
     if args.watch:
-        print(f"[watch] open {('http://localhost:8000')} in a browser and log in with any "
+        from arena import showdown
+        print(f"[watch] open {showdown.http_url()} in a browser and log in with any "
               f"name; click each battle URL below to spectate live.\n")
     emitter = None
     if args.emit_events:

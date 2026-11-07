@@ -1,0 +1,61 @@
+name: hymem_strategic_functional
+format: gen9ou
+seed: 13
+agents:
+- name: strategic
+  type: llm_hymem_fused
+  model: qwen3.5-9b-strategic
+  params:
+    config_path: configs/hymem/strategic.yaml
+    teacher: false
+    student_url: http://127.0.0.1:8093
+    student_model: s1-v7-2b
+    s1_timeout_s: 10.0
+    fold_mode: typed
+    memory_router: 'off'
+    fast_memory: false
+    max_hard: 1.0
+    mem_timeout_s: 20.0
+    lookahead_url: http://127.0.0.1:8106
+    search_ms: 700
+    samples: 8
+    fuse_w: 0.5
+    wait_policy: always
+    wait_s: 2.5
+    think_budget_s: 120.0
+    strategic_planning: true
+    strategy_memory_path: runs/hymem_strategy/experiences.jsonl
+    la_beliefs: false
+    opponent_model: prior
+    decision_rule: mean_q
+    async_analysis: false
+- name: foulplay
+  type: foulplay
+  kind: external
+  external:
+    launch_cmd:
+    - bash
+    - run.sh
+    cwd: external/foulplay
+    username: FoulPlay
+    challenger: them
+    env:
+      FOULPLAY_SEARCH_TIME_MS: '2000'
+      FOULPLAY_PARALLELISM: '4'
+      FOULPLAY_THREADS: '1'
+    ready_regex: Challenging
+    ready_timeout_s: 180
+    stall_timeout_s: 900
+augmentations: {}
+teams:
+  mode: mirror
+  pool: data/teams/gen9ou
+  per_team: 2
+  offset: 0
+evaluation:
+  mode: anchored
+  n_battles: 2
+  anchors:
+  - foulplay
+guardrails:
+  max_cost_usd: 0.01

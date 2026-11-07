@@ -62,6 +62,7 @@ def _ensure_loaded() -> None:
     import arena.agents.llm.self_consistency  # noqa: F401
     import arena.agents.llm.summary_ctx  # noqa: F401
     import arena.agents.system1.agents  # noqa: F401
+    import arena.agents.fusion.agent  # noqa: F401
 
 
 def entries() -> dict[str, AgentEntry]:

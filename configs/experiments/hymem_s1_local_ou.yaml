@@ -1,0 +1,18 @@
+# HyMem with the local System-1 student.
+name: hymem_s1_local_ou
+format: gen9ou
+seed: 7
+agents:
+  - name: hymem_deep_v7
+    type: llm_hymem_dual
+    model: qwen3.5-4b-vllm
+    params: {config_path: configs/hymem/gpu.yaml, teacher: false, student_url: "http://127.0.0.1:8093",
+             student_model: s1-v7-2b, s1_timeout_s: 10.0, fold_mode: typed, memory_router: jev, fast_memory: true,
+             shared_facts: true, step_control: true, s1_router: true, s1_executor: true, slow_budget_s: 60,
+             max_hard: 1.0, mem_timeout_s: 20.0}
+  - {name: heuristic, type: simple_heuristics}
+  - {name: maxpow, type: max_base_power}
+augmentations: {}
+teams: {mode: mirror}
+evaluation: {mode: anchored, n_battles: 45, anchors: [heuristic, maxpow]}
+guardrails: {max_cost_usd: 0.01}

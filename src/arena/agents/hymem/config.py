@@ -76,6 +76,11 @@ class HyMemConfig:
     replan_threshold: float = 0.5
     exec_synthesis: str = "llm"         # llm | rule   (results block when the executor runs out)
     dossier: bool = False               # state view lists every opponent reveal (control)
+    # Defaults since 2026-10-30 (user decision after the I/O audit): the corrected view and the lead prior. The
+    # paper's own runs used state_view=paper and team_preview=random (configs/hymem/gpu_paper.yaml).
+    state_view: str = "obs1"            # obs1 (adds the fields the I/O audit found missing; see views) | paper
+    team_preview: str = "lead_prior"    # lead_prior (arena.agents.team_preview) | random (paper runs)
+    opponent_model: str = ""            # "" (ARENA_OPPONENT_MODEL, default team) | team | prior (arena.knowledge.opponent_model)
     tools: Optional[tuple[str, ...]] = None   # executor tools; None -> experiment TOOL augments or defaults
     aux_model: Optional[str] = None     # memory/router/distill model; None -> same as the agent's
     log_calls: str = "full"             # full | meta | off
@@ -108,6 +113,12 @@ class HyMemConfig:
             raise ValueError(f"distill must be rule|llm, got {self.distill!r}")
         if self.exec_synthesis not in ("llm", "rule"):
             raise ValueError(f"exec_synthesis must be llm|rule, got {self.exec_synthesis!r}")
+        if self.state_view not in ("paper", "obs1"):
+            raise ValueError(f"state_view must be paper|obs1, got {self.state_view!r}")
+        if self.team_preview not in ("random", "lead_prior"):
+            raise ValueError(f"team_preview must be random|lead_prior, got {self.team_preview!r}")
+        if self.opponent_model not in ("", "team", "prior"):
+            raise ValueError(f"opponent_model must be team|prior, got {self.opponent_model!r}")
         if self.planner_steps < 1 or self.execute_turns < 1 or self.max_iso_turns < 1:
             raise ValueError("planner_steps, execute_turns and max_iso_turns must be >= 1")
         return self

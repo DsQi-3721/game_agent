@@ -51,6 +51,13 @@ from arena.state.views import legal_options, option_for, render_brief, render_st
         Param("aux_model", str, "", help="registry model for memory/router/distill (empty = same)", label="Aux model"),
         Param("tools", str, "", help="comma list of executor tools (empty = default set)", label="Executor tools"),
         Param("config_path", str, "", help="YAML with HyMem params", label="Config YAML"),
+        Param("state_view", str, "obs1", choices=["obs1", "paper"],
+              help="with the fields the I/O audit found missing (default), or the paper's view", label="State view"),
+        Param("team_preview", str, "lead_prior", choices=["lead_prior", "random"],
+              help="OU lead / team order policy (paper runs: random)", label="Team preview"),
+        Param("opponent_model", str, "", choices=["", "team", "prior"],
+              help="opponent set model for every tool and fact (empty: ARENA_OPPONENT_MODEL, default team)",
+              label="Opponent model"),
     ],
 )
 class HyMemAgent(LLMAgent):
@@ -60,6 +67,8 @@ class HyMemAgent(LLMAgent):
                  supports_tools: Optional[bool] = None, **params):
         super().__init__(ctx, model=model)
         self.cfg = HyMemConfig.from_params(**params)
+        self.team_preview = self.cfg.team_preview
+        self.opponent_model = self.cfg.opponent_model or None
         self._supports_tools = supports_tools
         self.sessions = SessionStore(self.cfg)
         self.call_log = CallLogger.beside(self.ctx.logger, level=self.cfg.log_calls)
@@ -117,11 +126,19 @@ class HyMemAgent(LLMAgent):
         return "\n".join(f"[{r.name}]\n{r.text}" for r in self.ctx.augmentations.passive(battle))
 
     async def call(self, space: str, messages: list[dict], *, tools=None,
-                   sess: Optional[BattleSession] = None) -> LLMResponse:
+                   sess: Optional[BattleSession] = None, extra_body=None) -> LLMResponse:
         sc = self.cfg.space(space)
         model = self.cfg.aux_model if (space in AUX_SPACES and self.cfg.aux_model) else self.model
         t_wall = time.time()
-        resp, latency = await complete_in_space(self.ctx.llm, model, messages, sc, tools=tools)
+        try:
+            resp, latency = await complete_in_space(self.ctx.llm, model, messages, sc, tools=tools,
+                                                    extra_body=extra_body)
+        except asyncio.CancelledError:            # a deadline or a superseded job stopped it: keep the time
+            if self.call_log is not None:
+                self.call_log.log(battle_tag=sess.tag if sess else "", decision=sess.decision_idx if sess else 0,
+                                  space=space, messages=messages, output="", latency_s=time.time() - t_wall,
+                                  t_start=t_wall, extra={"cancelled": True})
+            raise
         self.account(resp)
         self.metrics["llm_calls"] += 1
         self.metrics[f"prompt_tokens_{space}"] += resp.prompt_tokens
@@ -275,7 +292,8 @@ class HyMemAgent(LLMAgent):
             "won": battle.won, "turns": battle.turn, "decisions": sess.decision_idx,
             "planner_turns": sess.planner_turns_total, "folds": sess.store.folds,
             "fold_events": sess.store.fold_events,
-            "key_facts": [{"turn": kf.turn, "kind": kf.kind, "text": kf.text} for kf in sess.store.key_facts],
+            "key_facts": [{"turn": kf.turn, "kind": kf.kind, "text": kf.text, "scope": getattr(kf, "scope", "event"),
+                           "ended_turn": getattr(kf, "ended_turn", None)} for kf in sess.store.key_facts],
         })
 
     def extra_metrics(self) -> dict:

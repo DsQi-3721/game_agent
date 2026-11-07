@@ -9,7 +9,9 @@ It imports PokeChamp's vendored poke_env (NOT ours) -- that's why it lives in
 external/ and is launched in the repo's venv, never on the `arena` import path.
 
 Handshake env (see ../README.md): ARENA_SERVER / ARENA_USERNAME / ARENA_OPPONENT
-/ ARENA_FORMAT, plus POKECHAMP_MODEL + OPENAI_API_KEY/OPENROUTER_API_KEY.
+/ ARENA_FORMAT / ARENA_TEAM_FILE (mirror team; otherwise a random PokeChamp team), plus POKECHAMP_MODEL +
+OPENAI_BASE_URL / OPENAI_API_KEY (any OpenAI-compatible server, e.g. a local vLLM). The player connects to
+ARENA_SERVER (poke-env's localhost default is port 8000).
 """
 
 import argparse
@@ -23,7 +25,9 @@ sys.path.insert(0, _REPO)  # PokeChamp repo root (common.py, poke_env, ...)
 os.chdir(_REPO)            # PokeChamp loads static data (pokedex/move effects) via cwd-relative paths
 
 from common import *  # noqa: F401,F403  (PNUMBER1, prompt_algos, ...)
+import poke_env.player.player as _pe_player
 from poke_env.data import to_id_str
+from poke_env.ps_client.server_configuration import ServerConfiguration
 from poke_env.player.team_util import get_llm_player, load_random_team
 from pokechamp.gpt_player import GPTPlayer
 
@@ -33,6 +37,12 @@ FMT = os.environ["ARENA_FORMAT"]
 N = int(os.environ.get("ARENA_N_BATTLES", "1000"))
 BACKEND = os.environ.get("POKECHAMP_MODEL", "gpt-4o")
 KEY = os.environ.get("OPENAI_API_KEY") or os.environ.get("OPENROUTER_API_KEY", "")
+TEAM_FILE = os.environ.get("ARENA_TEAM_FILE")
+
+# PokeChamp's poke-env takes "host:port" and builds ws://<host:port>/showdown/websocket (it must contain "localhost",
+# otherwise it switches to wss). No password -> the name is claimed with "/trn <name>,0," (no auth request).
+_HOSTPORT = os.environ["ARENA_SERVER"].split("://", 1)[-1].split("/", 1)[0]
+_pe_player.LocalhostServerConfiguration = ServerConfiguration(_HOSTPORT, "https://play.pokemonshowdown.com/action.php?")
 
 # args namespace get_llm_player expects (.temperature/.log_dir/.device)
 # PokeChamp writes a replay here at battle end; ensure it exists or it crashes the
@@ -61,9 +71,10 @@ async def main() -> None:
         await asyncio.sleep(3)
     print(f"[pokechamp] logged in as {USERNAME}; accepting challenges from {OPPONENT}", flush=True)
 
+    team = open(TEAM_FILE).read() if TEAM_FILE else None
     for _ in range(N):
         if "random" not in FMT:
-            player.update_team(load_random_team())
+            player.update_team(team or load_random_team())
         await player.accept_challenges(to_id_str(OPPONENT), 1)
 
 

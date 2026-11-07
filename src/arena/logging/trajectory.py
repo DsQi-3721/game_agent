@@ -10,6 +10,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from arena.observation.capture import CURRENT_REQUEST
+
 
 class TrajectoryLogger:
     def __init__(self, path: Path | str, agent_name: str, on_turn=None):
@@ -36,6 +38,9 @@ class TrajectoryLogger:
             "fallback": fallback_used,
             "note": note,
         }
+        cur = CURRENT_REQUEST.get()
+        if cur is not None and cur[0] == battle_tag:
+            rec["rqid"] = cur[1]          # joins this record with the stream / server log of that request
         if extra:
             rec["extra"] = extra
         self._f.write(json.dumps(rec, ensure_ascii=False) + "\n")

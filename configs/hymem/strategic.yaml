@@ -1,0 +1,16 @@
+state_view: obs1
+team_preview: lead_prior
+planner_max_tokens: 600
+planner_temperature: 0.2
+planner_top_p: 1.0
+planner_thinking: false
+planner_timeout_s: 120
+executor_max_tokens: 1400
+executor_temperature: 0.0
+executor_top_p: 1.0
+executor_thinking: false
+executor_timeout_s: 120
+router: 'off'
+fold_mode: typed
+replan: false
+think_iso: false

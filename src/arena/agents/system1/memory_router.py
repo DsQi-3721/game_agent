@@ -62,7 +62,7 @@ SECTIONS = [("opponent_set", "Opponent info"), ("lesson", "Lessons from this bat
             ("tool_tip", "Tool tips")]
 KEY_FACT_KIND = {"opp_move": "opponent_set", "opp_item": "opponent_set", "opp_ability": "opponent_set",
                  "tera": "battle_event", "faint": "battle_event", "hazard": "battle_event",
-                 "status": "battle_event"}
+                 "status": "battle_event", "item_lost": "battle_event", "hazard_removed": "battle_event"}
 
 KIND_Q = "What kind of note is `note`? It was written earlier in this Pokemon battle by `you`'s assistant."
 VALID_Q = ("Is `note` still true now, given the current battle in `you`, `opponent` and `field`? Answer no if "
@@ -105,6 +105,9 @@ class RouterConfig:
     # validity gate sits just above the false ones; 0.5 dropped half of the true facts
     min_valid: float = 0.1
     min_useful: float = 0.3
+    # "still true now?" is a check of a factual claim against the state: plans, hypotheses and lessons are
+    # neither true nor false, so they are kept or dropped by usefulness only
+    valid_kinds: tuple = ("opponent_set", "battle_event")
     caps: dict = field(default_factory=lambda: {"opponent_set": 8, "lesson": 4, "battle_event": 6, "plan": 3,
                                                 "hypothesis": 3, "tool_tip": 5})
     fast_cap: int = 6
@@ -177,6 +180,8 @@ def collect_items(store: HyMemStore) -> list[MemoryItem]:
     """Every memory item HyMem would show any context, plus rule key facts, deduplicated."""
     raw: list[tuple[str, str, Optional[int], bool, str]] = []
     for kf in store.key_facts:
+        if not getattr(kf, "current", True):     # a state that has since ended (item lost, hazard removed ...)
+            continue
         raw.append((kf.text, "key_fact", kf.turn, True, KEY_FACT_KIND.get(kf.kind, "battle_event")))
     ep = store.episode or {}
     for f in ep.get("verified_facts", []):
@@ -250,7 +255,7 @@ class MemoryRouter:
         dest = DESTINATIONS.get(kind, ())
         if not dest:
             return (), kind
-        if p_valid is not None and p_valid < c.min_valid:
+        if p_valid is not None and p_valid < c.min_valid and kind in c.valid_kinds:
             return (), "invalid"
         if p_useful is not None and p_useful < c.min_useful and kind not in ("opponent_set", "battle_event"):
             return (), "not_useful"

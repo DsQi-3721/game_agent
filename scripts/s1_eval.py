@@ -24,9 +24,14 @@ async def run(args) -> dict:
         client = TypeSafeClient(model=args.teacher)
     else:
         from arena.s1.scorer import ScorerClient, load_scorer
-        client = ScorerClient(load_scorer(args.backend, args.model, args.adapter))
+        kw = {"batch_size": args.batch_size, "merge": args.merge, "dtype": args.dtype} if args.backend == "hf" else {}
+        client = ScorerClient(load_scorer(args.backend, args.model, args.adapter, **kw))
     res = await evaluate(client, read_jsonl(args.data), limit_requests=args.limit or None,
-                         model=args.teacher or None)
+                         model=args.teacher or None, keep_predictions=bool(args.dump))
+    if args.dump:
+        with open(args.dump, "w") as f:
+            for row in res.pop("predictions"):
+                f.write(json.dumps(row) + "\n")
     if hasattr(client, "aclose"):
         await client.aclose()
     return res
@@ -42,6 +47,10 @@ def main() -> None:
     ap.add_argument("--teacher", default=None)
     ap.add_argument("--limit", type=int, default=0, help="max requests")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--dump", default=None, help="write every request's predicted distributions (JSONL)")
+    ap.add_argument("--batch-size", type=int, default=16, help="hf: questions per forward pass")
+    ap.add_argument("--merge", action="store_true", help="hf: merge the adapter into the base weights")
+    ap.add_argument("--dtype", default=None, help="hf: bfloat16 (CUDA default) | float32 | float16")
     args = ap.parse_args()
     res = asyncio.run(run(args))
     print(json.dumps(res, indent=1))
