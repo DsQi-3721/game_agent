@@ -1,0 +1,9 @@
+.runtime/
+runs/
+outputs/
+*.pt
+*.safetensors
+*.log
+__pycache__/
+*.pyc
+!data/expert-v2-pro/*.jsonl.gz

@@ -1,0 +1,1041 @@
+{
+  "checks": [
+    {
+      "check": "schema_validity",
+      "status": "PASS",
+      "detail": "schema_errors=0"
+    },
+    {
+      "check": "token_length_budget",
+      "status": "PASS",
+      "detail": "train p50=478, p95=908, max=1231, gt_2048=0"
+    },
+    {
+      "check": "bot_skill_match_fidelity",
+      "status": "WARN",
+      "detail": "wait_fallback_rate=5.46%, wait_rate=12.16%"
+    },
+    {
+      "check": "tactical_diversity",
+      "status": "PASS",
+      "detail": "skills=7 (['attack', 'harvest', 'produce', 'wait', 'move', 'return', 'build']), barracks=True, combat_units=True"
+    },
+    {
+      "check": "player_symmetry",
+      "status": "PASS",
+      "detail": "P0=13758 (50.0%), P1=13758 (50.0%)"
+    },
+    {
+      "check": "duplicate_control",
+      "status": "PASS",
+      "detail": "dup_row_fraction=5.4%, conflict_groups=231"
+    },
+    {
+      "check": "train_val_isolation",
+      "status": "PASS",
+      "detail": "shared_maps=0, shared_contexts=0, shared_prompts=0"
+    }
+  ],
+  "train": {
+    "rows": 27516,
+    "episodes": 362,
+    "unique_contexts": 17888,
+    "unique_prompts": 26043,
+    "schema_errors": 0,
+    "schema_error_samples": [],
+    "tokens": {
+      "min": 193,
+      "p50": 478.0,
+      "p90": 855.0,
+      "p95": 908.0,
+      "p99": 1025.0,
+      "max": 1231,
+      "mean": 542.5708315162087,
+      "gt_512": 12441,
+      "gt_1024": 277,
+      "gt_2048": 0,
+      "by_map": {
+        "maps/10x10/basesWorkers10x10.xml": {
+          "n": 1305,
+          "p50": 315.0,
+          "p95": 406.0,
+          "max": 472,
+          "gt_512": 0,
+          "gt_1024": 0
+        },
+        "maps/12x12/FourBasesWorkers12x12.xml": {
+          "n": 7881,
+          "p50": 817.0,
+          "p95": 998.0,
+          "max": 1231,
+          "gt_512": 7832,
+          "gt_1024": 277
+        },
+        "maps/12x12/basesWorkers12x12A.xml": {
+          "n": 3026,
+          "p50": 444.0,
+          "p95": 602.0,
+          "max": 751,
+          "gt_512": 655,
+          "gt_1024": 0
+        },
+        "maps/12x12/basesWorkers12x12C.xml": {
+          "n": 1183,
+          "p50": 369.0,
+          "p95": 494.89999999999986,
+          "max": 604,
+          "gt_512": 40,
+          "gt_1024": 0
+        },
+        "maps/8x8/FourBasesWorkers8x8.xml": {
+          "n": 2284,
+          "p50": 678.0,
+          "p95": 820.0,
+          "max": 926,
+          "gt_512": 2276,
+          "gt_1024": 0
+        },
+        "maps/8x8/basesWorkers8x8A.xml": {
+          "n": 1098,
+          "p50": 304.5,
+          "p95": 383.2999999999997,
+          "max": 437,
+          "gt_512": 0,
+          "gt_1024": 0
+        },
+        "maps/8x8/basesWorkers8x8B.xml": {
+          "n": 1156,
+          "p50": 310.0,
+          "p95": 379.25,
+          "max": 437,
+          "gt_512": 0,
+          "gt_1024": 0
+        },
+        "maps/8x8/basesWorkers8x8D.xml": {
+          "n": 1074,
+          "p50": 327.0,
+          "p95": 413.3499999999999,
+          "max": 461,
+          "gt_512": 0,
+          "gt_1024": 0
+        },
+        "maps/8x8/basesWorkers8x8Obstacle.xml": {
+          "n": 997,
+          "p50": 353.0,
+          "p95": 464.0,
+          "max": 606,
+          "gt_512": 22,
+          "gt_1024": 0
+        },
+        "maps/9x8/NoWhereToRun9x8.xml": {
+          "n": 3271,
+          "p50": 383.0,
+          "p95": 495.0,
+          "max": 575,
+          "gt_512": 83,
+          "gt_1024": 0
+        },
+        "maps/open_competition/TwoBasesBarracks16x16.xml": {
+          "n": 1228,
+          "p50": 577.0,
+          "p95": 754.0,
+          "max": 881,
+          "gt_512": 975,
+          "gt_1024": 0
+        },
+        "maps/open_competition/basesWorkers16x16A.xml": {
+          "n": 3013,
+          "p50": 456.0,
+          "p95": 558.0,
+          "max": 673,
+          "gt_512": 558,
+          "gt_1024": 0
+        }
+      }
+    },
+    "k_stats": {
+      "min": 2,
+      "max": 8,
+      "mean": 3.8447085332170374,
+      "distribution": {
+        "2": 8394,
+        "3": 4148,
+        "4": 4770,
+        "5": 4964,
+        "6": 4090,
+        "7": 1081,
+        "8": 69
+      }
+    },
+    "answer_index_0_rate": 0.6647405146096816,
+    "wait_rate": 0.1216383195231865,
+    "wait_fallback_rate": 0.054622764936764066,
+    "skills": {
+      "attack": 8461,
+      "harvest": 8149,
+      "produce": 4369,
+      "wait": 3347,
+      "move": 2046,
+      "return": 690,
+      "build": 454
+    },
+    "unit_types": {
+      "Worker": 19848,
+      "Base": 4080,
+      "Ranged": 1435,
+      "Heavy": 984,
+      "Barracks": 819,
+      "Light": 350
+    },
+    "unit_skills_top20": {
+      "Worker:harvest": 8149,
+      "Worker:attack": 6740,
+      "Base:produce": 3596,
+      "Worker:wait": 2367,
+      "Worker:move": 1448,
+      "Barracks:produce": 773,
+      "Heavy:attack": 761,
+      "Worker:return": 690,
+      "Ranged:attack": 674,
+      "Base:wait": 484,
+      "Worker:build": 454,
+      "Ranged:move": 453,
+      "Ranged:wait": 308,
+      "Light:attack": 286,
+      "Heavy:wait": 114,
+      "Heavy:move": 109,
+      "Barracks:wait": 46,
+      "Light:move": 36,
+      "Light:wait": 28
+    },
+    "match_kinds": {
+      "exact": 20036,
+      "semantic": 4133,
+      "wait_native": 1844,
+      "wait_fallback": 1503
+    },
+    "maps": {
+      "maps/12x12/FourBasesWorkers12x12.xml": 7881,
+      "maps/9x8/NoWhereToRun9x8.xml": 3271,
+      "maps/12x12/basesWorkers12x12A.xml": 3026,
+      "maps/open_competition/basesWorkers16x16A.xml": 3013,
+      "maps/8x8/FourBasesWorkers8x8.xml": 2284,
+      "maps/10x10/basesWorkers10x10.xml": 1305,
+      "maps/open_competition/TwoBasesBarracks16x16.xml": 1228,
+      "maps/12x12/basesWorkers12x12C.xml": 1183,
+      "maps/8x8/basesWorkers8x8B.xml": 1156,
+      "maps/8x8/basesWorkers8x8A.xml": 1098,
+      "maps/8x8/basesWorkers8x8D.xml": 1074,
+      "maps/8x8/basesWorkers8x8Obstacle.xml": 997
+    },
+    "map_sizes": {
+      "12x12": 12090,
+      "8x8": 6609,
+      "16x16": 4241,
+      "9x8": 3271,
+      "10x10": 1305
+    },
+    "teachers": {
+      "ObiBotKenobi": 7657,
+      "TMA": 6632,
+      "CoacAI": 5698,
+      "Mayari": 4463,
+      "Droplet": 1764,
+      "StrategyTactics": 1302
+    },
+    "opponents": {
+      "HeavyRush": 5763,
+      "WorkerRush": 5659,
+      "LightRush": 5120,
+      "RangedRush": 4432,
+      "CoacAI": 2926,
+      "TMA": 1262,
+      "ObiBotKenobi": 1241,
+      "Mayari": 1113
+    },
+    "players": {
+      "0": 13758,
+      "1": 13758
+    },
+    "outcomes": {
+      "win": 27516
+    },
+    "won": {
+      "True": 27516
+    },
+    "terminated": {
+      "True": 27516
+    },
+    "tick_buckets": {
+      "0-99": 3597,
+      "100-299": 8929,
+      "300-699": 9978,
+      "700+": 5012
+    },
+    "duplicates": {
+      "duplicate_prompt_groups": 777,
+      "extra_duplicate_rows": 1473,
+      "duplicate_row_fraction": 0.05353249018752726,
+      "conflicting_prompt_groups": 231,
+      "conflict_samples": [
+        {
+          "map": "maps/8x8/basesWorkers8x8A.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U8 at (1,1) to win this match?",
+          "choices": [
+            "U8: harvest R4(0,0) -> B6",
+            "U8: build Barracks at (1,2)",
+            "U8: attack nearest enemy",
+            "U8: attack Base U7(5,6)",
+            "U8: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U8: harvest R4(0,0) -> B6": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U22 at (1,1) to win this match?",
+          "choices": [
+            "U22: harvest R17(1,0) -> B20",
+            "U22: build Barracks at (2,1)",
+            "U22: attack nearest enemy",
+            "U22: attack Base U21(10,9)",
+            "U22: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U22: harvest R17(1,0) -> B20": 4,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U67 at (2,1) to win this match?",
+          "choices": [
+            "U67: harvest R65(2,0) -> B66",
+            "U67: build Barracks at (3,1)",
+            "U67: attack nearest enemy",
+            "U67: attack Base U75(3,5)",
+            "U67: move to (4,4)",
+            "U67: move to (1,2)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U67: harvest R65(2,0) -> B66": 3,
+            "U67: build Barracks at (3,1)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U74 at (4,1) to win this match?",
+          "choices": [
+            "U74: harvest R72(4,0) -> B73",
+            "U74: build Barracks at (5,1)",
+            "U74: attack nearest enemy",
+            "U74: attack Base U68(5,5)",
+            "U74: move to (4,4)",
+            "U74: move to (1,2)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U74: harvest R72(4,0) -> B73": 3,
+            "U74: move to (1,2)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U81 at (6,1) to win this match?",
+          "choices": [
+            "U81: harvest R79(6,0) -> B80",
+            "U81: build Barracks at (7,1)",
+            "U81: attack nearest enemy",
+            "U81: attack Base U62(7,5)",
+            "U81: move to (4,4)",
+            "U81: move to (1,2)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U81: harvest R79(6,0) -> B80": 3,
+            "U81: move to (4,4)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U69 at (5,6) to win this match?",
+          "choices": [
+            "U69: harvest R70(5,7) -> B68",
+            "U69: build Barracks at (4,6)",
+            "U69: attack nearest enemy",
+            "U69: attack Base U73(4,2)",
+            "U69: move to (4,4)",
+            "U69: move to (7,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U69: harvest R70(5,7) -> B68": 3,
+            "U69: build Barracks at (4,6)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U76 at (3,6) to win this match?",
+          "choices": [
+            "U76: harvest R77(3,7) -> B75",
+            "U76: build Barracks at (2,6)",
+            "U76: attack nearest enemy",
+            "U76: attack Base U66(2,2)",
+            "U76: move to (4,4)",
+            "U76: move to (7,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U76: harvest R77(3,7) -> B75": 3,
+            "U76: move to (4,4)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/FourBasesWorkers8x8.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U83 at (1,6) to win this match?",
+          "choices": [
+            "U83: harvest R84(1,7) -> B82",
+            "U83: build Barracks at (0,6)",
+            "U83: attack nearest enemy",
+            "U83: attack Base U60(0,2)",
+            "U83: move to (4,4)",
+            "U83: move to (7,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U83: harvest R84(1,7) -> B82": 3,
+            "U83: attack nearest enemy": 1
+          }
+        }
+      ]
+    }
+  },
+  "val": {
+    "rows": 6289,
+    "episodes": 103,
+    "unique_contexts": 4629,
+    "unique_prompts": 6059,
+    "schema_errors": 0,
+    "schema_error_samples": [],
+    "tokens": {
+      "min": 180,
+      "p50": 414.0,
+      "p90": 512.0,
+      "p95": 538.5999999999995,
+      "p99": 586.0,
+      "max": 673,
+      "mean": 406.68023533153126,
+      "gt_512": 627,
+      "gt_1024": 0,
+      "gt_2048": 0,
+      "by_map": {
+        "maps/12x12/basesWorkers12x12B.xml": {
+          "n": 991,
+          "p50": 369.0,
+          "p95": 470.5,
+          "max": 533,
+          "gt_512": 5,
+          "gt_1024": 0
+        },
+        "maps/16x16/basesWorkers16x16B.xml": {
+          "n": 2440,
+          "p50": 444.0,
+          "p95": 547.0499999999997,
+          "max": 673,
+          "gt_512": 376,
+          "gt_1024": 0
+        },
+        "maps/16x16/basesWorkers16x16C.xml": {
+          "n": 2069,
+          "p50": 431.0,
+          "p95": 548.5999999999999,
+          "max": 644,
+          "gt_512": 246,
+          "gt_1024": 0
+        },
+        "maps/8x8/basesWorkers8x8C.xml": {
+          "n": 789,
+          "p50": 290.0,
+          "p95": 352.5999999999999,
+          "max": 392,
+          "gt_512": 0,
+          "gt_1024": 0
+        }
+      }
+    },
+    "k_stats": {
+      "min": 2,
+      "max": 8,
+      "mean": 4.592781046271267,
+      "distribution": {
+        "2": 1007,
+        "3": 240,
+        "4": 1306,
+        "5": 2052,
+        "6": 1181,
+        "7": 444,
+        "8": 59
+      }
+    },
+    "answer_index_0_rate": 0.6931149626331691,
+    "wait_rate": 0.04579424391795198,
+    "wait_fallback_rate": 0.010017490857051996,
+    "skills": {
+      "attack": 2224,
+      "harvest": 2169,
+      "produce": 1114,
+      "wait": 288,
+      "move": 230,
+      "return": 143,
+      "build": 121
+    },
+    "unit_types": {
+      "Worker": 4193,
+      "Base": 937,
+      "Heavy": 552,
+      "Barracks": 295,
+      "Light": 197,
+      "Ranged": 115
+    },
+    "unit_skills_top20": {
+      "Worker:harvest": 2169,
+      "Worker:attack": 1470,
+      "Base:produce": 819,
+      "Heavy:attack": 482,
+      "Barracks:produce": 295,
+      "Light:attack": 166,
+      "Worker:move": 160,
+      "Worker:return": 143,
+      "Worker:wait": 130,
+      "Worker:build": 121,
+      "Base:wait": 118,
+      "Ranged:attack": 106,
+      "Heavy:move": 43,
+      "Heavy:wait": 27,
+      "Light:move": 21,
+      "Light:wait": 10,
+      "Ranged:move": 6,
+      "Ranged:wait": 3
+    },
+    "match_kinds": {
+      "exact": 4543,
+      "semantic": 1458,
+      "wait_native": 225,
+      "wait_fallback": 63
+    },
+    "maps": {
+      "maps/16x16/basesWorkers16x16B.xml": 2440,
+      "maps/16x16/basesWorkers16x16C.xml": 2069,
+      "maps/12x12/basesWorkers12x12B.xml": 991,
+      "maps/8x8/basesWorkers8x8C.xml": 789
+    },
+    "map_sizes": {
+      "16x16": 4509,
+      "12x12": 991,
+      "8x8": 789
+    },
+    "teachers": {
+      "ObiBotKenobi": 2341,
+      "TMA": 1929,
+      "CoacAI": 1163,
+      "Mayari": 856
+    },
+    "opponents": {
+      "RangedRush": 1637,
+      "HeavyRush": 1233,
+      "CoacAI": 1150,
+      "LightRush": 744,
+      "WorkerRush": 466,
+      "ObiBotKenobi": 410,
+      "Mayari": 387,
+      "TMA": 262
+    },
+    "players": {
+      "1": 3328,
+      "0": 2961
+    },
+    "outcomes": {
+      "win": 6289
+    },
+    "won": {
+      "True": 6289
+    },
+    "terminated": {
+      "True": 6289
+    },
+    "tick_buckets": {
+      "0-99": 638,
+      "100-299": 1537,
+      "300-699": 2300,
+      "700+": 1814
+    },
+    "duplicates": {
+      "duplicate_prompt_groups": 140,
+      "extra_duplicate_rows": 230,
+      "duplicate_row_fraction": 0.03657179201780887,
+      "conflicting_prompt_groups": 42,
+      "conflict_samples": [
+        {
+          "map": "maps/16x16/basesWorkers16x16B.xml",
+          "tick": 40,
+          "question": "Best skill for Worker U23 at (14,12) to win this match?",
+          "choices": [
+            "U23: harvest R18(15,13) -> B21",
+            "U23: build Barracks at (14,11)",
+            "U23: attack nearest enemy",
+            "U23: attack Base U20(2,3)",
+            "U23: move to (8,8)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U23: harvest R18(15,13) -> B21": 3,
+            "U23: build Barracks at (14,11)": 1
+          }
+        },
+        {
+          "map": "maps/16x16/basesWorkers16x16C.xml",
+          "tick": 40,
+          "question": "Best skill for Worker U23 at (14,11) to win this match?",
+          "choices": [
+            "U23: harvest R18(15,12) -> B21",
+            "U23: build Barracks at (14,10)",
+            "U23: attack nearest enemy",
+            "U23: attack Base U20(2,4)",
+            "U23: move to (8,8)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U23: harvest R18(15,12) -> B21": 3,
+            "U23: build Barracks at (14,10)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (3,2) to win this match?",
+          "choices": [
+            "U10: harvest R4(0,1) -> B6",
+            "U10: build Barracks at (4,2)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U7(5,5)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R4(0,1) -> B6": 1,
+            "U10: build Barracks at (4,2)": 1,
+            "U10: attack nearest enemy": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (3,2) to win this match?",
+          "choices": [
+            "U10: harvest R4(0,1) -> B6",
+            "U10: build Barracks at (4,2)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U7(5,5)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R4(0,1) -> B6": 1,
+            "U10: build Barracks at (4,2)": 1,
+            "U10: attack nearest enemy": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (5,4) to win this match?",
+          "choices": [
+            "U10: harvest R5(7,6) -> B7",
+            "U10: build Barracks at (5,3)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U6(2,2)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R5(7,6) -> B7": 1,
+            "U10: build Barracks at (5,3)": 1,
+            "U10: move to (4,4)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (3,2) to win this match?",
+          "choices": [
+            "U10: harvest R4(0,1) -> B6",
+            "U10: build Barracks at (4,2)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U7(5,5)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R4(0,1) -> B6": 1,
+            "U10: build Barracks at (4,2)": 1,
+            "U10: attack nearest enemy": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (5,4) to win this match?",
+          "choices": [
+            "U10: harvest R5(7,6) -> B7",
+            "U10: build Barracks at (5,3)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U6(2,2)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R5(7,6) -> B7": 1,
+            "U10: build Barracks at (5,3)": 1,
+            "U10: move to (4,4)": 1
+          }
+        },
+        {
+          "map": "maps/8x8/basesWorkers8x8C.xml",
+          "tick": 50,
+          "question": "Best skill for Worker U10 at (3,2) to win this match?",
+          "choices": [
+            "U10: harvest R4(0,1) -> B6",
+            "U10: build Barracks at (4,2)",
+            "U10: attack nearest enemy",
+            "U10: attack Base U7(5,5)",
+            "U10: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U10: harvest R4(0,1) -> B6": 1,
+            "U10: build Barracks at (4,2)": 1,
+            "U10: attack nearest enemy": 1
+          }
+        }
+      ]
+    }
+  },
+  "all_train": {
+    "rows": 57671,
+    "episodes": 864,
+    "unique_contexts": 37819,
+    "unique_prompts": 53645,
+    "schema_errors": 0,
+    "schema_error_samples": [],
+    "tokens": {},
+    "k_stats": {
+      "min": 2,
+      "max": 8,
+      "mean": 3.985139844982747,
+      "distribution": {
+        "2": 16981,
+        "3": 7586,
+        "4": 9140,
+        "5": 10729,
+        "6": 9947,
+        "7": 3084,
+        "8": 204
+      }
+    },
+    "answer_index_0_rate": 0.665620502505592,
+    "wait_rate": 0.11846508643859131,
+    "wait_fallback_rate": 0.04336668342841289,
+    "skills": {
+      "harvest": 18263,
+      "attack": 16744,
+      "produce": 10140,
+      "wait": 6832,
+      "move": 3080,
+      "return": 1557,
+      "build": 1055
+    },
+    "unit_types": {
+      "Worker": 41961,
+      "Base": 9884,
+      "Heavy": 1955,
+      "Ranged": 1700,
+      "Barracks": 1631,
+      "Light": 540
+    },
+    "unit_skills_top20": {
+      "Worker:harvest": 18263,
+      "Worker:attack": 13808,
+      "Base:produce": 8597,
+      "Worker:wait": 4876,
+      "Worker:move": 2402,
+      "Heavy:attack": 1594,
+      "Worker:return": 1557,
+      "Barracks:produce": 1543,
+      "Base:wait": 1287,
+      "Worker:build": 1055,
+      "Ranged:attack": 900,
+      "Ranged:move": 465,
+      "Light:attack": 442,
+      "Ranged:wait": 335,
+      "Heavy:wait": 198,
+      "Heavy:move": 163,
+      "Barracks:wait": 88,
+      "Light:move": 50,
+      "Light:wait": 48
+    },
+    "match_kinds": {
+      "exact": 42590,
+      "semantic": 8249,
+      "wait_native": 4331,
+      "wait_fallback": 2501
+    },
+    "maps": {
+      "maps/12x12/FourBasesWorkers12x12.xml": 12324,
+      "maps/12x12/basesWorkers12x12A.xml": 6688,
+      "maps/9x8/NoWhereToRun9x8.xml": 6269,
+      "maps/open_competition/basesWorkers16x16A.xml": 5893,
+      "maps/8x8/FourBasesWorkers8x8.xml": 5081,
+      "maps/10x10/basesWorkers10x10.xml": 3817,
+      "maps/open_competition/TwoBasesBarracks16x16.xml": 3727,
+      "maps/8x8/basesWorkers8x8A.xml": 3144,
+      "maps/12x12/basesWorkers12x12C.xml": 3024,
+      "maps/8x8/basesWorkers8x8Obstacle.xml": 2985,
+      "maps/8x8/basesWorkers8x8B.xml": 2512,
+      "maps/8x8/basesWorkers8x8D.xml": 2207
+    },
+    "map_sizes": {
+      "12x12": 22036,
+      "8x8": 15929,
+      "16x16": 9620,
+      "9x8": 6269,
+      "10x10": 3817
+    },
+    "teachers": {
+      "TMA": 14237,
+      "ObiBotKenobi": 13657,
+      "CoacAI": 12552,
+      "Mayari": 10838,
+      "StrategyTactics": 3244,
+      "Droplet": 3143
+    },
+    "opponents": {
+      "WorkerRush": 9220,
+      "Mayari": 8715,
+      "CoacAI": 8510,
+      "HeavyRush": 7107,
+      "LightRush": 6527,
+      "TMA": 6227,
+      "ObiBotKenobi": 5793,
+      "RangedRush": 5572
+    },
+    "players": {
+      "1": 29496,
+      "0": 28175
+    },
+    "outcomes": {
+      "loss": 29283,
+      "win": 27516,
+      "timeout": 872
+    },
+    "won": {
+      "False": 30155,
+      "True": 27516
+    },
+    "terminated": {
+      "True": 56799,
+      "False": 872
+    },
+    "tick_buckets": {
+      "0-99": 7793,
+      "100-299": 18525,
+      "300-699": 22247,
+      "700+": 9106
+    },
+    "duplicates": {
+      "duplicate_prompt_groups": 1865,
+      "extra_duplicate_rows": 4026,
+      "duplicate_row_fraction": 0.06980978307988417,
+      "conflicting_prompt_groups": 596,
+      "conflict_samples": [
+        {
+          "map": "maps/8x8/basesWorkers8x8A.xml",
+          "tick": 0,
+          "question": "Best skill for Worker U8 at (1,1) to win this match?",
+          "choices": [
+            "U8: harvest R4(0,0) -> B6",
+            "U8: build Barracks at (1,2)",
+            "U8: attack nearest enemy",
+            "U8: attack Base U7(5,6)",
+            "U8: move to (4,4)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U8: harvest R4(0,0) -> B6": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U22 at (1,1) to win this match?",
+          "choices": [
+            "U22: harvest R17(1,0) -> B20",
+            "U22: build Barracks at (2,1)",
+            "U22: attack nearest enemy",
+            "U22: attack Base U21(10,9)",
+            "U22: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U22: harvest R17(1,0) -> B20": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U23 at (10,10) to win this match?",
+          "choices": [
+            "U23: harvest R19(10,11) -> B21",
+            "U23: build Barracks at (9,10)",
+            "U23: attack nearest enemy",
+            "U23: attack Base U20(1,2)",
+            "U23: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U23: harvest R19(10,11) -> B21": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U22 at (1,1) to win this match?",
+          "choices": [
+            "U22: harvest R17(1,0) -> B20",
+            "U22: build Barracks at (2,1)",
+            "U22: attack nearest enemy",
+            "U22: attack Base U21(10,9)",
+            "U22: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U22: harvest R17(1,0) -> B20": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U23 at (10,10) to win this match?",
+          "choices": [
+            "U23: harvest R19(10,11) -> B21",
+            "U23: build Barracks at (9,10)",
+            "U23: attack nearest enemy",
+            "U23: attack Base U20(1,2)",
+            "U23: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U23: harvest R19(10,11) -> B21": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U22 at (1,1) to win this match?",
+          "choices": [
+            "U22: harvest R17(1,0) -> B20",
+            "U22: build Barracks at (2,1)",
+            "U22: attack nearest enemy",
+            "U22: attack Base U21(10,9)",
+            "U22: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U22: harvest R17(1,0) -> B20": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U23 at (10,10) to win this match?",
+          "choices": [
+            "U23: harvest R19(10,11) -> B21",
+            "U23: build Barracks at (9,10)",
+            "U23: attack nearest enemy",
+            "U23: attack Base U20(1,2)",
+            "U23: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U23: harvest R19(10,11) -> B21": 5,
+            "Wait 4t": 1
+          }
+        },
+        {
+          "map": "maps/12x12/basesWorkers12x12A.xml",
+          "tick": 30,
+          "question": "Best skill for Worker U22 at (1,1) to win this match?",
+          "choices": [
+            "U22: harvest R17(1,0) -> B20",
+            "U22: build Barracks at (2,1)",
+            "U22: attack nearest enemy",
+            "U22: attack Base U21(10,9)",
+            "U22: move to (6,6)",
+            "Wait 4t"
+          ],
+          "answers": {
+            "U22: harvest R17(1,0) -> B20": 5,
+            "Wait 4t": 1
+          }
+        }
+      ]
+    }
+  },
+  "leakage": {
+    "shared_maps": [],
+    "shared_contexts": 0,
+    "shared_prompts": 0
+  },
+  "clean_stats": {
+    "train": {
+      "kept": 24549,
+      "dropped_dup": 1219,
+      "dropped_fallback": 1503,
+      "dropped_len": 245
+    },
+    "train_ans0_rate_after_shuffle": 0.30384129699784107,
+    "val": {
+      "kept": 6045,
+      "dropped_dup": 181,
+      "dropped_fallback": 63,
+      "dropped_len": 0
+    },
+    "val_ans0_rate_after_shuffle": 0.2506203473945409,
+    "win_train": {
+      "rows": 38840,
+      "win_rate": 0.4747682801235839
+    },
+    "win_val": {
+      "rows": 11123,
+      "win_rate": 0.4290209475860829
+    }
+  }
+}
