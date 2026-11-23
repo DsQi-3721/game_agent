@@ -447,3 +447,97 @@ def test_audit_data_cleaning_dedup_and_win_noul():
 
     gates = evaluate_gates(audit_split(cleaned, tok=None))
     assert any(g["check"] == "schema_validity" and g["status"] == "PASS" for g in gates)
+
+
+@pytest.mark.parametrize("group", [1, 2])
+def test_is_rlcd_expected_gradient_equals_half_brier_even_when_saturated(group):
+    """Exact enumeration proof: IS-RLCD is unbiased for 0.5 * grad Brier even at extreme p."""
+    from microrts_agent.decisions.sa_rlcd import importance_sampled_rlcd_loss, is_rlcd_proposal
+
+    # Extreme saturated logits (p ~ [0.99, 0.008, 0.002]) where vanilla RLCD would stall!
+    logits = torch.tensor([4.5, -0.3, -1.7], dtype=torch.float64, requires_grad=True)
+    probs = logits.softmax(-1).unsqueeze(0)
+    q_prop = is_rlcd_proposal(probs, [3], eps=0.2)[0]
+    q_true = [0.2, 0.5, 0.3]
+
+    expected = torch.zeros_like(logits)
+    for y, y_mass in enumerate(q_true):
+        for actions in itertools.product(range(3), repeat=group):
+            mass = q_prop[list(actions)].prod() * y_mass
+            act_t = torch.tensor([list(actions)], dtype=torch.long)
+            out_t = (act_t == y).double()
+            loss = importance_sampled_rlcd_loss(logits.unsqueeze(0), act_t, out_t, q_prop.unsqueeze(0))
+            expected += mass * torch.autograd.grad(loss, logits)[0]
+
+    target = sum(
+        y_mass * 0.5 * (probs[0] - torch.eye(3, dtype=torch.float64)[y]).square().sum()
+        for y, y_mass in enumerate(q_true)
+    )
+    exact = torch.autograd.grad(target, logits)[0]
+    torch.testing.assert_close(expected, exact, atol=1e-12, rtol=1e-12)
+
+
+def test_sa_rlcd_force_summary_wpc_advantages_and_update(tiny_export):
+    from microrts_agent.decisions.eve_policy import unit_choice_question, win_question
+    from microrts_agent.decisions.sa_rlcd import (
+        compute_wpc_advantages,
+        rb_rlcd_loss,
+        sa_rlcd_update,
+        td_lambda_win_targets,
+    )
+    from microrts_agent.decisions.state import ensure_force_summary
+
+    raw_ctx = (
+        "MicroRTS t=200 map=8x8 me=P0 opp=WorkerRush\n"
+        "Res: me=5(avail=5) opp=5(avail=5)\n"
+        "My units (2):\n- U6 Base(2,1) hp=10/10 idle\n- U8 Worker(1,1) hp=1/1 idle\n"
+        "Enemy units (1):\n- U7 Base(5,6) hp=10/10 idle"
+    )
+    enriched = ensure_force_summary(raw_ctx)
+    assert "Force: me[B=1 Rax=0 W=1 Mil=0 hp=11] vs opp[B=1 Rax=0 W=0 Mil=0 hp=10] phase=mid" in enriched
+    assert ensure_force_summary(enriched) == enriched  # idempotent
+
+    # TD(lambda) targets & WPC advantages
+    steps = [
+        {"win_probability": 0.4, "reward": 0.0, "discount": 0.9, "terminated": False, "truncated": False, "won": True},
+        {"win_probability": 0.7, "reward": 20.0, "discount": 0.9, "terminated": True, "truncated": False, "won": True},
+    ]
+    z = td_lambda_win_targets(steps, td_lambda=0.8)
+    assert z[1] == pytest.approx(1.0)
+    assert 0.7 < z[0] < 1.0
+    advs = compute_wpc_advantages(steps)
+    assert advs[0] > 0 and advs[1] > 0
+
+    # RB-RLCD exact Brier check
+    wl = torch.tensor([[0.0, 0.0]], dtype=torch.float32, requires_grad=True)
+    assert rb_rlcd_loss(wl, [1.0]).item() == pytest.approx(0.25)
+
+    # Full online SA-RLCD update on tiny_export
+    policy = EveRLCDPolicy(tiny_export, device="cpu", rank=2, dtype="fp32")
+    ref = EveRLCDPolicy(tiny_export, device="cpu", rank=2, dtype="fp32")
+    ref.load_trainable_state(policy.trainable_state())
+    u = {"id": 6, "type": "Base", "x": 2, "y": 1}
+    cands = [{"skill": "produce", "actor": 6, "unit_type": "Worker", "target": [2, 0]}, {"skill": "wait", "ticks": 16}]
+    q = unit_choice_question(STATE, u, cands)
+    wq = win_question(STATE)
+    with torch.no_grad():
+        lp = float(policy.forward_questions([q])[0, :2].log_softmax(-1)[0].item())
+    ep_step = {
+        "unit_decisions": [{"unit_id": 6, "question": q, "candidates": cands, "chosen_index": 0, "log_prob": lp}],
+        "win_question": wq,
+        "win_probability": 0.5,
+        "reward": 20.0,
+        "discount": 0.95,
+        "terminated": True,
+        "truncated": False,
+    }
+    opt = torch.optim.AdamW(policy.param_groups(lr=1e-3))
+    stats = sa_rlcd_update(
+        policy,
+        ref,
+        opt,
+        [([ep_step], STATE, {"outcome": "win", "terminated": True})],
+        ppo_epochs=2,
+        micro_batch=2,
+    )
+    assert stats["ppo_samples"] == 1 and stats["cal_samples"] == 1 and stats["calibration_loss"] > 0

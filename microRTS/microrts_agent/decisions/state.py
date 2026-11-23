@@ -1,5 +1,6 @@
 """Lossless MicroRTS engine state extraction and compact text rendering."""
 
+import contextlib
 import json
 
 import jpype
@@ -74,8 +75,58 @@ def _fmt_unit(u, unit_types):
     return " ".join(parts)
 
 
+def _force_counts(units):
+    b = sum(1 for u in units if u["type"] == "Base")
+    rax = sum(1 for u in units if u["type"] == "Barracks")
+    w = sum(1 for u in units if u["type"] == "Worker")
+    mil = sum(1 for u in units if u["type"] in ("Light", "Heavy", "Ranged"))
+    hp = sum(int(u["hp"]) for u in units)
+    return f"B={b} Rax={rax} W={w} Mil={mil} hp={hp}"
+
+
+def ensure_force_summary(context_text):
+    """Idempotently inject the 1-line Force summary into an existing state_to_text string."""
+    if "\nForce: " in context_text:
+        return context_text
+    lines = context_text.splitlines()
+    if not lines:
+        return context_text
+    section = None
+    me_u, opp_u = [], []
+    tick = 0
+    for token in lines[0].split():
+        if token.startswith("t="):
+            with contextlib.suppress(ValueError):
+                tick = int(token[2:])
+    for ln in lines[1:]:
+        if ln.startswith("My units"):
+            section = "me"
+            continue
+        if ln.startswith("Enemy units"):
+            section = "opp"
+            continue
+        if ln.startswith("Resources:") or ln.startswith("Walls:"):
+            section = None
+            continue
+        if ln.startswith("- U") and section in ("me", "opp"):
+            parts = ln[2:].split()
+            if len(parts) >= 3:
+                utype = parts[1].split("(")[0]
+                hp_tok = next((p for p in parts if p.startswith("hp=")), "hp=1")
+                try:
+                    hp = int(hp_tok[3:].split("/")[0])
+                except ValueError:
+                    hp = 1
+                (me_u if section == "me" else opp_u).append({"type": utype, "hp": hp})
+    phase = "early" if tick < 150 else "mid" if tick < 500 else "late"
+    summary = f"Force: me[{_force_counts(me_u)}] vs opp[{_force_counts(opp_u)}] phase={phase}"
+    insert_at = 2 if len(lines) > 1 and lines[1].startswith("Res:") else 1
+    lines.insert(insert_at, summary)
+    return "\n".join(lines)
+
+
 def state_to_text(state):
-    """Render a compact, high-signal MicroRTS state description (~130-250 tokens on 8x8)."""
+    """Render a compact, high-signal MicroRTS state description (~150-260 tokens on 8x8)."""
     player = state["player"]
     opp = 1 - player
     unit_types = state.get("unit_types") or {}
@@ -92,6 +143,13 @@ def state_to_text(state):
             f"opp={opp_p['resources']}(avail={opp_p['available_resources']})"
         )
 
+    own = [u for u in state["units"] if u["owner"] == player]
+    enemies = [u for u in state["units"] if u["owner"] == opp]
+    resources = [u for u in state["units"] if u["type"] == "Resource" and u["resources"] > 0]
+
+    phase = "early" if state["time"] < 150 else "mid" if state["time"] < 500 else "late"
+    lines.append(f"Force: me[{_force_counts(own)}] vs opp[{_force_counts(enemies)}] phase={phase}")
+
     terrain = state.get("terrain", "")
     walls = [(i % state["width"], i // state["width"]) for i, v in enumerate(terrain) if int(v)]
     if walls:
@@ -99,10 +157,6 @@ def state_to_text(state):
         if len(walls) > 24:
             wall_str += f" (+{len(walls) - 24})"
         lines.append(f"Walls: {wall_str}")
-
-    own = [u for u in state["units"] if u["owner"] == player]
-    enemies = [u for u in state["units"] if u["owner"] == opp]
-    resources = [u for u in state["units"] if u["type"] == "Resource" and u["resources"] > 0]
 
     lines.append(f"My units ({len(own)}):")
     for u in own:
