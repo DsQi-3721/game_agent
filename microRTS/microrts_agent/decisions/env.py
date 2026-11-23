@@ -21,8 +21,13 @@ REWARD_NAMES = (
     "ranged",
     "military_score",
 )
-# Engine reward weights: strong win/loss signal + shaped macro/combat incentives.
+# Engine reward weights:
+# - shaped: dense macro/combat signals (useful for early exploration)
+# - win_focused: terminal win/loss dominates (+20/-20) with light shaping + stalemate penalty
+# - sparse: pure terminal win/loss (+1/-1)
 SHAPED_WEIGHTS = (10.0, 1.0, 0.2, 0.0, 0.2, 1.0, 0.2, 0.2, 0.2, 0.0)
+WIN_FOCUSED_WEIGHTS = (20.0, 0.08, 0.04, 0.0, 0.25, 0.08, 0.15, 0.15, 0.15, 0.0)
+SPARSE_WEIGHTS = (1.0,) + (0.0,) * 9
 
 
 def _seed_java_bot(ai_obj, seed):
@@ -82,7 +87,16 @@ class SkillEnv:
         self.opponent = opponent
         self.candidate_limit, self.gamma = candidate_limit, gamma
         self.seed = seed
-        self.weights = np.array(SHAPED_WEIGHTS if reward == "shaped" else (1.0,) + (0.0,) * 9)
+        self.reward_mode = reward
+        weight_map = {
+            "shaped": SHAPED_WEIGHTS,
+            "win_focused": WIN_FOCUSED_WEIGHTS,
+            "sparse": SPARSE_WEIGHTS,
+        }
+        if reward not in weight_map:
+            raise ValueError(f"Unknown reward mode {reward!r}; choose from {list(weight_map)}")
+        self.weights = np.array(weight_map[reward])
+        self.timeout_penalty = -6.0 if reward == "win_focused" else (-0.5 if reward == "sparse" else 0.0)
         self.base = MicroRTSRLVecEnv(
             num_selfplay_envs=0,
             num_bot_envs=1,
@@ -210,6 +224,8 @@ class SkillEnv:
 
             terminated = bool(self.gs.gameover())
             truncated = not terminated and int(self.gs.getTime()) >= self.max_ticks
+            if truncated and self.timeout_penalty != 0.0:
+                rewards[-1] += self.timeout_penalty
             if terminated or truncated:
                 break
 

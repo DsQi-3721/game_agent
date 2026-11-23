@@ -794,6 +794,8 @@ def run_online_rl(args):
 
     maps = args.maps.split(",")
     opponents = args.opponents.split(",")
+    val_maps = args.val_maps.split(",") if args.val_maps else maps
+    val_opponents = args.val_opponents.split(",") if args.val_opponents else list(dict.fromkeys(opponents))
     players = [int(p) for p in args.players.split(",")]
     scenarios = [(m, o, p) for m in maps for o in opponents for p in players]
 
@@ -813,8 +815,8 @@ def run_online_rl(args):
             _, val_sum = evaluate_policy(
                 policy,
                 pool,
-                maps=maps,
-                opponents=opponents,
+                maps=val_maps,
+                opponents=val_opponents,
                 players=players,
                 repeats=args.eval_repeats,
                 seed_base=100_000,
@@ -884,8 +886,8 @@ def run_online_rl(args):
                 _, val_sum = evaluate_policy(
                     policy,
                     pool,
-                    maps=maps,
-                    opponents=opponents,
+                    maps=val_maps,
+                    opponents=val_opponents,
                     players=players,
                     repeats=args.eval_repeats,
                     seed_base=100_000,
@@ -1073,12 +1075,14 @@ def build_parser():
     p_rl.add_argument("--max-len", type=int, default=2048)
     p_rl.add_argument("--maps", default="maps/8x8/basesWorkers8x8A.xml,maps/8x8/basesWorkers8x8B.xml")
     p_rl.add_argument("--opponents", default="RandomBiasedAI,WorkerRush")
+    p_rl.add_argument("--val-maps", default="", help="Optional held-out maps for periodic validation")
+    p_rl.add_argument("--val-opponents", default="", help="Optional opponents for periodic validation")
     p_rl.add_argument("--players", default="0,1")
     p_rl.add_argument("--max-ticks", type=int, default=2000)
     p_rl.add_argument("--skill-ticks", type=int, default=64)
     p_rl.add_argument("--candidate-limit", type=int, default=12)
     p_rl.add_argument("--gamma", type=float, default=0.99)
-    p_rl.add_argument("--reward", choices=["shaped", "sparse"], default="shaped")
+    p_rl.add_argument("--reward", choices=["shaped", "win_focused", "sparse"], default="shaped")
     p_rl.add_argument("--updates", type=int, default=50)
     p_rl.add_argument("--max-minutes", type=float, default=0.0)
     p_rl.add_argument("--batch-episodes", type=int, default=4)
