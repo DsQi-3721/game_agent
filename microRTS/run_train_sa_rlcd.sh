@@ -54,25 +54,23 @@ echo "=== Stage 2a: Offline IS-RLCD (ChoiceQ) + RB-RLCD (NoulQ) (1 epoch) ==="
   --epochs 1 --micro-batch 16 --accum 2 --lr 3e-5 --head-lr-mult 5.0 \
   --group 4 --eps 0.15 --seed 202
 
-echo "=== Stage 2b: Online SA-RLCD (WPC-PPO + Adaptive Entropy + RB-TD(lambda) + Calib-Replay + KL) ==="
+echo "=== Stage 2b: Online SA-RLCD (Undiscounted WPC-PBRS + Asymmetric Entropy + Joint Mini-Batch) ==="
 "$PY" -u -m microrts_agent.decisions.sa_rlcd online \
   --checkpoint "$OUT/stage2a-is-rlcd/best.pt" \
   --calib-replay "$DATA_DIR/win_pro_train.jsonl.gz" \
-  --anchor-data "$DATA_DIR/train_pro_clean.jsonl.gz" \
   --out "$OUT/stage2b-online-sa-rlcd" --device cuda --dtype bf16 \
   --maps "$TRAIN_MAPS" \
-  --opponents "$TRAIN_OPPS" \
+  --opponents "Mayari,Mayari,WorkerRush,CoacAI" \
   --val-maps "$UNSEEN_MAPS" \
   --val-opponents "$VAL_OPPS" \
   --players 0,1 \
   --max-ticks 2500 --skill-ticks 64 --candidate-limit 12 \
-  --gamma 0.9985 \
-  --updates 60 --batch-episodes 4 --ppo-epochs 2 --micro-batch 16 \
-  --clip-eps 0.2 --ent-min 0.003 --ent-max 0.025 --kl-coef 0.02 \
-  --calibration-weight 1.5 --td-lambda 0.85 --timeout-value 0.15 \
-  --replay-win-n 24 --replay-choice-n 16 \
-  --lr 1.5e-5 --head-lr-mult 5.0 \
-  --eval-every 10 --eval-repeats 1 --eval-greedy --seed 2028
+  --updates 60 --batch-episodes 4 --ppo-epochs 3 --ppo-batch-size 64 --micro-batch 16 \
+  --clip-eps 0.2 --ent-min 0.003 --ent-max 0.025 --kl-coef 0.005 \
+  --calibration-weight 1.0 --td-lambda 0.85 --gae-lambda 0.95 --potential-scale 0.15 \
+  --replay-win-n 16 --replay-timeout-n 4 \
+  --lr 2.5e-5 --head-lr-mult 5.0 \
+  --eval-every 10 --eval-repeats 1 --eval-greedy --seed 2029
 
 FINAL_CKPT="$OUT/stage2b-online-sa-rlcd/best.pt"
 [ -f "$FINAL_CKPT" ] || FINAL_CKPT="$OUT/stage2b-online-sa-rlcd/last.pt"
@@ -87,7 +85,6 @@ echo "=== Stage 4: LoRA Merge Export & Latency Benchmark ==="
 "$PY" -u -m microrts_agent.decisions.train export \
   --checkpoint "$FINAL_CKPT" --out "$OUT/exported-decision"
 "$PY" -u -m microrts_agent.decisions.train bench \
-  --checkpoint "$FINAL_CKPT" --device cuda --dtype bf16 \
-  --max-ticks 2500 --out "$OUT/bench_final.json"
+  --checkpoint "$FINAL_CKPT" --device cuda --dtype bf16 --iters 10 | tee "$OUT/bench_final.json"
 
 echo "[$(date -Is)] SA-RLCD pipeline completed cleanly! Outputs in $OUT"

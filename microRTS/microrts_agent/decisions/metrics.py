@@ -58,13 +58,23 @@ def episode_outcome(terminated, truncated, winner, player):
 
 
 def forecast_summary(win_probs, terminated, won):
-    """Brier (0-2 two-class sum, matching eve-rlcd) and 10-bin ECE for one episode."""
-    if not terminated or not win_probs:
+    """Brier (0-2 two-class sum, matching eve-rlcd) and 10-bin ECE for one episode.
+
+    Always records mean_win_probability and strict draw=false Brier (all_game_win_brier)
+    so timeout stalemates remain observable, while keeping forecast_labeled_decisions=0 on
+    truncated games for apples-to-apples comparison with terminated-only summaries.
+    """
+    if not win_probs:
         return {"forecast_labeled_decisions": 0}
     p = np.asarray(win_probs, dtype=np.float64)
-    y = 1.0 if won else 0.0
-    # Two-class Brier: (p - y)^2 + ((1-p) - (1-y))^2 = 2 * (p - y)^2
+    y = 1.0 if (terminated and won) else 0.0
     brier_val = float(2.0 * np.mean((p - y) ** 2))
+    if not terminated:
+        return {
+            "forecast_labeled_decisions": 0,
+            "mean_win_probability": float(p.mean()),
+            "all_game_win_brier": brier_val,
+        }
     bins = np.zeros((10, 3), dtype=np.float64)
     for pi in p:
         bins[min(int(pi * 10), 9)] += np.array([1.0, pi, y]) / len(p)
@@ -72,6 +82,7 @@ def forecast_summary(win_probs, terminated, won):
     return {
         "forecast_labeled_decisions": len(win_probs),
         "win_brier": brier_val,
+        "all_game_win_brier": brier_val,
         "win_ece": ece_val,
         "mean_win_probability": float(p.mean()),
         "forecast_bins": bins.tolist(),
@@ -82,6 +93,12 @@ def aggregate_games(games):
     counts = Counter(g["outcome"] for g in games)
     n = len(games)
     labeled = [g for g in games if g.get("terminated") and g.get("forecast_labeled_decisions", 0)]
+    all_briers = [g["all_game_win_brier"] for g in games if "all_game_win_brier" in g]
+    timeout_ps = [
+        g["mean_win_probability"]
+        for g in games
+        if g.get("outcome") == "timeout" and g.get("mean_win_probability") is not None
+    ]
     result = {
         "games": n,
         **{k: counts[k] for k in ("win", "loss", "draw", "timeout")},
@@ -99,6 +116,10 @@ def aggregate_games(games):
         result["game_weighted_ece"] = float(
             np.abs(bins[:, 1] - bins[:, 2]).sum() / max(bins[:, 0].sum(), 1e-12)
         )
+    if all_briers:
+        result["all_games_brier"] = float(np.mean(all_briers))
+    if timeout_ps:
+        result["timeout_mean_win_probability"] = float(np.mean(timeout_ps))
     latencies = [g["ms_per_decision"] for g in games if "ms_per_decision" in g]
     if latencies:
         result["mean_ms_per_decision"] = float(np.mean(latencies))

@@ -477,8 +477,108 @@ def test_is_rlcd_expected_gradient_equals_half_brier_even_when_saturated(group):
     torch.testing.assert_close(expected, exact, atol=1e-12, rtol=1e-12)
 
 
+def test_state_potential_conservation_neutrality_and_zero_sum():
+    """Verify Phi(s) is bounded, zero-sum, and conservation-neutral for building/producing."""
+    from microrts_agent.decisions.state import state_potential
+
+    base_state = {
+        "player": 0,
+        "players": [{"id": 0, "resources": 10}, {"id": 1, "resources": 10}],
+        "units": [
+            {"id": 1, "owner": 0, "type": "Base", "hp": 10, "resources": 0},
+            {"id": 2, "owner": 1, "type": "Base", "hp": 10, "resources": 0},
+        ],
+        "unit_types": {
+            "Base": {"cost": 10, "hp": 10},
+            "Barracks": {"cost": 5, "hp": 4},
+            "Worker": {"cost": 1, "hp": 1},
+        },
+    }
+    # Symmetric start -> exactly 0.0
+    assert state_potential(base_state) == pytest.approx(0.0, abs=1e-12)
+
+    # Spending 5 gold to build a full-HP Barracks is strictly conservation-neutral!
+    after_build = {
+        **base_state,
+        "players": [{"id": 0, "resources": 5}, {"id": 1, "resources": 10}],
+        "units": base_state["units"] + [{"id": 3, "owner": 0, "type": "Barracks", "hp": 4, "resources": 0}],
+    }
+    assert state_potential(after_build) == pytest.approx(0.0, abs=1e-12)
+
+    # Net harvesting or dealing damage strictly increases Phi(s), and P0 == -P1 (zero-sum)
+    after_damage = {
+        **base_state,
+        "units": [
+            {"id": 1, "owner": 0, "type": "Base", "hp": 10, "resources": 0},
+            {"id": 2, "owner": 1, "type": "Base", "hp": 5, "resources": 0},
+        ],
+    }
+    phi_p0 = state_potential(after_damage, scale=0.15)
+    phi_p1 = state_potential({**after_damage, "player": 1}, scale=0.15)
+    assert 0.0 < phi_p0 < 0.15
+    assert phi_p0 == pytest.approx(-phi_p1, abs=1e-12)
+
+
+def test_wpc_pbrs_exact_telescoping_positive_long_win_and_asymmetric_entropy():
+    """Verify the 3 core theoretical invariants of undiscounted WPC-PBRS and asymmetric entropy."""
+    from microrts_agent.decisions.sa_rlcd import (
+        asymmetric_entropy_weight,
+        compute_wpc_advantages,
+        td_lambda_win_targets,
+    )
+
+    # 1. Exact telescoping when gae_lambda=1.0: A_k == Y - V(s_k) - Phi(s_k) (win, loss, timeout)
+    for terminated, won, expected_y in [(True, True, 1.0), (True, False, 0.0), (False, False, 0.0)]:
+        steps = [
+            {"win_probability": 0.45, "state_potential": 0.10, "terminated": False, "truncated": False, "won": won},
+            {"win_probability": 0.60, "state_potential": 0.35, "terminated": False, "truncated": False, "won": won},
+            {"win_probability": 0.80, "state_potential": 0.50, "terminated": terminated, "truncated": not terminated, "won": won},
+        ]
+        advs = compute_wpc_advantages(steps, gae_lambda=1.0, potential_scale=0.15)
+        for s, a in zip(steps, advs, strict=True):
+            exact = expected_y - s["win_probability"] - 0.15 * s["state_potential"]
+            assert a == pytest.approx(exact, abs=1e-12)
+        z = td_lambda_win_targets(steps, td_lambda=0.85)
+        assert z[-1] == pytest.approx(expected_y, abs=1e-12)
+
+    # 2. Long 60-step winning trajectory (simulating 1200 ticks): mean advantage strictly positive!
+    long_win = [
+        {
+            "win_probability": 0.50 + 0.45 * (i / 59.0),
+            "state_potential": 0.0 + 0.6 * (i / 59.0),
+            "discount": 0.9985**20,  # ignored by undiscounted WPC-PBRS!
+            "terminated": i == 59,
+            "truncated": False,
+            "won": True,
+        }
+        for i in range(60)
+    ]
+    long_advs = compute_wpc_advantages(long_win, gae_lambda=0.95, potential_scale=0.15)
+    assert sum(long_advs) / len(long_advs) > 0.05
+
+    # 3. Flat-critic losing trajectory (Mayari-like V~0.10): gaining material potential gives positive step delta!
+    flat_loss = [
+        {"win_probability": 0.10, "state_potential": 0.00, "terminated": False, "truncated": False, "won": False},
+        {"win_probability": 0.10, "state_potential": 0.40, "terminated": False, "truncated": False, "won": False},
+        {"win_probability": 0.08, "state_potential": -0.30, "terminated": True, "truncated": False, "won": False},
+    ]
+    # Pure 1-step delta (gae_lambda=0) isolates immediate PBRS credit
+    d_flat = compute_wpc_advantages(flat_loss, gae_lambda=0.0, potential_scale=0.15)
+    assert d_flat[0] > 0.0  # improved board material gets immediate positive credit
+    assert d_flat[1] < 0.0  # losing board material gets immediate negative credit
+
+    # 4. Asymmetric failure-driven entropy is strictly decreasing in calibrated win probability
+    w_lose = asymmetric_entropy_weight(0.05, ent_min=0.003, ent_max=0.025)
+    w_even = asymmetric_entropy_weight(0.50, ent_min=0.003, ent_max=0.025)
+    w_win = asymmetric_entropy_weight(0.95, ent_min=0.003, ent_max=0.025)
+    assert w_lose > w_even > w_win > 0.003
+
+
 def test_sa_rlcd_force_summary_wpc_advantages_and_update(tiny_export):
+    from collections import deque
+
     from microrts_agent.decisions.eve_policy import unit_choice_question, win_question
+    from microrts_agent.decisions.metrics import aggregate_games, forecast_summary
     from microrts_agent.decisions.sa_rlcd import (
         compute_wpc_advantages,
         rb_rlcd_loss,
@@ -497,10 +597,21 @@ def test_sa_rlcd_force_summary_wpc_advantages_and_update(tiny_export):
     assert "Force: me[B=1 Rax=0 W=1 Mil=0 hp=11] vs opp[B=1 Rax=0 W=0 Mil=0 hp=10] phase=mid" in enriched
     assert ensure_force_summary(enriched) == enriched  # idempotent
 
+    # Timeout forecast_summary tracks mean_win_probability & all_game_win_brier while keeping labeled=0
+    t_fs = forecast_summary([0.6, 0.7], terminated=False, won=False)
+    assert t_fs["forecast_labeled_decisions"] == 0
+    assert t_fs["mean_win_probability"] == pytest.approx(0.65)
+    assert t_fs["all_game_win_brier"] > 0.8
+    agg = aggregate_games(
+        [{"outcome": "timeout", "terminated": False, "reward": -6.0, "ticks": 2500, "decisions": 2, **t_fs}]
+    )
+    assert agg["timeout_mean_win_probability"] == pytest.approx(0.65)
+    assert agg["all_games_brier"] == pytest.approx(t_fs["all_game_win_brier"])
+
     # TD(lambda) targets & WPC advantages
     steps = [
-        {"win_probability": 0.4, "reward": 0.0, "discount": 0.9, "terminated": False, "truncated": False, "won": True},
-        {"win_probability": 0.7, "reward": 20.0, "discount": 0.9, "terminated": True, "truncated": False, "won": True},
+        {"win_probability": 0.4, "state_potential": 0.0, "terminated": False, "truncated": False, "won": True},
+        {"win_probability": 0.7, "state_potential": 0.2, "terminated": True, "truncated": False, "won": True},
     ]
     z = td_lambda_win_targets(steps, td_lambda=0.8)
     assert z[1] == pytest.approx(1.0)
@@ -512,7 +623,7 @@ def test_sa_rlcd_force_summary_wpc_advantages_and_update(tiny_export):
     wl = torch.tensor([[0.0, 0.0]], dtype=torch.float32, requires_grad=True)
     assert rb_rlcd_loss(wl, [1.0]).item() == pytest.approx(0.25)
 
-    # Full online SA-RLCD update on tiny_export
+    # Full online SA-RLCD v2 single-objective mini-batch update (with timeout ring buffer)
     policy = EveRLCDPolicy(tiny_export, device="cpu", rank=2, dtype="fp32")
     ref = EveRLCDPolicy(tiny_export, device="cpu", rank=2, dtype="fp32")
     ref.load_trainable_state(policy.trainable_state())
@@ -526,18 +637,35 @@ def test_sa_rlcd_force_summary_wpc_advantages_and_update(tiny_export):
         "unit_decisions": [{"unit_id": 6, "question": q, "candidates": cands, "chosen_index": 0, "log_prob": lp}],
         "win_question": wq,
         "win_probability": 0.5,
-        "reward": 20.0,
-        "discount": 0.95,
+        "state_potential": 0.1,
         "terminated": True,
         "truncated": False,
     }
+    timeout_step = {
+        "unit_decisions": [{"unit_id": 6, "question": q, "candidates": cands, "chosen_index": 0, "log_prob": lp}],
+        "win_question": wq,
+        "win_probability": 0.6,
+        "state_potential": 0.0,
+        "terminated": False,
+        "truncated": True,
+    }
+    tbuf = deque(maxlen=16)
     opt = torch.optim.AdamW(policy.param_groups(lr=1e-3))
     stats = sa_rlcd_update(
         policy,
         ref,
         opt,
-        [([ep_step], STATE, {"outcome": "win", "terminated": True})],
+        [
+            ([ep_step], STATE, {"outcome": "win", "terminated": True}),
+            ([timeout_step], STATE, {"outcome": "timeout", "terminated": False}),
+        ],
+        timeout_cal_buffer=tbuf,
         ppo_epochs=2,
-        micro_batch=2,
+        ppo_batch_size=1,
+        micro_batch=1,
     )
-    assert stats["ppo_samples"] == 1 and stats["cal_samples"] == 1 and stats["calibration_loss"] > 0
+    assert stats["ppo_samples"] == 2
+    assert stats["opt_steps"] == 4  # 2 epochs x 2 mini-batches
+    assert stats["calibration_loss"] > 0
+    assert stats["mean_adv_win"] > 0 and stats["mean_adv_loss"] < 0
+    assert len(tbuf) == 1 and tbuf[0]["target"] == 0.0

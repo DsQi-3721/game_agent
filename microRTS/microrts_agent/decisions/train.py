@@ -37,7 +37,7 @@ from .metrics import (
     forecast_summary,
     selection_score,
 )
-from .state import state_to_text
+from .state import state_potential, state_to_text
 
 
 def _seed_all(seed):
@@ -545,6 +545,7 @@ def play_episode(
                 "forecast_probs": dec["forecast_probs"],
                 "forecast_answers": dec["forecast_answers"],
                 "value": dec["state_value"],
+                "state_potential": state_potential(state, scale=1.0),
                 "reward": res["reward"],
                 "discounted_reward": res["discounted_reward"],
                 "duration": res["duration"],

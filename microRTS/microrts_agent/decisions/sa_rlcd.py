@@ -1,21 +1,22 @@
 """SA-RLCD: Sequential Advantage-Calibrated RLCD for adversarial MicroRTS decision-making.
 
-Four core algorithmic improvements over naive eve-rlcd adaptation:
+Four self-consistent core principles unifying calibrated evaluation and sequential control:
   1. IS-RLCD (Importance-Sampled Exploratory Bandit RLCD):
      Samples from an eps-mixed proposal q = (1 - eps) * p + eps / K with importance weight
-     w_a = stopgrad(p_a / q_a) and LOO baseline. Mathematically proven unbiased for half
-     the Brier gradient while eliminating the zero-gradient saturation dead-zone of vanilla RLCD.
-  2. RB-TD(lambda)-RLCD (Rao-Blackwellized Temporal-Difference RLCD):
-     Computes the exact analytical expectation of RLCD over binary NoulQ win forecasts against
-     TD(lambda) win-probability targets z_t in [0, 1] (zero Monte Carlo variance, zero
-     saturation dead-zone, and bootstraps timeout games instead of discarding them).
-  3. WPC-PPO + Uncertainty-Adaptive Entropy:
-     Unifies NoulQ and ChoiceQ by using calibrated P(win | s) directly as the bounded SMDP
-     critic in PPO, and scaling per-state exploration entropy by calibrated outcome uncertainty
-     u(s) = 4 * P(win|s) * (1 - P(win|s)).
-  4. Anti-Forgetting Calibration Replay & Reference-KL Anchor:
-     Interleaves balanced NoulQ calibration replay and ChoiceQ anchors during online RL so
-     cross-opponent probability calibration never drifts under hard-opponent specialization.
+     w_a = stopgrad(p_a / q_a) and LOO baseline. Strictly unbiased for 0.5 * grad Brier
+     while eliminating the finite-sample saturation dead-zone of vanilla RLCD.
+  2. RB-TD(lambda)-RLCD (Rao-Blackwellized Undiscounted TD(lambda) Proper-Scoring Calibration):
+     Analytically eliminates sampling variance over binary NoulQ win forecasts against
+     undiscounted TD(lambda) targets z_t in [0, 1], strictly honoring Y=0 on loss/timeout
+     ("draw counts as false") plus dual-distribution calibration replay.
+  3. Undiscounted WPC-PBRS (Win-Probability-Critic with Conservation-Neutral Potential Shaping):
+     Uses calibrated V(s) = P(win | s) directly as an undiscounted (gamma=1) critic paired
+     with bounded, conservation-neutral material potential Phi(s) (strictly Phi(s_T)=0).
+     Guarantees zero discount leakage, exact telescoping, and optimal policy invariance.
+  4. Calibration-Driven Asymmetric Exploration + Single-Objective Mini-Batch Joint Optimization:
+     Scales entropy monotonically decreasing with calibrated win probability (1 - V(s)^2):
+     decisive exploitation when winning (V->1), maximum exploration when losing (V->0),
+     optimized jointly in one unified mini-batch gradient step without post-hoc overwrite.
 """
 
 import argparse
@@ -23,6 +24,7 @@ import copy
 import json
 import random
 import time
+from collections import deque
 from pathlib import Path
 
 import numpy as np
@@ -37,7 +39,6 @@ from .eve_policy import (
     EveRLCDPolicy,
     resolve_device,
     shuffle_candidates,
-    win_question,
 )
 from .metrics import aggregate_games, atomic_json, selection_score
 from .state import ensure_force_summary
@@ -87,21 +88,18 @@ def importance_sampled_rlcd_loss(logits, actions, outcomes, proposal_probs):
 # =====================================================================
 
 
-def td_lambda_win_targets(steps, bootstrap_pwin=0.2, td_lambda=0.85, timeout_value=0.15):
-    """Compute backward TD(lambda) calibrated win-probability targets z_t in [0, 1].
+def td_lambda_win_targets(steps, td_lambda=0.85):
+    """Compute undiscounted backward TD(lambda) calibrated win-probability targets z_t in [0, 1].
 
-    - Natural win  -> terminal target 1.0
-    - Natural loss -> terminal target 0.0
-    - Timeout      -> soft target min(bootstrap_pwin, timeout_value) to discourage stalemates
+    Strictly honors NoulQ semantics ("will our player win? A draw counts as false"):
+      - Natural win  -> Y = 1.0
+      - Loss/Timeout -> Y = 0.0
     """
     n = len(steps)
     if n == 0:
         return []
     final = steps[-1]
-    if final["terminated"]:
-        terminal_target = 1.0 if final.get("won", False) else 0.0
-    else:
-        terminal_target = float(min(max(bootstrap_pwin, 0.0), timeout_value))
+    terminal_target = 1.0 if (final.get("terminated") and final.get("won", False)) else 0.0
 
     targets = [0.0] * n
     z_next = terminal_target
@@ -130,55 +128,64 @@ def rb_rlcd_loss(win_logits, targets):
 
 
 # =====================================================================
-# 3. WPC-PPO: Win-Probability-Critic SMDP Advantages & Adaptive Entropy
+# 3. Undiscounted WPC-PBRS Advantages & Asymmetric Failure-Driven Entropy
 # =====================================================================
+
+
+def asymmetric_entropy_weight(p_win, ent_min=0.003, ent_max=0.025):
+    """Monotonically decreasing exploration temperature: ent_min + (ent_max - ent_min) * (1 - p^2).
+
+    - Winning (p -> 1): low entropy to exploit decisively and close out matches.
+    - Contested (p ~ 0.5): strong exploration to break stalemates.
+    - Losing (p -> 0): maximum exploration to escape losing local optima.
+    """
+    if isinstance(p_win, torch.Tensor):
+        p = p_win.clamp(0.0, 1.0)
+        return ent_min + (ent_max - ent_min) * (1.0 - p * p)
+    p = min(max(float(p_win), 0.0), 1.0)
+    return float(ent_min + (ent_max - ent_min) * (1.0 - p * p))
 
 
 def compute_wpc_advantages(
     steps,
-    bootstrap_pwin=0.15,
     *,
     gae_lambda=0.95,
-    shaping_scale=0.005,
-    timeout_value=0.15,
+    potential_scale=0.15,
 ):
-    """SMDP GAE directly in calibrated win-probability space V(s) = P(win | s) in [0, 1].
+    """Undiscounted (gamma=1) GAE in calibrated win-probability space with exact PBRS.
 
-    Uses terminal outcome (win=1.0, loss=0.0, timeout=timeout_value) plus tiny bounded
-    potential tie-breaker shaping, eliminating raw reward hacking while giving every step
-    dense win-probability-delta credit assignment.
+    delta_t = (V(s_{t+1}) + Phi(s_{t+1})) - (V(s_t) + Phi(s_t)),
+    with terminal V(s_T) = Y in {0, 1} (draw/timeout -> 0) and Phi(s_T) = 0 strictly.
+
+    Guarantees:
+      1. Zero discount leakage (never distorts long winning games into negative advantages).
+      2. Exact telescoping when gae_lambda=1: A_k == Y - V(s_k) - Phi(s_k).
+      3. Optimal policy invariance under Ng et al. (1999) PBRS theorem.
     """
     n = len(steps)
+    if n == 0:
+        return []
     advantages = [0.0] * n
-    gae = 0.0
     final = steps[-1]
-    if final["terminated"]:
-        next_v = 1.0 if final.get("won", False) else 0.0
-    else:
-        next_v = float(min(max(bootstrap_pwin, 0.0), timeout_value))
+    y_term = 1.0 if (final.get("terminated") and final.get("won", False)) else 0.0
 
+    gae = 0.0
+    next_v = y_term
+    next_phi = 0.0
     for i in range(n - 1, -1, -1):
         s = steps[i]
         v_cur = float(s["win_probability"])
-        # Extract pure tiny shaping delta without terminal +-20 spike.
-        raw_r = float(s["reward"])
-        if s["terminated"]:
-            shaped_only = 0.0
-            r_step = 1.0 if s.get("won", False) else 0.0
-            mask = 0.0
-        elif s["truncated"]:
-            shaped_only = 0.0
-            r_step = float(timeout_value)
-            mask = 0.0
+        phi_cur = float(potential_scale) * float(s.get("state_potential", 0.0))
+        is_end = (i == n - 1) or bool(s.get("terminated")) or bool(s.get("truncated"))
+        if is_end:
+            delta = (y_term + 0.0) - (v_cur + phi_cur)
+            gae = delta
         else:
-            shaped_only = float(np.clip(raw_r * shaping_scale, -0.04, 0.04))
-            r_step = shaped_only
-            mask = 1.0
-        disc = float(s["discount"])
-        delta = r_step + disc * mask * next_v - v_cur
-        gae = delta + disc * gae_lambda * mask * gae
-        advantages[i] = gae
+            delta = (next_v + next_phi) - (v_cur + phi_cur)
+            gae = delta + gae_lambda * gae
+        advantages[i] = float(gae)
         next_v = v_cur
+        next_phi = phi_cur
     return advantages
 
 
@@ -387,7 +394,7 @@ def run_offline_sa_rlcd(
 
 
 # =====================================================================
-# 5. Online SA-RLCD Update (WPC-PPO + Adaptive Entropy + RB-TD(lambda) + Calib-Replay)
+# 5. Online SA-RLCD Update (Single-Objective Mini-Batch Joint Optimization)
 # =====================================================================
 
 
@@ -398,56 +405,64 @@ def sa_rlcd_update(
     episode_batch,
     *,
     calib_win_rows=None,
-    anchor_choice_rows=None,
-    ppo_epochs=2,
+    timeout_cal_buffer=None,
+    ppo_epochs=3,
+    ppo_batch_size=64,
     micro_batch=16,
     clip_eps=0.2,
     ent_min=0.003,
     ent_max=0.025,
-    kl_coef=0.02,
-    calibration_weight=1.5,
+    kl_coef=0.005,
+    calibration_weight=1.0,
     td_lambda=0.85,
     gae_lambda=0.95,
-    timeout_value=0.15,
-    replay_win_n=24,
-    replay_choice_n=16,
+    potential_scale=0.15,
+    replay_win_n=16,
+    replay_timeout_n=4,
     rng=None,
 ):
-    """Unified SA-RLCD update combining WPC-PPO, Uncertainty-Adaptive Entropy,
-    KL anchoring, RB-TD(lambda)-RLCD win calibration, and anti-forgetting replay."""
+    """Unified single-objective mini-batch SA-RLCD update.
+
+    Jointly optimizes in every mini-batch optimizer step:
+      L = L_PPO(A^{WPC-PBRS}) - E[beta_ent(V) * H(pi)] + kl_coef * KL(pi || pi_ref)
+          + calibration_weight * L_{RB-TD+Replay}(NoulQ)
+    No separate post-hoc anchor step overwriting PPO gradients.
+    """
     rng = rng or random.Random(0)
     ppo_items = []
-    cal_items = []
+    online_cal_items = []
     all_advs = []
+    win_advs, loss_advs, potentials = [], [], []
 
-    for steps, final_state, metrics in episode_batch:
+    for steps, _final_state, metrics in episode_batch:
         if not steps:
             continue
         won = metrics["outcome"] == "win"
         for st in steps:
             st["won"] = won
-        bootstrap_p = 0.15
-        if steps[-1]["truncated"]:
-            with torch.no_grad():
-                wq = win_question(final_state, greedy=False)
-                wl = policy.forward_questions([wq], strict_len=False)[0, :2]
-                bootstrap_p = float(wl.softmax(-1)[0].item())
 
         advs = compute_wpc_advantages(
             steps,
-            bootstrap_pwin=bootstrap_p,
             gae_lambda=gae_lambda,
-            timeout_value=timeout_value,
+            potential_scale=potential_scale,
         )
-        win_targets = td_lambda_win_targets(
-            steps,
-            bootstrap_pwin=bootstrap_p,
-            td_lambda=td_lambda,
-            timeout_value=timeout_value,
-        )
+        win_targets = td_lambda_win_targets(steps, td_lambda=td_lambda)
+
+        # Store evenly spaced timeout states (Y=0) into ring buffer to cure stalemate over-optimism.
+        if timeout_cal_buffer is not None and steps[-1].get("truncated"):
+            stride = max(1, len(steps) // 12)
+            for idx in range(0, len(steps), stride):
+                timeout_cal_buffer.append(
+                    {"question": steps[idx]["win_question"], "target": float(win_targets[idx])}
+                )
+
         for st, adv, z_t in zip(steps, advs, win_targets, strict=True):
             p_win = float(st["win_probability"])
-            uncertainty = float(4.0 * p_win * (1.0 - p_win))  # in [0, 1], peaks at 0.5
+            potentials.append(float(st.get("state_potential", 0.0)))
+            if won:
+                win_advs.append(adv)
+            else:
+                loss_advs.append(adv)
             for ud in st["unit_decisions"]:
                 ppo_items.append(
                     {
@@ -455,35 +470,22 @@ def sa_rlcd_update(
                         "action": ud["chosen_index"],
                         "old_logp": ud["log_prob"],
                         "adv": adv,
-                        "uncertainty": uncertainty,
+                        "p_win": p_win,
                     }
                 )
                 all_advs.append(adv)
-            cal_items.append({"question": st["win_question"], "target": z_t})
+            online_cal_items.append({"question": st["win_question"], "target": float(z_t)})
 
     if not ppo_items:
-        return {"ppo_samples": 0, "policy_loss": 0.0, "calibration_loss": 0.0}
+        return {"ppo_samples": 0, "cal_samples": 0, "opt_steps": 0, "policy_loss": 0.0, "calibration_loss": 0.0}
 
-    # Normalize WPC advantages across the episode batch.
+    # Normalize WPC-PBRS advantages across the episode batch.
     adv_arr = np.asarray(all_advs, dtype=np.float32)
     adv_mean, adv_std = float(adv_arr.mean()), float(adv_arr.std()) + 1e-8
     for item in ppo_items:
         item["norm_adv"] = (item["adv"] - adv_mean) / adv_std
 
-    # Mix anti-forgetting Calibration Replay states from balanced win_pro_train!
-    if calib_win_rows and replay_win_n > 0:
-        for r in rng.sample(calib_win_rows, min(replay_win_n, len(calib_win_rows))):
-            q, a = _row_to_enriched_question(r)
-            cal_items.append({"question": q, "target": 1.0 if a == 0 else 0.0})
-
-    # Optional ChoiceQ anchor batch to prevent catastrophic forgetting of macro fundamentals.
-    anchor_items = []
-    if anchor_choice_rows and replay_choice_n > 0:
-        for r in rng.sample(anchor_choice_rows, min(replay_choice_n, len(anchor_choice_rows))):
-            q, a = _row_to_enriched_question(r, shuffle_rng=rng)
-            anchor_items.append({"question": q, "answer": a})
-
-    # Precompute frozen reference logp for KL regularization (once before PPO epochs).
+    # Precompute frozen reference logp once for KL regularization.
     if ref_policy is not None and kl_coef > 0:
         with torch.no_grad():
             for i in range(0, len(ppo_items), micro_batch):
@@ -494,87 +496,113 @@ def sa_rlcd_update(
                     c["ref_logp"] = rlp
 
     params = [p for p in policy.parameters() if p.requires_grad]
-    pi_losses, entropies, kls, clip_fracs, cal_losses, anc_losses, grad_norms = [], [], [], [], [], [], []
+    pi_losses, entropies, ent_weights_log, kls, clip_fracs, cal_losses, grad_norms = (
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+    )
+    opt_steps = 0
+    total_cal_seen = 0
 
-    # 1. WPC-PPO epochs with Uncertainty-Adaptive Entropy & KL anchor.
     for _ in range(ppo_epochs):
         order = list(range(len(ppo_items)))
         rng.shuffle(order)
-        optimizer.zero_grad(set_to_none=True)
-        total_n = len(order)
-        for i in range(0, total_n, micro_batch):
-            chunk = [ppo_items[j] for j in order[i : i + micro_batch]]
-            logits = policy.forward_questions([c["question"] for c in chunk], strict_len=False)
-            dev = logits.device
-            actions = torch.tensor([c["action"] for c in chunk], dtype=torch.long, device=dev)
-            old_logp = torch.tensor([c["old_logp"] for c in chunk], dtype=torch.float32, device=dev)
-            adv_t = torch.tensor([c["norm_adv"] for c in chunk], dtype=torch.float32, device=dev)
-            unc_t = torch.tensor([c["uncertainty"] for c in chunk], dtype=torch.float32, device=dev)
+        cal_order = list(range(len(online_cal_items)))
+        rng.shuffle(cal_order)
+        cal_cursor = 0
+        n_mbs = max(1, (len(order) + ppo_batch_size - 1) // ppo_batch_size)
+        cal_per_mb = max(1, (len(cal_order) + n_mbs - 1) // n_mbs) if cal_order else 0
 
-            logp_all = logits.log_softmax(-1)
-            probs = logp_all.exp()
-            new_logp = logp_all.gather(1, actions[:, None]).squeeze(1)
-            ratio = (new_logp - old_logp).exp()
-            surr1 = ratio * adv_t
-            surr2 = ratio.clamp(1.0 - clip_eps, 1.0 + clip_eps) * adv_t
-            pi_loss = -torch.min(surr1, surr2).mean()
+        for mb_start in range(0, len(order), ppo_batch_size):
+            mb_indices = order[mb_start : mb_start + ppo_batch_size]
+            mb = [ppo_items[j] for j in mb_indices]
+            mb_n = len(mb)
+            optimizer.zero_grad(set_to_none=True)
 
-            # Uncertainty-adaptive entropy: explore more in uncertain/stalemate states!
-            per_ent = -(probs * logp_all).sum(-1)
-            ent_weights = ent_min + (ent_max - ent_min) * unc_t
-            ent_bonus = (ent_weights * per_ent).mean()
+            # 1) Actor part: WPC-PBRS clipped PPO + asymmetric failure-driven entropy + KL anchor.
+            for i in range(0, mb_n, micro_batch):
+                chunk = mb[i : i + micro_batch]
+                logits = policy.forward_questions([c["question"] for c in chunk], strict_len=False)
+                dev = logits.device
+                actions = torch.tensor([c["action"] for c in chunk], dtype=torch.long, device=dev)
+                old_logp = torch.tensor([c["old_logp"] for c in chunk], dtype=torch.float32, device=dev)
+                adv_t = torch.tensor([c["norm_adv"] for c in chunk], dtype=torch.float32, device=dev)
+                p_t = torch.tensor([c["p_win"] for c in chunk], dtype=torch.float32, device=dev)
 
-            kl_val = torch.zeros((), device=dev)
-            if ref_policy is not None and kl_coef > 0:
-                ref_lp = torch.stack([c["ref_logp"] for c in chunk], dim=0).to(dev)
-                kl_val = kl_categorical(logp_all, ref_lp).mean()
+                logp_all = logits.log_softmax(-1)
+                probs = logp_all.exp()
+                new_logp = logp_all.gather(1, actions[:, None]).squeeze(1)
+                ratio = (new_logp - old_logp).exp()
+                surr1 = ratio * adv_t
+                surr2 = ratio.clamp(1.0 - clip_eps, 1.0 + clip_eps) * adv_t
+                pi_loss = -torch.min(surr1, surr2).mean()
 
-            loss = pi_loss - ent_bonus + kl_coef * kl_val
-            (loss * (len(chunk) / total_n)).backward()
+                per_ent = -(probs * logp_all).sum(-1)
+                ent_w = asymmetric_entropy_weight(p_t, ent_min=ent_min, ent_max=ent_max)
+                ent_bonus = (ent_w * per_ent).mean()
 
-            pi_losses.append(float(pi_loss.item()))
-            entropies.append(float(per_ent.mean().item()))
-            kls.append(float(kl_val.item()))
-            clip_fracs.append(float(((ratio - 1.0).abs() > clip_eps).float().mean().item()))
+                kl_val = torch.zeros((), device=dev)
+                if ref_policy is not None and kl_coef > 0:
+                    ref_lp = torch.stack([c["ref_logp"] for c in chunk], dim=0).to(dev)
+                    kl_val = kl_categorical(logp_all, ref_lp).mean()
 
-        grad_norms.append(float(torch.nn.utils.clip_grad_norm_(params, 1.0)))
-        optimizer.step()
+                loss = pi_loss - ent_bonus + kl_coef * kl_val
+                (loss * (len(chunk) / mb_n)).backward()
 
-    # 2. RB-TD(lambda)-RLCD Calibration Pass (online trajectories + balanced Calib-Replay) + ChoiceQ anchor.
-    optimizer.zero_grad(set_to_none=True)
-    total_cal = len(cal_items)
-    if total_cal > 0:
-        for i in range(0, total_cal, micro_batch):
-            chunk = cal_items[i : i + micro_batch]
-            w_logits = policy.forward_questions([c["question"] for c in chunk], strict_len=False)[:, :2]
-            c_loss = rb_rlcd_loss(w_logits, [c["target"] for c in chunk])
-            (calibration_weight * c_loss * (len(chunk) / total_cal)).backward()
-            cal_losses.append(float(c_loss.item()))
+                pi_losses.append(float(pi_loss.item()))
+                entropies.append(float(per_ent.mean().item()))
+                ent_weights_log.append(float(ent_w.mean().item()))
+                kls.append(float(kl_val.item()))
+                clip_fracs.append(float(((ratio - 1.0).abs() > clip_eps).float().mean().item()))
 
-    if anchor_items:
-        total_anc = len(anchor_items)
-        for i in range(0, total_anc, micro_batch):
-            chunk = anchor_items[i : i + micro_batch]
-            a_logits = policy.forward_questions([c["question"] for c in chunk], strict_len=False)
-            a_ans = torch.tensor([c["answer"] for c in chunk], dtype=torch.long, device=a_logits.device)
-            a_loss = supervised_loss(a_logits.log_softmax(-1), a_ans)
-            (0.15 * a_loss * (len(chunk) / total_anc)).backward()
-            anc_losses.append(float(a_loss.item()))
+            # 2) Joint Critic/Calibration part in the SAME optimizer step (RB-TD + balanced Replay + timeout buffer).
+            if calibration_weight > 0:
+                cal_mb = []
+                if cal_per_mb > 0 and cal_cursor < len(cal_order):
+                    end_c = min(len(cal_order), cal_cursor + cal_per_mb)
+                    cal_mb.extend(online_cal_items[j] for j in cal_order[cal_cursor:end_c])
+                    cal_cursor = end_c
+                if calib_win_rows and replay_win_n > 0:
+                    rep_k = min(len(calib_win_rows), max(4, replay_win_n // n_mbs))
+                    for r in rng.sample(calib_win_rows, rep_k):
+                        q, a = _row_to_enriched_question(r)
+                        cal_mb.append({"question": q, "target": 1.0 if a == 0 else 0.0})
+                if timeout_cal_buffer and replay_timeout_n > 0:
+                    t_k = min(len(timeout_cal_buffer), max(1, replay_timeout_n // n_mbs))
+                    cal_mb.extend(rng.sample(list(timeout_cal_buffer), t_k))
 
-    if total_cal > 0 or anchor_items:
-        grad_norms.append(float(torch.nn.utils.clip_grad_norm_(params, 1.0)))
-        optimizer.step()
+                total_cal = len(cal_mb)
+                if total_cal > 0:
+                    total_cal_seen += total_cal
+                    for i in range(0, total_cal, micro_batch):
+                        c_chunk = cal_mb[i : i + micro_batch]
+                        w_logits = policy.forward_questions([c["question"] for c in c_chunk], strict_len=False)[:, :2]
+                        c_loss = rb_rlcd_loss(w_logits, [c["target"] for c in c_chunk])
+                        (calibration_weight * c_loss * (len(c_chunk) / total_cal)).backward()
+                        cal_losses.append(float(c_loss.item()))
+
+            grad_norms.append(float(torch.nn.utils.clip_grad_norm_(params, 1.0)))
+            optimizer.step()
+            opt_steps += 1
 
     return {
         "ppo_samples": len(ppo_items),
-        "cal_samples": len(cal_items),
+        "cal_samples": total_cal_seen,
+        "opt_steps": opt_steps,
         "policy_loss": float(np.mean(pi_losses)),
         "entropy": float(np.mean(entropies)),
+        "ent_weight": float(np.mean(ent_weights_log)),
         "kl": float(np.mean(kls)) if kls else 0.0,
         "clip_frac": float(np.mean(clip_fracs)),
         "calibration_loss": float(np.mean(cal_losses)) if cal_losses else 0.0,
-        "anchor_loss": float(np.mean(anc_losses)) if anc_losses else 0.0,
         "grad_norm": float(np.mean(grad_norms)) if grad_norms else 0.0,
+        "mean_adv_win": float(np.mean(win_advs)) if win_advs else None,
+        "mean_adv_loss": float(np.mean(loss_advs)) if loss_advs else None,
+        "mean_potential": float(np.mean(potentials)) if potentials else 0.0,
     }
 
 
@@ -599,8 +627,6 @@ def run_online_sa_rlcd(args):
         )
     policy.save(out / "initial.pt", vars_json(args))
 
-    # Lightweight frozen reference copy for KL anchoring (shares frozen backbone weights via deepcopy of adapters only?
-    # Full deepcopy of 0.6B bf16 is only 1.2 GB VRAM on A800 80GB — super fast and exact!).
     ref_policy = None
     if args.kl_coef > 0:
         ref_policy = copy.deepcopy(policy).eval()
@@ -608,7 +634,7 @@ def run_online_sa_rlcd(args):
             p.requires_grad_(False)
 
     calib_win_rows = load_decision_rows(args.calib_replay) if args.calib_replay else None
-    anchor_choice_rows = load_decision_rows(args.anchor_data) if args.anchor_data else None
+    timeout_cal_buffer = deque(maxlen=256)
 
     optimizer = torch.optim.AdamW(
         policy.param_groups(lr=args.lr, head_lr_mult=args.head_lr_mult), weight_decay=0.0
@@ -625,7 +651,7 @@ def run_online_sa_rlcd(args):
         max_ticks=args.max_ticks,
         skill_ticks=args.skill_ticks,
         candidate_limit=args.candidate_limit,
-        gamma=args.gamma,
+        gamma=1.0,
         reward="win_focused",
     )
     t0 = time.monotonic()
@@ -676,8 +702,9 @@ def run_online_sa_rlcd(args):
                 optimizer,
                 batch_data,
                 calib_win_rows=calib_win_rows,
-                anchor_choice_rows=anchor_choice_rows,
+                timeout_cal_buffer=timeout_cal_buffer,
                 ppo_epochs=args.ppo_epochs,
+                ppo_batch_size=args.ppo_batch_size,
                 micro_batch=args.micro_batch,
                 clip_eps=args.clip_eps,
                 ent_min=args.ent_min,
@@ -685,9 +712,10 @@ def run_online_sa_rlcd(args):
                 kl_coef=args.kl_coef,
                 calibration_weight=args.calibration_weight,
                 td_lambda=args.td_lambda,
-                timeout_value=args.timeout_value,
+                gae_lambda=args.gae_lambda,
+                potential_scale=args.potential_scale,
                 replay_win_n=args.replay_win_n,
-                replay_choice_n=args.replay_choice_n,
+                replay_timeout_n=args.replay_timeout_n,
                 rng=rng,
             )
             agg = aggregate_games(batch_metrics)
@@ -704,7 +732,9 @@ def run_online_sa_rlcd(args):
                         "mean_reward",
                         "mean_ticks",
                         "mean_episode_brier",
+                        "all_games_brier",
                         "game_weighted_ece",
+                        "timeout_mean_win_probability",
                         "mean_ms_per_decision",
                     )
                     if k in agg
@@ -777,45 +807,51 @@ def build_parser():
         p.add_argument("--eps", type=float, default=0.15)
         p.add_argument("--seed", type=int, default=7)
 
-    # Online SA-RLCD
+    # Online SA-RLCD (v2: strictly undiscounted WPC-PBRS + asymmetric entropy + single-objective mini-batch)
     p_on = sub.add_parser("online")
     p_on.add_argument("--out", type=Path, required=True)
     p_on.add_argument("--init", type=Path)
     p_on.add_argument("--checkpoint", type=Path)
     p_on.add_argument("--calib-replay", type=Path, help="Balanced NoulQ JSONL for calibration replay")
-    p_on.add_argument("--anchor-data", type=Path, help="ChoiceQ JSONL for anti-forgetting anchor")
     p_on.add_argument("--device", default="auto")
     p_on.add_argument("--dtype", choices=["auto", "bf16", "fp16", "fp32"], default="auto")
     p_on.add_argument("--rank", type=int, default=16)
     p_on.add_argument("--max-len", type=int, default=2048)
-    p_on.add_argument("--maps", default="maps/8x8/basesWorkers8x8A.xml,maps/8x8/basesWorkers8x8B.xml,maps/12x12/basesWorkers12x12A.xml,maps/open_competition/basesWorkers16x16A.xml")
-    p_on.add_argument("--opponents", default="WorkerRush,WorkerRush,CoacAI,Mayari,LightRush")
-    p_on.add_argument("--val-maps", default="maps/8x8/basesWorkers8x8C.xml,maps/12x12/basesWorkers12x12B.xml,maps/16x16/basesWorkers16x16B.xml")
-    p_on.add_argument("--val-opponents", default="WorkerRush,CoacAI,Mayari,LightRush")
+    p_on.add_argument(
+        "--maps",
+        default="maps/8x8/basesWorkers8x8A.xml,maps/8x8/basesWorkers8x8B.xml,maps/8x8/basesWorkers8x8D.xml,maps/12x12/basesWorkers12x12A.xml,maps/open_competition/basesWorkers16x16A.xml",
+    )
+    p_on.add_argument("--opponents", default="Mayari,Mayari,WorkerRush,CoacAI")
+    p_on.add_argument(
+        "--val-maps",
+        default="maps/8x8/basesWorkers8x8C.xml,maps/12x12/basesWorkers12x12B.xml,maps/16x16/basesWorkers16x16B.xml",
+    )
+    p_on.add_argument("--val-opponents", default="Mayari,WorkerRush,CoacAI")
     p_on.add_argument("--players", default="0,1")
     p_on.add_argument("--max-ticks", type=int, default=2500)
     p_on.add_argument("--skill-ticks", type=int, default=64)
     p_on.add_argument("--candidate-limit", type=int, default=12)
-    p_on.add_argument("--gamma", type=float, default=0.9985)
     p_on.add_argument("--updates", type=int, default=60)
     p_on.add_argument("--batch-episodes", type=int, default=4)
-    p_on.add_argument("--ppo-epochs", type=int, default=2)
+    p_on.add_argument("--ppo-epochs", type=int, default=3)
+    p_on.add_argument("--ppo-batch-size", type=int, default=64)
     p_on.add_argument("--micro-batch", type=int, default=16)
     p_on.add_argument("--clip-eps", type=float, default=0.2)
     p_on.add_argument("--ent-min", type=float, default=0.003)
     p_on.add_argument("--ent-max", type=float, default=0.025)
-    p_on.add_argument("--kl-coef", type=float, default=0.02)
-    p_on.add_argument("--calibration-weight", type=float, default=1.5)
+    p_on.add_argument("--kl-coef", type=float, default=0.005)
+    p_on.add_argument("--calibration-weight", type=float, default=1.0)
     p_on.add_argument("--td-lambda", type=float, default=0.85)
-    p_on.add_argument("--timeout-value", type=float, default=0.15)
-    p_on.add_argument("--replay-win-n", type=int, default=24)
-    p_on.add_argument("--replay-choice-n", type=int, default=16)
-    p_on.add_argument("--lr", type=float, default=1.5e-5)
+    p_on.add_argument("--gae-lambda", type=float, default=0.95)
+    p_on.add_argument("--potential-scale", type=float, default=0.15)
+    p_on.add_argument("--replay-win-n", type=int, default=16)
+    p_on.add_argument("--replay-timeout-n", type=int, default=4)
+    p_on.add_argument("--lr", type=float, default=2.5e-5)
     p_on.add_argument("--head-lr-mult", type=float, default=5.0)
     p_on.add_argument("--eval-every", type=int, default=10)
     p_on.add_argument("--eval-repeats", type=int, default=1)
     p_on.add_argument("--eval-greedy", action="store_true")
-    p_on.add_argument("--seed", type=int, default=2028)
+    p_on.add_argument("--seed", type=int, default=2029)
     return ap
 
 

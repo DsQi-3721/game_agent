@@ -75,6 +75,54 @@ def _fmt_unit(u, unit_types):
     return " ".join(parts)
 
 
+DEFAULT_UNIT_COSTS = {
+    "Base": 10.0,
+    "Barracks": 5.0,
+    "Worker": 1.0,
+    "Light": 2.0,
+    "Heavy": 2.0,
+    "Ranged": 2.0,
+}
+DEFAULT_UNIT_MAX_HP = {
+    "Base": 10.0,
+    "Barracks": 4.0,
+    "Worker": 1.0,
+    "Light": 4.0,
+    "Heavy": 4.0,
+    "Ranged": 1.0,
+}
+
+
+def state_potential(state, scale=1.0):
+    """Bounded, zero-sum, conservation-neutral tactical potential Phi(s) in (-scale, +scale).
+
+    Material value counts resources + sum_u cost(u) * (hp(u) / max_hp(u)).
+    Spending gold to build/produce is conservation-neutral (cannot farm fake potential);
+    only net harvesting, combat damage, and unit trades move Phi(s).
+    """
+    player = state["player"]
+    opp = 1 - player
+    unit_types = state.get("unit_types") or {}
+    players = {p["id"]: p for p in state.get("players", [])}
+    me_mat = float(players.get(player, {}).get("resources", 0.0))
+    opp_mat = float(players.get(opp, {}).get("resources", 0.0))
+    for u in state.get("units", ()):
+        owner = u.get("owner")
+        if owner not in (player, opp):
+            continue
+        utype = u["type"]
+        meta = unit_types.get(utype, {})
+        cost = float(meta.get("cost", DEFAULT_UNIT_COSTS.get(utype, 1.0)))
+        max_hp = float(meta.get("hp", DEFAULT_UNIT_MAX_HP.get(utype, max(u["hp"], 1))))
+        hp_frac = min(max(float(u["hp"]) / max(max_hp, 1.0), 0.0), 1.0)
+        val = cost * hp_frac + float(u.get("resources", 0.0))
+        if owner == player:
+            me_mat += val
+        else:
+            opp_mat += val
+    return float(scale * (me_mat - opp_mat) / (me_mat + opp_mat + 10.0))
+
+
 def _force_counts(units):
     b = sum(1 for u in units if u["type"] == "Base")
     rax = sum(1 for u in units if u["type"] == "Barracks")
